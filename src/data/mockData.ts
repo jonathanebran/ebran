@@ -1,7 +1,7 @@
 import type {
   User, Goal, WorkRecord, FinanceRecord, DailyFocusItem,
   Appointment, Medication, WishlistItem,
-  CareProduct, GoogleIntegration, GoalContribution
+  CareProduct, GoogleIntegration, GoalContribution, PhotoSession
 } from '../lib/types';
 
 export const mockUser: User = {
@@ -249,6 +249,37 @@ export const mockWorkSummary = {
   services_count: 28,
   average_ticket: 312.5,
 };
+
+export const mockPhotoSessions: PhotoSession[] = [
+  // June 2026 (10 sessions)
+  { id: 's-01', client: 'Ana Lima', service_type: 'Ensaio Retrato', date: '2026-06-15', time: '09:00' },
+  { id: 's-02', client: 'Mariana e Pedro', service_type: 'Ensaio Casal', date: '2026-06-12', time: '14:00' },
+  { id: 's-03', client: 'TechSoft Ltda', service_type: 'Fotografia Corporativa', date: '2026-06-10', time: '10:00' },
+  { id: 's-04', client: 'Beatriz Costa', service_type: 'Aniversário/Debutante', date: '2026-06-07', time: '09:30' },
+  { id: 's-05', client: 'Studio Moda', service_type: 'Fotografia de Produto', date: '2026-06-05', time: '15:00' },
+  { id: 's-06', client: 'Lucas e Fernanda', service_type: 'Ensaio Casal', date: '2026-06-01', time: '09:00' },
+  // May 2026 (9 sessions)
+  { id: 's-07', client: 'Família Rodrigues', service_type: 'Ensaio Família', date: '2026-05-31', time: '10:00' },
+  { id: 's-08', client: 'Sofia Mendes', service_type: 'Ensaio Retrato', date: '2026-05-28', time: '14:30' },
+  { id: 's-09', client: 'Rafael Souza', service_type: 'Ensaio Retrato', date: '2026-05-25', time: '09:00' },
+  { id: 's-10', client: 'Camila e Henrique', service_type: 'Ensaio Casal', date: '2026-05-20', time: '10:00' },
+  { id: 's-11', client: 'Isabela Ferreira', service_type: 'Aniversário/Debutante', date: '2026-05-15', time: '09:00' },
+  { id: 's-12', client: 'André Santos', service_type: 'Fotografia Corporativa', date: '2026-05-11', time: '14:00' },
+  { id: 's-13', client: 'Vitória e Guilherme', service_type: 'Ensaio Casal', date: '2026-05-08', time: '10:30' },
+  { id: 's-14', client: 'Bruna Oliveira', service_type: 'Ensaio Retrato', date: '2026-05-04', time: '09:00' },
+  { id: 's-15', client: 'Nexus Digital', service_type: 'Fotografia de Produto', date: '2026-05-01', time: '15:00' },
+  // April 2026 (6 sessions)
+  { id: 's-16', client: 'Larissa Costa', service_type: 'Ensaio Retrato', date: '2026-04-26', time: '09:00' },
+  { id: 's-17', client: 'Família Alves', service_type: 'Ensaio Família', date: '2026-04-22', time: '14:00' },
+  { id: 's-18', client: 'Carlos e Maria', service_type: 'Ensaio Casal', date: '2026-04-19', time: '10:00' },
+  { id: 's-19', client: 'Patricia Lima', service_type: 'Ensaio Retrato', date: '2026-04-12', time: '09:00' },
+  { id: 's-20', client: 'Digital Agency', service_type: 'Fotografia Corporativa', date: '2026-04-08', time: '10:00' },
+  { id: 's-21', client: 'Daniela e Marco', service_type: 'Ensaio Casal', date: '2026-04-04', time: '14:30' },
+  // March 2026 (3 sessions)
+  { id: 's-22', client: 'Julia Soares', service_type: 'Aniversário/Debutante', date: '2026-03-28', time: '09:30' },
+  { id: 's-23', client: 'Loja Trend', service_type: 'Fotografia de Produto', date: '2026-03-22', time: '10:00' },
+  { id: 's-24', client: 'Família Pereira', service_type: 'Ensaio Família', date: '2026-03-19', time: '14:00' },
+];
 
 export const mockFinanceRecords: FinanceRecord[] = [
   {

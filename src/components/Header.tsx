@@ -1,4 +1,6 @@
 import { User } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import { AppLogo } from './AppLogo';
 import { mockUser } from '../data/mockData';
 
@@ -7,11 +9,17 @@ interface HeaderProps {
 }
 
 export function Header({ showGreeting = false }: HeaderProps) {
+  const navigate = useNavigate();
+
   return (
     <div className="px-5 pt-4 pb-2">
       <div className="flex items-center justify-between">
-        <AppLogo size={38} />
-        <div
+        <motion.button whileTap={{ scale: 0.93 }} onClick={() => navigate('/')}>
+          <AppLogo size={38} />
+        </motion.button>
+        <motion.button
+          whileTap={{ scale: 0.9 }}
+          onClick={() => navigate('/perfil')}
           className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0"
           style={{
             background: 'rgba(28,28,30,0.85)',
@@ -23,7 +31,7 @@ export function Header({ showGreeting = false }: HeaderProps) {
           ) : (
             <User size={18} color="#A8A8A8" />
           )}
-        </div>
+        </motion.button>
       </div>
 
       {showGreeting && (

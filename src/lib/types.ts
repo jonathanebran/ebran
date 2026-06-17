@@ -288,3 +288,13 @@ export interface AIClassifierResult {
   confirmationRequired: boolean;
   suggestedActions: string[];
 }
+
+export interface PhotoSession {
+  id: string;
+  client: string;
+  service_type: string;
+  date: string;  // YYYY-MM-DD
+  time: string;  // HH:MM
+  duration_min?: number;
+  notes?: string;
+}

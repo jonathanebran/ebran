@@ -20,14 +20,14 @@ import { EconomyMode } from './pages/EconomyMode';
 import { Login } from './pages/Login';
 import { Signup } from './pages/Signup';
 
-const mainRoutes = ['/', '/metas', '/ai-hub', '/trabalho', '/financas', '/foco', '/saude'];
+const mainRoutes = ['/', '/metas', '/ai-hub', '/trabalho', '/financas', '/foco', '/saude', '/perfil'];
 
 function AppContent() {
   const location = useLocation();
   const showNav = mainRoutes.some(r => location.pathname === r);
 
   return (
-    <div className="relative min-h-screen" style={{ background: '#000', maxWidth: 430, margin: '0 auto' }}>
+    <div className="relative min-h-screen" style={{ background: '#000', maxWidth: 430, margin: '0 auto', paddingTop: 'env(safe-area-inset-top, 0px)' }}>
       <AnimatePresence mode="wait">
         <motion.div
           key={location.pathname}

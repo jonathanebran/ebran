@@ -1,13 +1,12 @@
 import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, Briefcase, Camera, Globe, Sparkles, TrendingUp, Target } from 'lucide-react';
+import { Plus, Camera, Sparkles, TrendingUp, TrendingDown, Target } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { GlassCard } from '../components/GlassCard';
-import { ProgressBar } from '../components/ProgressBar';
 import { Chip } from '../components/Chip';
-import { AICommandBar } from '../components/AICommandBar';
-import { mockWorkSummary, mockWorkRecords } from '../data/mockData';
-import { formatCurrency, getPercentage } from '../lib/utils';
+import { mockPhotoSessions } from '../data/mockData';
+import { formatCurrency } from '../lib/utils';
+import type { PhotoSession } from '../lib/types';
 
 // ─── Work Goals data ──────────────────────────────────────────────────────────
 
@@ -20,12 +19,10 @@ interface WorkGoal {
   icon: string;
   category: string;
   color: string;
-  // financial goal
   target?: number;
   current?: number;
   unit?: string;
   deadline?: string;
-  // checklist goal
   tasks?: TaskItem[];
 }
 
@@ -85,67 +82,167 @@ const workGoals: WorkGoal[] = [
   },
 ];
 
+// ─── Helpers ──────────────────────────────────────────────────────────────────
+
+function formatSessionDate(dateStr: string): string {
+  const [, m, d] = dateStr.split('-');
+  const months = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+  return `${parseInt(d)} ${months[parseInt(m) - 1]}`;
+}
+
+function getSessionsInRange(sessions: PhotoSession[], startMs: number, endMs: number) {
+  return sessions.filter(s => {
+    const t = new Date(s.date).getTime();
+    return t >= startMs && t <= endMs;
+  });
+}
+
+const SERVICE_ICONS: Record<string, string> = {
+  'Ensaio Retrato': '🧑‍🎨',
+  'Ensaio Casal': '💑',
+  'Ensaio Família': '👨‍👩‍👧',
+  'Aniversário/Debutante': '🎂',
+  'Fotografia Corporativa': '🏢',
+  'Fotografia de Produto': '📦',
+};
+
 // ─── Atendimentos tab ─────────────────────────────────────────────────────────
 
 function AtendimentosTab() {
   const navigate = useNavigate();
-  const workPct = getPercentage(mockWorkSummary.monthly_revenue, mockWorkSummary.monthly_goal);
+  const [period, setPeriod] = useState<30 | 60 | 90>(30);
+
+  const todayMs = new Date('2026-06-17').getTime();
+  const startMs = todayMs - period * 86_400_000;
+  const prevStartMs = startMs - period * 86_400_000;
+
+  const current = useMemo(
+    () => getSessionsInRange(mockPhotoSessions, startMs, todayMs)
+      .sort((a, b) => new Date(`${b.date}T${b.time}`).getTime() - new Date(`${a.date}T${a.time}`).getTime()),
+    [period]
+  );
+  const prev = useMemo(
+    () => getSessionsInRange(mockPhotoSessions, prevStartMs, startMs),
+    [period]
+  );
+
+  const trendPct = prev.length > 0
+    ? Math.round(((current.length - prev.length) / prev.length) * 100)
+    : 0;
+  const weeklyAvg = (current.length / (period / 7)).toFixed(1);
 
   return (
     <div className="flex flex-col gap-3">
+      {/* Period selector */}
+      <div className="flex gap-2">
+        {([30, 60, 90] as const).map(p => (
+          <motion.button
+            key={p}
+            whileTap={{ scale: 0.95 }}
+            onClick={() => setPeriod(p)}
+            className="flex-1 py-2.5 rounded-2xl text-sm font-semibold transition-colors"
+            style={{
+              background: period === p ? 'rgba(255,159,61,0.18)' : 'rgba(255,255,255,0.05)',
+              color: period === p ? '#FF9F3D' : '#6F6F6F',
+              border: period === p ? '0.5px solid rgba(255,159,61,0.35)' : '0.5px solid rgba(255,255,255,0.06)',
+            }}
+          >
+            {p} dias
+          </motion.button>
+        ))}
+      </div>
+
+      {/* Stats card */}
       <GlassCard>
-        <div className="flex items-center gap-2 mb-4">
-          <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ background: 'rgba(255,159,61,0.15)' }}>
-            <Briefcase size={18} color="#FF9F3D" />
+        <div className="flex items-center gap-4 mb-4">
+          <div
+            className="w-12 h-12 rounded-2xl flex items-center justify-center flex-shrink-0"
+            style={{ background: 'rgba(255,159,61,0.15)' }}
+          >
+            <Camera size={22} color="#FF9F3D" />
           </div>
           <div>
-            <p className="text-[#A8A8A8] text-xs">Faturamento de junho</p>
-            <p className="text-[#F7F7F7] font-bold text-2xl">{formatCurrency(mockWorkSummary.monthly_revenue)}</p>
+            <p className="text-[#A8A8A8] text-xs">Atendimentos — últimos {period} dias</p>
+            <div className="flex items-end gap-2 mt-0.5">
+              <p className="text-[#F7F7F7] font-bold text-3xl leading-none">{current.length}</p>
+              {prev.length > 0 && (
+                <div
+                  className="flex items-center gap-0.5 mb-0.5"
+                  style={{ color: trendPct >= 0 ? '#22c55e' : '#FF6B5F' }}
+                >
+                  {trendPct >= 0
+                    ? <TrendingUp size={14} />
+                    : <TrendingDown size={14} />
+                  }
+                  <span className="text-sm font-bold">
+                    {trendPct >= 0 ? '+' : ''}{trendPct}%
+                  </span>
+                </div>
+              )}
+            </div>
           </div>
         </div>
-        <div className="flex justify-between text-xs mb-2">
-          <span className="text-[#A8A8A8]">Meta: {formatCurrency(mockWorkSummary.monthly_goal)}</span>
-          <span className="text-[#FF9F3D] font-bold">{workPct}%</span>
-        </div>
-        <ProgressBar value={workPct} height={6} />
-        <div className="grid grid-cols-2 gap-3 mt-4">
-          <div className="rounded-xl p-3" style={{ background: 'rgba(255,255,255,0.04)' }}>
-            <p className="text-[#6F6F6F] text-[10px] uppercase">Atendimentos</p>
-            <p className="text-[#F7F7F7] font-bold text-xl mt-0.5">{mockWorkSummary.services_count}</p>
+
+        <div className="grid grid-cols-2 gap-3">
+          <div className="rounded-2xl p-3" style={{ background: 'rgba(255,255,255,0.04)' }}>
+            <p className="text-[#6F6F6F] text-[10px] uppercase tracking-wider">Período anterior</p>
+            <p className="text-[#F7F7F7] font-bold text-xl mt-1">{prev.length}</p>
           </div>
-          <div className="rounded-xl p-3" style={{ background: 'rgba(255,255,255,0.04)' }}>
-            <p className="text-[#6F6F6F] text-[10px] uppercase">Ticket médio</p>
-            <p className="text-[#F7F7F7] font-bold text-xl mt-0.5">{formatCurrency(mockWorkSummary.average_ticket)}</p>
+          <div className="rounded-2xl p-3" style={{ background: 'rgba(255,255,255,0.04)' }}>
+            <p className="text-[#6F6F6F] text-[10px] uppercase tracking-wider">Média/semana</p>
+            <p className="text-[#F7F7F7] font-bold text-xl mt-1">{weeklyAvg}</p>
           </div>
         </div>
       </GlassCard>
 
-      <AICommandBar placeholder="Recebi R$ 500 via Pix hoje da Camila..." compact />
-
+      {/* Session list */}
       <GlassCard>
-        <p className="text-[#A8A8A8] text-xs font-semibold uppercase tracking-wider mb-3">Atendimentos recentes</p>
-        {mockWorkRecords.map(r => (
-          <div key={r.id} className="flex items-center gap-3 py-3.5 border-b" style={{ borderColor: 'rgba(255,255,255,0.06)' }}>
-            <div className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: 'rgba(34,197,94,0.12)' }}>
-              <Camera size={16} color="#22c55e" />
+        <p className="text-[#A8A8A8] text-xs font-semibold uppercase tracking-wider mb-3">
+          Registros do período
+        </p>
+        {current.length === 0 ? (
+          <p className="text-[#6F6F6F] text-sm text-center py-6">
+            Nenhum atendimento neste período
+          </p>
+        ) : (
+          current.map((s, i) => (
+            <div
+              key={s.id}
+              className="flex items-center gap-3 py-3"
+              style={{
+                borderBottom: i < current.length - 1 ? '0.5px solid rgba(255,255,255,0.06)' : 'none',
+              }}
+            >
+              <div
+                className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 text-base"
+                style={{ background: 'rgba(255,159,61,0.1)' }}
+              >
+                {SERVICE_ICONS[s.service_type] ?? '📷'}
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-[#F7F7F7] text-sm font-medium truncate">{s.client}</p>
+                <p className="text-[#6F6F6F] text-xs mt-0.5">{s.service_type}</p>
+              </div>
+              <div className="text-right flex-shrink-0">
+                <p className="text-[#A8A8A8] text-xs">{formatSessionDate(s.date)}</p>
+                <p className="text-[#6F6F6F] text-[10px] mt-0.5">{s.time}</p>
+              </div>
             </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-[#F7F7F7] text-sm font-medium truncate">{r.description}</p>
-              <p className="text-[#6F6F6F] text-xs">{r.date} · {r.payment_method?.toUpperCase()}</p>
-            </div>
-            <p className="text-[#22c55e] font-bold text-sm">+{formatCurrency(r.amount)}</p>
-          </div>
-        ))}
+          ))
+        )}
       </GlassCard>
 
+      {/* Register button */}
       <motion.button
         whileTap={{ scale: 0.96 }}
         onClick={() => navigate('/novo-registro')}
         className="w-full flex items-center justify-center gap-2 rounded-2xl py-4"
-        style={{ background: 'linear-gradient(90deg, #FFD84A, #FF9F3D 40%, #FF6B5F 70%, #FF2F7D)' }}
+        style={{
+          background: 'linear-gradient(90deg, #FFD84A, #FF9F3D 40%, #FF6B5F 70%, #FF2F7D)',
+        }}
       >
         <Plus size={18} color="#000" strokeWidth={2.5} />
-        <span className="text-black font-bold">Novo atendimento</span>
+        <span className="text-black font-bold">Registrar atendimento</span>
       </motion.button>
     </div>
   );
@@ -173,7 +270,10 @@ function WorkGoalCard({ goal }: { goal: WorkGoal }) {
         <div className="flex-1">
           <div className="flex items-center gap-2">
             <span className="text-[#F7F7F7] font-bold text-sm">{goal.title}</span>
-            <span className="text-[10px] px-2 py-0.5 rounded-xl font-medium" style={{ background: `${goal.color}22`, color: goal.color }}>
+            <span
+              className="text-[10px] px-2 py-0.5 rounded-xl font-medium"
+              style={{ background: `${goal.color}22`, color: goal.color }}
+            >
               {goal.category}
             </span>
           </div>
@@ -232,7 +332,9 @@ function WorkGoalCard({ goal }: { goal: WorkGoal }) {
                 <div
                   className="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 transition-all"
                   style={{
-                    background: task.done ? `linear-gradient(135deg, ${goal.color}, #FF2F7D)` : 'rgba(255,255,255,0.08)',
+                    background: task.done
+                      ? `linear-gradient(135deg, ${goal.color}, #FF2F7D)`
+                      : 'rgba(255,255,255,0.08)',
                     border: task.done ? 'none' : '1px solid rgba(255,255,255,0.15)',
                   }}
                 >
@@ -271,82 +373,112 @@ function MetasTab() {
 // ─── AI Analysis tab ──────────────────────────────────────────────────────────
 
 function AIAnalysisTab() {
-  const { monthly_revenue, monthly_goal, services_count, average_ticket } = mockWorkSummary;
+  const sessions = mockPhotoSessions;
 
-  const insights = useMemo(() => {
-    const metaPct = getPercentage(monthly_revenue, monthly_goal);
-    const daysInMonth = 30;
-    const daysPassed = 17;
-    const daysLeft = daysInMonth - daysPassed;
-    const dailyRate = monthly_revenue / daysPassed;
-    const projection = Math.round(monthly_revenue + dailyRate * daysLeft);
-    const projPct = getPercentage(projection, monthly_goal);
-    const missingToGoal = Math.max(0, monthly_goal - monthly_revenue);
-    const sessionsNeeded = missingToGoal > 0 ? Math.ceil(missingToGoal / average_ticket) : 0;
+  // Sessions by month (last 6 months from Jun 2026)
+  const byMonth = useMemo(() => {
+    const months = ['Jan','Fev','Mar','Abr','Mai','Jun'];
+    const counts = [0, 0, 3, 6, 9, 6]; // derived from mock data
+    return months.map((label, i) => ({ label, value: counts[i] }));
+  }, []);
 
-    return [
-      {
-        icon: metaPct >= 60 ? '📈' : '⚠️',
-        title: metaPct >= 80 ? 'Meta quase atingida!' : metaPct >= 50 ? 'No caminho certo' : 'Atenção à meta',
-        desc: `Você está em ${metaPct}% da meta mensal. ${sessionsNeeded > 0 ? `Faltam ${sessionsNeeded} atendimento${sessionsNeeded > 1 ? 's' : ''} para atingi-la.` : 'Meta já atingida!'}`,
-        color: metaPct >= 80 ? '#22c55e' : metaPct >= 50 ? '#FF9F3D' : '#FF6B5F',
-      },
-      {
-        icon: '🔮',
-        title: 'Projeção do mês',
-        desc: `No ritmo atual (R$ ${Math.round(dailyRate).toLocaleString('pt-BR')}/dia), você fecha em ${formatCurrency(projection)} — ${projPct >= 100 ? 'acima' : 'abaixo'} da meta.`,
-        color: projPct >= 100 ? '#22c55e' : '#FF9F3D',
-      },
-      {
-        icon: '💡',
-        title: 'Ticket médio',
-        desc: `Seu ticket médio é ${formatCurrency(average_ticket)}. Aumentar em 10% adicionaria ${formatCurrency(services_count * average_ticket * 0.1)} por mês no faturamento.`,
-        color: '#FFD84A',
-      },
-      {
-        icon: '📅',
-        title: 'Ritmo de atendimentos',
-        desc: `Você fez ${services_count} atendimentos em ${daysPassed} dias — uma média de ${(services_count / daysPassed * 7).toFixed(1)} por semana. Continue assim!`,
-        color: '#FF9F3D',
-      },
-      {
-        icon: '✈️',
-        title: 'Meta Europa',
-        desc: `Guardando ${formatCurrency(Math.round(monthly_goal * 0.3))} por mês, você atinge a meta da viagem em ${Math.ceil((15000 - 4200) / (monthly_goal * 0.3))} meses.`,
-        color: '#FF6B5F',
-      },
-    ];
-  }, [monthly_revenue, monthly_goal, services_count, average_ticket]);
+  // Peak hours — count sessions by hour bucket
+  const peakHours = useMemo(() => {
+    const buckets: Record<string, number> = {};
+    sessions.forEach(s => {
+      const h = parseInt(s.time.split(':')[0]);
+      const label = `${h}h`;
+      buckets[label] = (buckets[label] ?? 0) + 1;
+    });
+    return Object.entries(buckets)
+      .map(([label, count]) => ({ label, count }))
+      .sort((a, b) => parseInt(a.label) - parseInt(b.label));
+  }, [sessions]);
 
-  const chartMax = mockWorkRecords.reduce((max, r) => Math.max(max, r.amount), 0);
-  const byMonth = ['Jan','Fev','Mar','Abr','Mai','Jun'].map((m, i) => ({
-    label: m,
-    value: [2100, 3400, 2800, 3900, 4200, monthly_revenue][i],
-  }));
+  // Busiest days of week
+  const byDayOfWeek = useMemo(() => {
+    const days = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sab'];
+    const counts = [0, 0, 0, 0, 0, 0, 0];
+    sessions.forEach(s => {
+      const dow = new Date(s.date).getDay();
+      counts[dow]++;
+    });
+    return days.map((label, i) => ({ label, count: counts[i] }));
+  }, [sessions]);
+
+  const maxHour = Math.max(...peakHours.map(h => h.count));
+  const maxDay = Math.max(...byDayOfWeek.map(d => d.count));
+
+  const topHour = peakHours.reduce((a, b) => (a.count > b.count ? a : b), peakHours[0]);
+  const topDay = byDayOfWeek.reduce((a, b) => (a.count > b.count ? a : b), byDayOfWeek[0]);
+  const totalSessions = sessions.length;
+  const lastMonthCount = byMonth[byMonth.length - 1].value;
+  const prevMonthCount = byMonth[byMonth.length - 2].value;
+  const monthTrend = prevMonthCount > 0
+    ? Math.round(((lastMonthCount - prevMonthCount) / prevMonthCount) * 100)
+    : 0;
+
+  const insights = [
+    {
+      icon: '🕘',
+      title: `Horário de pico: ${topHour?.label}`,
+      desc: `Você é mais procurado às ${topHour?.label}. Reserve esta faixa para seus melhores clientes e evite outros compromissos neste horário.`,
+      color: '#FF9F3D',
+    },
+    {
+      icon: '📅',
+      title: `Dia mais movimentado: ${topDay?.label}`,
+      desc: `${topDay?.label} é seu dia mais procurado (${topDay?.count} sessões). Garanta disponibilidade neste dia toda semana.`,
+      color: '#FFD84A',
+    },
+    {
+      icon: monthTrend >= 0 ? '📈' : '📉',
+      title: monthTrend >= 0 ? 'Crescimento em alta' : 'Volume caindo',
+      desc: `Este mês você tem ${lastMonthCount} sessões registradas — ${Math.abs(monthTrend)}% ${monthTrend >= 0 ? 'acima' : 'abaixo'} do mês anterior (${prevMonthCount} sessões).`,
+      color: monthTrend >= 0 ? '#22c55e' : '#FF6B5F',
+    },
+    {
+      icon: '💡',
+      title: 'Dica de agenda',
+      desc: `Você fez ${totalSessions} atendimentos nos últimos 90 dias. Para crescer, considere abrir 2 horários extras por semana nas manhãs de sábado.`,
+      color: '#FF6B5F',
+    },
+    {
+      icon: '✈️',
+      title: 'Meta Europa',
+      desc: `Com ${lastMonthCount} sessões/mês e crescimento consistente, você está no caminho certo para alcançar seus objetivos profissionais na Europa.`,
+      color: '#FF2F7D',
+    },
+  ];
 
   return (
     <div className="flex flex-col gap-3">
-      {/* Trend chart */}
+      {/* Session trend chart */}
       <GlassCard>
         <div className="flex items-center gap-2 mb-4">
-          <div className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ background: 'rgba(255,159,61,0.15)' }}>
+          <div
+            className="w-8 h-8 rounded-xl flex items-center justify-center"
+            style={{ background: 'rgba(255,159,61,0.15)' }}
+          >
             <TrendingUp size={15} color="#FF9F3D" />
           </div>
           <div>
-            <p className="text-[#F7F7F7] font-semibold text-sm">Faturamento 2025</p>
-            <p className="text-[#6F6F6F] text-xs">Tendência dos últimos 6 meses</p>
+            <p className="text-[#F7F7F7] font-semibold text-sm">Sessões por mês</p>
+            <p className="text-[#6F6F6F] text-xs">Evolução dos últimos 6 meses</p>
           </div>
         </div>
         <div className="flex items-end gap-2 h-20">
           {byMonth.map((m, i) => {
-            const h = Math.round((m.value / 5000) * 100);
+            const h = byMonth[byMonth.length - 1].value > 0
+              ? Math.max(8, Math.round((m.value / Math.max(...byMonth.map(x => x.value))) * 100))
+              : 8;
             const isLast = i === byMonth.length - 1;
             return (
               <div key={m.label} className="flex-1 flex flex-col items-center gap-1.5">
                 <div className="w-full relative" style={{ height: 64 }}>
                   <motion.div
                     initial={{ height: 0 }}
-                    animate={{ height: `${h}%` }}
+                    animate={{ height: m.value > 0 ? `${h}%` : '8%' }}
                     transition={{ delay: i * 0.07, duration: 0.5, ease: 'easeOut' }}
                     className="absolute bottom-0 left-0 right-0 rounded-t-lg"
                     style={{
@@ -364,6 +496,74 @@ function AIAnalysisTab() {
         </div>
       </GlassCard>
 
+      {/* Peak hours */}
+      <GlassCard>
+        <div className="flex items-center gap-2 mb-3">
+          <span style={{ fontSize: 16 }}>🕘</span>
+          <p className="text-[#F7F7F7] font-semibold text-sm">Horários de pico</p>
+        </div>
+        <div className="flex flex-col gap-2.5">
+          {peakHours.map(h => (
+            <div key={h.label} className="flex items-center gap-3">
+              <span className="text-[#A8A8A8] text-xs w-8 text-right">{h.label}</span>
+              <div className="flex-1 h-5 rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.06)' }}>
+                <motion.div
+                  initial={{ width: 0 }}
+                  animate={{ width: `${Math.max(6, Math.round((h.count / maxHour) * 100))}%` }}
+                  transition={{ duration: 0.6, ease: 'easeOut' }}
+                  className="h-full rounded-full flex items-center justify-end pr-2"
+                  style={{
+                    background: h.count === maxHour
+                      ? 'linear-gradient(90deg, #FF9F3D99, #FF9F3D)'
+                      : 'rgba(255,255,255,0.12)',
+                    boxShadow: h.count === maxHour ? '0 0 8px #FF9F3D60' : 'none',
+                  }}
+                >
+                  <span className="text-[9px] font-bold" style={{ color: h.count === maxHour ? '#000' : '#6F6F6F' }}>
+                    {h.count}
+                  </span>
+                </motion.div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </GlassCard>
+
+      {/* Busiest days */}
+      <GlassCard>
+        <div className="flex items-center gap-2 mb-3">
+          <span style={{ fontSize: 16 }}>📅</span>
+          <p className="text-[#F7F7F7] font-semibold text-sm">Dias mais movimentados</p>
+        </div>
+        <div className="flex items-end gap-2 h-16">
+          {byDayOfWeek.map(d => {
+            const h = maxDay > 0 ? Math.max(8, Math.round((d.count / maxDay) * 100)) : 8;
+            const isTop = d.count === maxDay && d.count > 0;
+            return (
+              <div key={d.label} className="flex-1 flex flex-col items-center gap-1">
+                <div className="w-full relative" style={{ height: 48 }}>
+                  <motion.div
+                    initial={{ height: 0 }}
+                    animate={{ height: d.count > 0 ? `${h}%` : '6%' }}
+                    transition={{ duration: 0.5, ease: 'easeOut' }}
+                    className="absolute bottom-0 left-0 right-0 rounded-t-md"
+                    style={{
+                      background: isTop
+                        ? 'linear-gradient(180deg, #FFD84A, #FF2F7D)'
+                        : 'rgba(255,255,255,0.09)',
+                      boxShadow: isTop ? '0 0 10px #FF9F3D50' : 'none',
+                    }}
+                  />
+                </div>
+                <span className="text-[9px]" style={{ color: isTop ? '#FF9F3D' : '#6F6F6F' }}>
+                  {d.label}
+                </span>
+              </div>
+            );
+          })}
+        </div>
+      </GlassCard>
+
       {/* Insights */}
       <div className="flex items-center gap-2 mt-1 mb-1">
         <Sparkles size={14} color="#FFD84A" />
@@ -375,7 +575,7 @@ function AIAnalysisTab() {
           <div className="flex gap-3">
             <span style={{ fontSize: 22, lineHeight: 1 }}>{insight.icon}</span>
             <div className="flex-1">
-              <p className="text-[#F7F7F7] font-semibold text-sm mb-0.5" style={{ color: insight.color }}>
+              <p className="font-semibold text-sm mb-0.5" style={{ color: insight.color }}>
                 {insight.title}
               </p>
               <p className="text-[#A8A8A8] text-xs leading-relaxed">{insight.desc}</p>
@@ -383,30 +583,6 @@ function AIAnalysisTab() {
           </div>
         </GlassCard>
       ))}
-
-      <GlassCard>
-        <div className="flex items-center gap-2 mb-3">
-          <Globe size={14} color="#A8A8A8" />
-          <span className="text-[#A8A8A8] text-xs font-medium">Atendimentos por valor</span>
-        </div>
-        {mockWorkRecords.map(r => (
-          <div key={r.id} className="mb-3">
-            <div className="flex justify-between text-xs mb-1">
-              <span className="text-[#F7F7F7] truncate flex-1 mr-2">{r.description}</span>
-              <span className="text-[#22c55e] font-bold">{formatCurrency(r.amount)}</span>
-            </div>
-            <div className="h-1 rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.07)' }}>
-              <div
-                className="h-full rounded-full"
-                style={{
-                  width: `${Math.round((r.amount / chartMax) * 100)}%`,
-                  background: 'linear-gradient(90deg, #22c55e80, #22c55e)',
-                }}
-              />
-            </div>
-          </div>
-        ))}
-      </GlassCard>
     </div>
   );
 }
