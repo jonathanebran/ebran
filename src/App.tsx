@@ -1,0 +1,75 @@
+import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
+import { AnimatePresence, motion } from 'framer-motion';
+import { AuthProvider } from './contexts/AuthContext';
+import { BottomNav } from './components/BottomNav';
+import { Home } from './pages/Home';
+import { DailyFocus } from './pages/DailyFocus';
+import { Goals } from './pages/Goals';
+import { GoalDetail } from './pages/GoalDetail';
+import { GoalEdit } from './pages/GoalEdit';
+import { GoalCreate } from './pages/GoalCreate';
+import { Health } from './pages/Health';
+import { Finance } from './pages/Finance';
+import { Work } from './pages/Work';
+import { NewRecord } from './pages/NewRecord';
+import { AIHub } from './pages/AIHub';
+import { Profile } from './pages/Profile';
+import { ConnectedAccounts } from './pages/ConnectedAccounts';
+import { GooglePermissions } from './pages/GooglePermissions';
+import { EconomyMode } from './pages/EconomyMode';
+import { Login } from './pages/Login';
+import { Signup } from './pages/Signup';
+
+const mainRoutes = ['/', '/metas', '/ai-hub', '/trabalho', '/financas', '/foco', '/saude'];
+
+function AppContent() {
+  const location = useLocation();
+  const showNav = mainRoutes.some(r => location.pathname === r);
+
+  return (
+    <div className="relative min-h-screen" style={{ background: '#000', maxWidth: 430, margin: '0 auto' }}>
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={location.pathname}
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -8 }}
+          transition={{ duration: 0.2 }}
+        >
+          <Routes location={location} key={location.pathname}>
+            <Route path="/" element={<Home />} />
+            <Route path="/foco" element={<DailyFocus />} />
+            <Route path="/metas" element={<Goals />} />
+            <Route path="/metas/nova" element={<GoalCreate />} />
+            <Route path="/metas/:id" element={<GoalDetail />} />
+            <Route path="/metas/:id/editar" element={<GoalEdit />} />
+            <Route path="/saude" element={<Health />} />
+            <Route path="/financas" element={<Finance />} />
+            <Route path="/trabalho" element={<Work />} />
+            <Route path="/novo-registro" element={<NewRecord />} />
+            <Route path="/ai" element={<AIHub />} />
+            <Route path="/ai-hub" element={<AIHub />} />
+            <Route path="/perfil" element={<Profile />} />
+            <Route path="/contas" element={<ConnectedAccounts />} />
+            <Route path="/permissoes-google" element={<GooglePermissions />} />
+            <Route path="/modo-economia" element={<EconomyMode />} />
+            <Route path="/entrar" element={<Login />} />
+            <Route path="/cadastro" element={<Signup />} />
+          </Routes>
+        </motion.div>
+      </AnimatePresence>
+
+      {showNav && <BottomNav />}
+    </div>
+  );
+}
+
+export default function App() {
+  return (
+    <BrowserRouter>
+      <AuthProvider>
+        <AppContent />
+      </AuthProvider>
+    </BrowserRouter>
+  );
+}
