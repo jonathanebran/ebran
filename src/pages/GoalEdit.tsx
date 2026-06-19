@@ -65,15 +65,17 @@ export function GoalEdit() {
   const [saved, setSaved] = useState(false);
 
   const handleSave = () => {
+    const parsedTarget = parseFloat(targetAmount);
+    const parsedCurrent = parseFloat(currentAmount);
     updateGoal(goal.id, {
       title,
       description,
       type,
       status,
       priority,
-      target_amount: parseFloat(targetAmount) || goal.target_amount,
-      current_amount: parseFloat(currentAmount) || goal.current_amount,
-      reserved_amount: parseFloat(currentAmount) || goal.current_amount,
+      target_amount: isNaN(parsedTarget) ? goal.target_amount : parsedTarget,
+      current_amount: isNaN(parsedCurrent) ? goal.current_amount : parsedCurrent,
+      reserved_amount: isNaN(parsedCurrent) ? goal.current_amount : parsedCurrent,
       desired_date: desiredDate || undefined,
       recurrence,
       notes,

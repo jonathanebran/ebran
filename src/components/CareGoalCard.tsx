@@ -1,5 +1,4 @@
-import { motion } from 'framer-motion';
-import { Sparkles, MoreHorizontal } from 'lucide-react';
+import { Sparkles } from 'lucide-react';
 import { GlassCard } from './GlassCard';
 import { ProgressBar } from './ProgressBar';
 import type { Goal } from '../lib/types';
@@ -31,9 +30,6 @@ export function CareGoalCard({ goal, onClick }: CareGoalCardProps) {
             )}
           </div>
         </div>
-        <motion.button whileTap={{ scale: 0.9 }}>
-          <MoreHorizontal size={16} color="#6F6F6F" />
-        </motion.button>
       </div>
 
       <div className="flex justify-between text-xs mb-1.5">

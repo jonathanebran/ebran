@@ -12,7 +12,7 @@ import type { GoalType, Priority, Recurrence } from '../lib/types';
 
 const goalTypeOptions: { value: GoalType; label: string; desc: string; category: string }[] = [
   { value: 'financial', label: '💰 Financeira', desc: 'Reserva, poupança, investimento', category: 'Finanças' },
-  { value: 'small',     label: '🎯 Pequena',    desc: 'Compra menor, item do dia a dia', category: 'Compras' },
+  { value: 'small',     label: '🎯 Foco',       desc: 'Tarefa, hábito ou compra do dia a dia', category: 'Focos' },
   { value: 'wish',      label: '✨ Desejo',      desc: 'Algo que você quer muito',        category: 'Desejos' },
   { value: 'care',      label: '🌿 Cuidado',    desc: 'Procedimento, tratamento, estética', category: 'Cuidado Pessoal' },
   { value: 'health',    label: '❤️ Saúde',      desc: 'Consulta, exame, medicamento',   category: 'Saúde' },
@@ -48,7 +48,7 @@ export function GoalCreate() {
   const [recurrence, setRecurrence] = useState('once');
   const [saving, setSaving] = useState(false);
 
-  const canSave = selectedType && title.trim() && parseFloat(targetAmount) > 0;
+  const canSave = selectedType && title.trim();
 
   function handleCreate() {
     if (!canSave || !selectedType) return;
@@ -58,7 +58,7 @@ export function GoalCreate() {
     const now = new Date().toISOString();
     const id = `goal-${Date.now()}`;
     const initial = parseFloat(initialAmount) || 0;
-    const target = parseFloat(targetAmount);
+    const target = parseFloat(targetAmount) || 0;
 
     addGoal({
       id,
