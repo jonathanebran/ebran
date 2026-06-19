@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, Edit2, Plus, Minus } from 'lucide-react';
@@ -6,7 +6,7 @@ import { GlassCard } from '../components/GlassCard';
 import { ProgressRing } from '../components/ProgressRing';
 import { ProgressBar } from '../components/ProgressBar';
 import { SecondaryButton } from '../components/SecondaryButton';
-import { mockGoals, mockGoalContributions } from '../data/mockData';
+import { useGoals } from '../contexts/GoalsContext';
 import { formatCurrency, getPercentage, getDaysRemaining, getMonthlySuggestion, formatDate } from '../lib/utils';
 
 function ValueModal({
@@ -88,19 +88,47 @@ function ValueModal({
 export function GoalDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const goal = mockGoals.find(g => g.id === id) ?? mockGoals[0];
+  const { goals, contributions: allContributions, updateGoal, addContribution } = useGoals();
+  const goal = goals.find(g => g.id === id) ?? goals[0];
   const days = goal.desired_date ? getDaysRemaining(goal.desired_date) : null;
   const monthlySuggestion = goal.desired_date
     ? getMonthlySuggestion(goal.target_amount, goal.current_amount, goal.desired_date)
     : null;
-  const contributions = mockGoalContributions.filter(c => c.goal_id === goal.id);
+  const contributions = allContributions.filter(c => c.goal_id === goal.id);
 
   const [modal, setModal] = useState<'add' | 'remove' | null>(null);
   const [currentAmount, setCurrentAmount] = useState(goal.current_amount);
 
-  const handleConfirm = (value: number, _note: string) => {
-    if (modal === 'add') setCurrentAmount(prev => Math.min(prev + value, goal.target_amount));
-    if (modal === 'remove') setCurrentAmount(prev => Math.max(0, prev - value));
+  useEffect(() => {
+    setCurrentAmount(goal.current_amount);
+  }, [goal.current_amount]);
+
+  const handleConfirm = (value: number, note: string) => {
+    let newAmount = currentAmount;
+    if (modal === 'add') {
+      newAmount = Math.min(currentAmount + value, goal.target_amount);
+      addContribution({
+        id: `c-${Date.now()}`,
+        goal_id: goal.id,
+        user_id: goal.user_id,
+        amount: value,
+        note: note || 'Aporte',
+        created_at: new Date().toISOString(),
+      });
+    }
+    if (modal === 'remove') {
+      newAmount = Math.max(0, currentAmount - value);
+      addContribution({
+        id: `c-${Date.now()}`,
+        goal_id: goal.id,
+        user_id: goal.user_id,
+        amount: -value,
+        note: note || 'Retirada',
+        created_at: new Date().toISOString(),
+      });
+    }
+    setCurrentAmount(newAmount);
+    updateGoal(goal.id, { current_amount: newAmount, reserved_amount: newAmount });
     setModal(null);
   };
 
@@ -194,15 +222,20 @@ export function GoalDetail() {
         {contributions.length > 0 && (
           <GlassCard>
             <p className="text-[#A8A8A8] text-xs font-semibold uppercase tracking-wider mb-3">Histórico de aportes</p>
-            {contributions.map(c => (
-              <div key={c.id} className="flex items-center justify-between py-2.5 border-b" style={{ borderColor: 'rgba(255,255,255,0.06)' }}>
-                <div>
-                  <p className="text-[#F7F7F7] text-sm">{c.note ?? 'Aporte'}</p>
-                  <p className="text-[#6F6F6F] text-xs mt-0.5">{formatDate(c.created_at)}</p>
+            {contributions.map(c => {
+              const isRemoval = c.amount < 0;
+              return (
+                <div key={c.id} className="flex items-center justify-between py-2.5 border-b" style={{ borderColor: 'rgba(255,255,255,0.06)' }}>
+                  <div>
+                    <p className="text-[#F7F7F7] text-sm">{c.note ?? (isRemoval ? 'Retirada' : 'Aporte')}</p>
+                    <p className="text-[#6F6F6F] text-xs mt-0.5">{formatDate(c.created_at)}</p>
+                  </div>
+                  <p className="font-bold text-sm" style={{ color: isRemoval ? '#FF6B5F' : '#22c55e' }}>
+                    {isRemoval ? '-' : '+'}{formatCurrency(Math.abs(c.amount))}
+                  </p>
                 </div>
-                <p className="text-[#22c55e] font-bold text-sm">+{formatCurrency(c.amount)}</p>
-              </div>
-            ))}
+              );
+            })}
           </GlassCard>
         )}
 

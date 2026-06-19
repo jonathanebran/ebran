@@ -6,7 +6,7 @@ import { TextField } from '../components/TextField';
 import { SelectField } from '../components/SelectField';
 import { PrimaryButton } from '../components/PrimaryButton';
 import { Chip } from '../components/Chip';
-import { mockGoals } from '../data/mockData';
+import { useGoals } from '../contexts/GoalsContext';
 
 const goalTypes = [
   { value: 'financial', label: 'Financeira' },
@@ -49,7 +49,8 @@ const recurrenceOptions = [
 export function GoalEdit() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const goal = mockGoals.find(g => g.id === id) ?? mockGoals[0];
+  const { goals, updateGoal } = useGoals();
+  const goal = goals.find(g => g.id === id) ?? goals[0];
 
   const [title, setTitle] = useState(goal.title);
   const [description, setDescription] = useState(goal.description ?? '');
@@ -64,6 +65,19 @@ export function GoalEdit() {
   const [saved, setSaved] = useState(false);
 
   const handleSave = () => {
+    updateGoal(goal.id, {
+      title,
+      description,
+      type,
+      status,
+      priority,
+      target_amount: parseFloat(targetAmount) || goal.target_amount,
+      current_amount: parseFloat(currentAmount) || goal.current_amount,
+      reserved_amount: parseFloat(currentAmount) || goal.current_amount,
+      desired_date: desiredDate || undefined,
+      recurrence,
+      notes,
+    });
     setSaved(true);
     setTimeout(() => { navigate(-1); }, 800);
   };

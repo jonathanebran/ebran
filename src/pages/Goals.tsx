@@ -8,7 +8,8 @@ import { GoalCard } from '../components/GoalCard';
 import { WishlistCard } from '../components/WishlistCard';
 import { CareGoalCard } from '../components/CareGoalCard';
 import { GlassCard } from '../components/GlassCard';
-import { mockGoals, mockWishlistItems, mockEconomyMode } from '../data/mockData';
+import { mockWishlistItems, mockEconomyMode } from '../data/mockData';
+import { useGoals } from '../contexts/GoalsContext';
 
 const tabs = ['Grandes', 'Pequenas', 'Desejos', 'Cuidado', 'Economia'] as const;
 type Tab = typeof tabs[number];
@@ -30,11 +31,12 @@ const recommendationColor: Record<string, string> = {
 export function Goals() {
   const [activeTab, setActiveTab] = useState<Tab>('Grandes');
   const navigate = useNavigate();
+  const { goals } = useGoals();
 
-  const largeGoals = mockGoals.filter(g => g.type === 'financial' || g.type === 'travel');
-  const smallGoals = mockGoals.filter(g => g.type === 'small');
-  const careGoals = mockGoals.filter(g => g.type === 'care');
-  const wishGoals = mockGoals.filter(g => g.type === 'wish');
+  const largeGoals = goals.filter(g => g.type === 'financial' || g.type === 'travel');
+  const smallGoals = goals.filter(g => g.type === 'small');
+  const careGoals = goals.filter(g => g.type === 'care');
+  const wishGoals = goals.filter(g => g.type === 'wish');
 
   return (
     <div className="flex flex-col min-h-screen pb-28" style={{ background: '#000' }}>
