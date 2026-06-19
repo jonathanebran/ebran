@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import { AuthProvider } from './contexts/AuthContext';
 import { GoalsProvider } from './contexts/GoalsContext';
+import { DailyFocusProvider } from './contexts/DailyFocusContext';
 import { BottomNav } from './components/BottomNav';
 import { Home } from './pages/Home';
 import { DailyFocus } from './pages/DailyFocus';
@@ -70,7 +71,9 @@ export default function App() {
     <BrowserRouter>
       <AuthProvider>
         <GoalsProvider>
-          <AppContent />
+          <DailyFocusProvider>
+            <AppContent />
+          </DailyFocusProvider>
         </GoalsProvider>
       </AuthProvider>
     </BrowserRouter>

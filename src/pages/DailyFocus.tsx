@@ -5,7 +5,7 @@ import { Header } from '../components/Header';
 import { Chip } from '../components/Chip';
 import { GlassCard } from '../components/GlassCard';
 import { ChecklistItem } from '../components/ChecklistItem';
-import { mockDailyFocusItems } from '../data/mockData';
+import { useDailyFocus } from '../contexts/DailyFocusContext';
 import type { DailyFocusItem } from '../lib/types';
 
 const tabs = ['Hoje', 'Mercado', 'Casa', 'Treino', 'Cuidado'] as const;
@@ -36,7 +36,7 @@ const recurrenceOptions = [
 ] as const;
 
 function nextRestockDate(recurrence: string): string {
-  const d = new Date('2026-06-17');
+  const d = new Date();
   if (recurrence === 'daily') d.setDate(d.getDate() + 1);
   else if (recurrence === 'weekly') d.setDate(d.getDate() + 7);
   else if (recurrence === 'biweekly') d.setDate(d.getDate() + 15);
@@ -55,7 +55,7 @@ function AddItemSheet({ onClose, onSave }: {
   const [name, setName] = useState('');
   const [category, setCategory] = useState<string>('market');
   const [recurrence, setRecurrence] = useState<string>('once');
-  const [price, setPrice] = useState('');
+  const [note, setNote] = useState('');
 
   const handleSave = () => {
     if (!name.trim()) return;
@@ -65,7 +65,7 @@ function AddItemSheet({ onClose, onSave }: {
       status: 'pending',
       priority: 'medium',
       recurrence: recurrence as DailyFocusItem['recurrence'],
-      estimated_price: price ? parseFloat(price) : undefined,
+      note: note.trim() || undefined,
     });
     onClose();
   };
@@ -80,8 +80,13 @@ function AddItemSheet({ onClose, onSave }: {
       onClick={onClose}
     >
       <motion.div
-        className="w-full max-w-[430px] mx-auto rounded-t-3xl p-6 pb-10"
-        style={{ background: 'rgba(15,15,15,0.98)', border: '0.5px solid rgba(255,255,255,0.1)' }}
+        className="w-full max-w-[430px] mx-auto rounded-t-3xl p-6 overflow-y-auto"
+        style={{
+          background: 'rgba(15,15,15,0.98)',
+          border: '0.5px solid rgba(255,255,255,0.1)',
+          paddingBottom: 'max(40px, env(safe-area-inset-bottom, 0px))',
+          maxHeight: '90vh',
+        }}
         initial={{ y: 120, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         exit={{ y: 120, opacity: 0 }}
@@ -145,11 +150,10 @@ function AddItemSheet({ onClose, onSave }: {
         </div>
 
         <input
-          type="number"
-          inputMode="decimal"
-          placeholder="Valor aproximado (opcional)"
-          value={price}
-          onChange={e => setPrice(e.target.value)}
+          type="text"
+          placeholder="Observações (opcional)"
+          value={note}
+          onChange={e => setNote(e.target.value)}
           className="w-full rounded-2xl px-4 py-3 mb-5 text-[#F7F7F7] text-sm outline-none"
           style={{ background: 'rgba(255,255,255,0.05)', border: '0.5px solid rgba(255,255,255,0.08)' }}
         />
@@ -196,8 +200,12 @@ function RestockPrompt({ item, onConfirm, onDismiss }: {
       onClick={onDismiss}
     >
       <motion.div
-        className="w-full max-w-[430px] mx-auto rounded-t-3xl p-6 pb-10"
-        style={{ background: 'rgba(15,15,15,0.98)', border: '0.5px solid rgba(255,255,255,0.1)' }}
+        className="w-full max-w-[430px] mx-auto rounded-t-3xl p-6"
+        style={{
+          background: 'rgba(15,15,15,0.98)',
+          border: '0.5px solid rgba(255,255,255,0.1)',
+          paddingBottom: 'max(40px, env(safe-area-inset-bottom, 0px))',
+        }}
         initial={{ y: 80, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         exit={{ y: 80, opacity: 0 }}
@@ -243,13 +251,12 @@ function RestockPrompt({ item, onConfirm, onDismiss }: {
 
 // ─── Main page ────────────────────────────────────────────────────────────────
 
-let nextId = 100;
-
 export function DailyFocus() {
+  const { items, addItem, toggleItem, updateItem } = useDailyFocus();
+
   const [activeTab, setActiveTab] = useState<Tab>('Hoje');
-  const [items, setItems] = useState<DailyFocusItem[]>(mockDailyFocusItems);
-  const [restockQueue, setRestockQueue] = useState<DailyFocusItem[]>(
-    mockDailyFocusItems.filter(i => i.recurrence && i.next_restock_date && i.status !== 'done')
+  const [restockQueue, setRestockQueue] = useState<DailyFocusItem[]>(() =>
+    items.filter(i => i.recurrence && i.next_restock_date && i.status !== 'done')
   );
   const [showDone, setShowDone] = useState(false);
   const [showAddSheet, setShowAddSheet] = useState(false);
@@ -263,9 +270,8 @@ export function DailyFocus() {
   const toggle = (id: string) => {
     const item = items.find(i => i.id === id);
     if (!item) return;
-    const newStatus = item.status === 'done' ? 'pending' : 'done';
-    setItems(prev => prev.map(i => i.id === id ? { ...i, status: newStatus } : i));
-    if (newStatus === 'done' && item.recurrence && item.recurrence !== 'once') {
+    toggleItem(id);
+    if (item.status !== 'done' && item.recurrence && item.recurrence !== 'once') {
       setRestockPrompt(item);
     }
   };
@@ -273,6 +279,7 @@ export function DailyFocus() {
   const handleRestockConfirm = () => {
     if (!restockPrompt) return;
     const restock = nextRestockDate(restockPrompt.recurrence ?? '');
+    updateItem(restockPrompt.id, { next_restock_date: restock });
     setRestockQueue(prev => [
       ...prev.filter(r => r.id !== restockPrompt.id),
       { ...restockPrompt, next_restock_date: restock, status: 'pending' },
@@ -281,19 +288,16 @@ export function DailyFocus() {
   };
 
   const handleAddItem = (data: Omit<DailyFocusItem, 'id' | 'user_id' | 'created_at'>) => {
-    const newItem: DailyFocusItem = {
+    addItem({
       ...data,
-      id: `df-new-${++nextId}`,
+      id: `df-${Date.now()}`,
       user_id: 'user-1',
       created_at: new Date().toISOString(),
-    };
-    setItems(prev => [newItem, ...prev]);
+    });
   };
 
   const handleAddFromRestock = (suggestion: DailyFocusItem) => {
-    setItems(prev => prev.map(i =>
-      i.id === suggestion.id ? { ...i, status: 'pending' } : i
-    ));
+    updateItem(suggestion.id, { status: 'pending' });
     setRestockQueue(prev => prev.filter(r => r.id !== suggestion.id));
   };
 
@@ -386,7 +390,7 @@ export function DailyFocus() {
                         : item.recurrence === 'monthly' ? 'Mensal'
                         : item.recurrence === 'biweekly' ? '15 dias'
                         : item.recurrence}
-                      {item.estimated_price ? ` · ~R$ ${item.estimated_price}` : ''}
+                      {item.note ? ` · ${item.note}` : ''}
                       {item.next_restock_date ? ` · Próximo: ${item.next_restock_date}` : ''}
                     </p>
                   </div>

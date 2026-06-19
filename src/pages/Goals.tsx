@@ -8,8 +8,10 @@ import { GoalCard } from '../components/GoalCard';
 import { WishlistCard } from '../components/WishlistCard';
 import { CareGoalCard } from '../components/CareGoalCard';
 import { GlassCard } from '../components/GlassCard';
+import { ChecklistItem } from '../components/ChecklistItem';
 import { mockWishlistItems } from '../data/mockData';
 import { useGoals } from '../contexts/GoalsContext';
+import { useDailyFocus } from '../contexts/DailyFocusContext';
 import { formatCurrency, getPercentage, getDaysRemaining, getMonthlySuggestion } from '../lib/utils';
 import type { Goal } from '../lib/types';
 
@@ -272,6 +274,7 @@ export function Goals() {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const { goals } = useGoals();
+  const { items: focusItems, toggleItem: toggleFocusItem } = useDailyFocus();
 
   const paramTab = searchParams.get('tab');
   const [activeTab, setActiveTab] = useState<Tab>(
@@ -286,6 +289,7 @@ export function Goals() {
   const focusGoals = goals.filter(g => g.type === 'small');
   const careGoals  = goals.filter(g => g.type === 'care' || g.type === 'health');
   const wishGoals  = goals.filter(g => g.type === 'wish');
+  const pendingFocusItems = focusItems.filter(i => i.status === 'pending');
 
   return (
     <div className="flex flex-col min-h-screen pb-28" style={{ background: '#000' }}>
@@ -323,9 +327,40 @@ export function Goals() {
         )}
 
         {activeTab === 'Focos' && (
-          focusGoals.length > 0
-            ? focusGoals.map(g => <GoalCard key={g.id} goal={g} />)
-            : <EmptyState label="Nenhum foco cadastrado." onAdd={() => navigate('/metas/nova')} />
+          <>
+            {pendingFocusItems.length > 0 && (
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <p className="text-[#A8A8A8] text-xs font-semibold uppercase tracking-wider">Foco do dia</p>
+                  <motion.button
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => navigate('/foco')}
+                    className="text-[#FF9F3D] text-xs font-medium"
+                  >
+                    Ver todos →
+                  </motion.button>
+                </div>
+                <GlassCard padding="px-4 py-1">
+                  {pendingFocusItems.slice(0, 6).map(item => (
+                    <ChecklistItem key={item.id} item={item} onToggle={toggleFocusItem} />
+                  ))}
+                </GlassCard>
+              </div>
+            )}
+
+            {focusGoals.length > 0 && (
+              <div>
+                {pendingFocusItems.length > 0 && (
+                  <p className="text-[#A8A8A8] text-xs font-semibold uppercase tracking-wider mb-2 mt-1">Metas de foco</p>
+                )}
+                {focusGoals.map(g => <GoalCard key={g.id} goal={g} />)}
+              </div>
+            )}
+
+            {pendingFocusItems.length === 0 && focusGoals.length === 0 && (
+              <EmptyState label="Nenhum foco cadastrado." onAdd={() => navigate('/metas/nova')} />
+            )}
+          </>
         )}
 
         {activeTab === 'Desejos' && (
