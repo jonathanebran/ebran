@@ -27,6 +27,7 @@ interface GoalsContextValue {
   contributions: GoalContribution[];
   addGoal: (goal: Goal) => void;
   updateGoal: (id: string, updates: Partial<Goal>) => void;
+  deleteGoal: (id: string) => void;
   addContribution: (contribution: GoalContribution) => void;
 }
 
@@ -51,12 +52,17 @@ export function GoalsProvider({ children }: { children: ReactNode }) {
     );
   }
 
+  function deleteGoal(id: string) {
+    setGoals(prev => prev.filter(g => g.id !== id));
+    setContributions(prev => prev.filter(c => c.goal_id !== id));
+  }
+
   function addContribution(contribution: GoalContribution) {
     setContributions(prev => [contribution, ...prev]);
   }
 
   return (
-    <GoalsContext.Provider value={{ goals, contributions, addGoal, updateGoal, addContribution }}>
+    <GoalsContext.Provider value={{ goals, contributions, addGoal, updateGoal, deleteGoal, addContribution }}>
       {children}
     </GoalsContext.Provider>
   );

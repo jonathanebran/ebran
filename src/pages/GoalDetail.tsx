@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, Edit2, Plus, Minus } from 'lucide-react';
+import { ArrowLeft, Edit2, Plus, Minus, Trash2 } from 'lucide-react';
 import { GlassCard } from '../components/GlassCard';
 import { ProgressRing } from '../components/ProgressRing';
 import { ProgressBar } from '../components/ProgressBar';
@@ -88,7 +88,7 @@ function ValueModal({
 export function GoalDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { goals, contributions: allContributions, updateGoal, addContribution } = useGoals();
+  const { goals, contributions: allContributions, updateGoal, deleteGoal, addContribution } = useGoals();
   const goal = goals.find(g => g.id === id) ?? goals[0];
   const days = goal.desired_date ? getDaysRemaining(goal.desired_date) : null;
   const monthlySuggestion = goal.desired_date
@@ -96,7 +96,7 @@ export function GoalDetail() {
     : null;
   const contributions = allContributions.filter(c => c.goal_id === goal.id);
 
-  const [modal, setModal] = useState<'add' | 'remove' | null>(null);
+  const [modal, setModal] = useState<'add' | 'remove' | 'delete' | null>(null);
   const [currentAmount, setCurrentAmount] = useState(goal.current_amount);
 
   useEffect(() => {
@@ -142,6 +142,14 @@ export function GoalDetail() {
           <ArrowLeft size={22} color="#F7F7F7" />
         </motion.button>
         <h1 className="text-xl font-bold text-[#F7F7F7] flex-1">{goal.title}</h1>
+        <motion.button
+          whileTap={{ scale: 0.9 }}
+          onClick={() => setModal('delete')}
+          className="w-9 h-9 rounded-xl flex items-center justify-center"
+          style={{ background: 'rgba(255,107,95,0.12)' }}
+        >
+          <Trash2 size={16} color="#FF6B5F" />
+        </motion.button>
         <motion.button
           whileTap={{ scale: 0.9 }}
           onClick={() => navigate(`/metas/${goal.id}/editar`)}
@@ -245,8 +253,54 @@ export function GoalDetail() {
       </div>
 
       <AnimatePresence>
-        {modal && (
+        {(modal === 'add' || modal === 'remove') && (
           <ValueModal mode={modal} onClose={() => setModal(null)} onConfirm={handleConfirm} />
+        )}
+        {modal === 'delete' && (
+          <motion.div
+            className="fixed inset-0 z-50 flex items-end justify-center"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            style={{ background: 'rgba(0,0,0,0.75)', backdropFilter: 'blur(8px)' }}
+            onClick={() => setModal(null)}
+          >
+            <motion.div
+              initial={{ y: 80, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              exit={{ y: 80, opacity: 0 }}
+              transition={{ type: 'spring', stiffness: 360, damping: 34 }}
+              className="w-full max-w-sm mx-auto rounded-t-3xl p-6"
+              style={{ background: 'rgba(18,18,18,0.98)', border: '0.5px solid rgba(255,255,255,0.1)' }}
+              onClick={e => e.stopPropagation()}
+            >
+              <div className="flex items-center justify-center w-12 h-12 rounded-2xl mx-auto mb-4" style={{ background: 'rgba(255,107,95,0.15)' }}>
+                <Trash2 size={22} color="#FF6B5F" />
+              </div>
+              <h3 className="text-[#F7F7F7] font-bold text-lg text-center mb-1">Excluir meta?</h3>
+              <p className="text-[#6F6F6F] text-sm text-center mb-6">
+                "{goal.title}" será excluída permanentemente junto com todo o histórico de aportes.
+              </p>
+              <div className="flex gap-3">
+                <motion.button
+                  whileTap={{ scale: 0.96 }}
+                  onClick={() => setModal(null)}
+                  className="flex-1 py-4 rounded-2xl font-bold text-sm"
+                  style={{ background: 'rgba(255,255,255,0.07)', color: '#F7F7F7' }}
+                >
+                  Cancelar
+                </motion.button>
+                <motion.button
+                  whileTap={{ scale: 0.96 }}
+                  onClick={() => { deleteGoal(goal.id); navigate('/metas', { replace: true }); }}
+                  className="flex-1 py-4 rounded-2xl font-bold text-sm"
+                  style={{ background: 'linear-gradient(90deg, #FF6B5F99, #FF6B5F)', color: '#fff' }}
+                >
+                  Excluir
+                </motion.button>
+              </div>
+            </motion.div>
+          </motion.div>
         )}
       </AnimatePresence>
     </div>
