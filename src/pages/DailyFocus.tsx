@@ -72,7 +72,7 @@ function AddItemSheet({ onClose, onSave }: {
 
   return (
     <motion.div
-      className="fixed inset-0 z-50 flex items-end"
+      className="fixed inset-0 z-[100] flex items-end"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
@@ -192,7 +192,7 @@ function RestockPrompt({ item, onConfirm, onDismiss }: {
 
   return (
     <motion.div
-      className="fixed inset-0 z-50 flex items-end"
+      className="fixed inset-0 z-[100] flex items-end"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
