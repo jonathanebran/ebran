@@ -89,7 +89,14 @@ export function GoalDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { goals, contributions: allContributions, updateGoal, deleteGoal, addContribution } = useGoals();
-  const goal = goals.find(g => g.id === id) ?? goals[0];
+  const goal = goals.find(g => g.id === id);
+
+  useEffect(() => {
+    if (!goal) navigate('/metas', { replace: true });
+  }, [goal, navigate]);
+
+  if (!goal) return null;
+
   const days = goal.desired_date ? getDaysRemaining(goal.desired_date) : null;
   const monthlySuggestion = goal.desired_date
     ? getMonthlySuggestion(goal.target_amount, goal.current_amount, goal.desired_date)
@@ -292,7 +299,7 @@ export function GoalDetail() {
                 </motion.button>
                 <motion.button
                   whileTap={{ scale: 0.96 }}
-                  onClick={() => { deleteGoal(goal.id); navigate('/metas', { replace: true }); }}
+                  onClick={() => { navigate('/metas', { replace: true }); deleteGoal(goal.id); }}
                   className="flex-1 py-4 rounded-2xl font-bold text-sm"
                   style={{ background: 'linear-gradient(90deg, #FF6B5F99, #FF6B5F)', color: '#fff' }}
                 >
