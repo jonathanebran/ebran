@@ -7,8 +7,9 @@ import { AICommandBar } from '../components/AICommandBar';
 import { ProgressBar } from '../components/ProgressBar';
 import { ProgressRing } from '../components/ProgressRing';
 import {
-  mockWorkSummary, mockGoals, mockHealthToday, mockRecentActivity, mockDailyFocusItems
+  mockWorkSummary, mockHealthToday, mockRecentActivity, mockDailyFocusItems
 } from '../data/mockData';
+import { useGoals } from '../contexts/GoalsContext';
 import { formatCurrency, getPercentage } from '../lib/utils';
 
 const stagger = {
@@ -18,9 +19,11 @@ const stagger = {
 
 export function Home() {
   const navigate = useNavigate();
+  const { goals } = useGoals();
   const workPct = getPercentage(mockWorkSummary.monthly_revenue, mockWorkSummary.monthly_goal);
-  const primaryGoal = mockGoals[0];
-  const goalPct = getPercentage(primaryGoal.current_amount, primaryGoal.target_amount);
+  const primaryGoal = goals[0] ?? null;
+  const goalPct = primaryGoal ? getPercentage(primaryGoal.current_amount, primaryGoal.target_amount) : 0;
+  const activeGoalsCount = goals.filter(g => g.status === 'active').length;
   const pendingFocus = mockDailyFocusItems.filter(i => i.status === 'pending').slice(0, 3);
 
   return (
@@ -114,14 +117,18 @@ export function Home() {
               <span className="text-[#F7F7F7] font-semibold text-sm">Metas</span>
               <ChevronRight size={16} color="#6F6F6F" />
             </div>
-            <div className="flex items-center gap-4">
-              <ProgressRing value={goalPct} size={60} strokeWidth={5} label={`${goalPct}%`} />
-              <div>
-                <p className="text-[#F7F7F7] font-bold text-sm">{primaryGoal.title}</p>
-                <p className="text-[#A8A8A8] text-xs mt-0.5">{formatCurrency(primaryGoal.current_amount)} guardados</p>
-                <p className="text-[#6F6F6F] text-[10px] mt-1">{mockGoals.filter(g => g.status === 'active').length} metas ativas</p>
+            {primaryGoal ? (
+              <div className="flex items-center gap-4">
+                <ProgressRing value={goalPct} size={60} strokeWidth={5} label={`${goalPct}%`} />
+                <div>
+                  <p className="text-[#F7F7F7] font-bold text-sm">{primaryGoal.title}</p>
+                  <p className="text-[#A8A8A8] text-xs mt-0.5">{formatCurrency(primaryGoal.current_amount)} guardados</p>
+                  <p className="text-[#6F6F6F] text-[10px] mt-1">{activeGoalsCount} {activeGoalsCount === 1 ? 'meta ativa' : 'metas ativas'}</p>
+                </div>
               </div>
-            </div>
+            ) : (
+              <p className="text-[#6F6F6F] text-sm">Nenhuma meta ainda. Toque para criar a primeira.</p>
+            )}
           </GlassCard>
         </motion.div>
 

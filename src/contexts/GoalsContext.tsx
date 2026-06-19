@@ -1,10 +1,9 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 import type { ReactNode } from 'react';
 import type { Goal, GoalContribution } from '../lib/types';
-import { mockGoals, mockGoalContributions } from '../data/mockData';
 
-const GOALS_KEY = 'ebran:goals';
-const CONTRIBUTIONS_KEY = 'ebran:contributions';
+const GOALS_KEY = 'ebran:goals:v2';
+const CONTRIBUTIONS_KEY = 'ebran:contributions:v2';
 
 function loadFromStorage<T>(key: string, fallback: T): T {
   try {
@@ -26,6 +25,7 @@ function saveToStorage<T>(key: string, value: T) {
 interface GoalsContextValue {
   goals: Goal[];
   contributions: GoalContribution[];
+  addGoal: (goal: Goal) => void;
   updateGoal: (id: string, updates: Partial<Goal>) => void;
   addContribution: (contribution: GoalContribution) => void;
 }
@@ -33,15 +33,17 @@ interface GoalsContextValue {
 const GoalsContext = createContext<GoalsContextValue | null>(null);
 
 export function GoalsProvider({ children }: { children: ReactNode }) {
-  const [goals, setGoals] = useState<Goal[]>(() =>
-    loadFromStorage(GOALS_KEY, mockGoals)
-  );
+  const [goals, setGoals] = useState<Goal[]>(() => loadFromStorage(GOALS_KEY, []));
   const [contributions, setContributions] = useState<GoalContribution[]>(() =>
-    loadFromStorage(CONTRIBUTIONS_KEY, mockGoalContributions)
+    loadFromStorage(CONTRIBUTIONS_KEY, [])
   );
 
   useEffect(() => { saveToStorage(GOALS_KEY, goals); }, [goals]);
   useEffect(() => { saveToStorage(CONTRIBUTIONS_KEY, contributions); }, [contributions]);
+
+  function addGoal(goal: Goal) {
+    setGoals(prev => [goal, ...prev]);
+  }
 
   function updateGoal(id: string, updates: Partial<Goal>) {
     setGoals(prev =>
@@ -54,7 +56,7 @@ export function GoalsProvider({ children }: { children: ReactNode }) {
   }
 
   return (
-    <GoalsContext.Provider value={{ goals, contributions, updateGoal, addContribution }}>
+    <GoalsContext.Provider value={{ goals, contributions, addGoal, updateGoal, addContribution }}>
       {children}
     </GoalsContext.Provider>
   );
