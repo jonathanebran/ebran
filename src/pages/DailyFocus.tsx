@@ -446,14 +446,24 @@ export function DailyFocus() {
                       {item.next_restock_date ? ` · Próximo: ${item.next_restock_date}` : ''}
                     </p>
                   </div>
-                  <motion.button
-                    whileTap={{ scale: 0.94 }}
-                    onClick={() => handleAddFromRestock(item)}
-                    className="text-xs font-medium px-3 py-1.5 rounded-xl flex-shrink-0"
-                    style={{ background: 'rgba(255,159,61,0.15)', color: '#FF9F3D' }}
-                  >
-                    Adicionar
-                  </motion.button>
+                  <div className="flex items-center gap-2 flex-shrink-0">
+                    <motion.button
+                      whileTap={{ scale: 0.94 }}
+                      onClick={() => handleAddFromRestock(item)}
+                      className="text-xs font-medium px-3 py-1.5 rounded-xl"
+                      style={{ background: 'rgba(255,159,61,0.15)', color: '#FF9F3D' }}
+                    >
+                      Adicionar
+                    </motion.button>
+                    <motion.button
+                      whileTap={{ scale: 0.9 }}
+                      onClick={() => setRestockQueue(prev => prev.filter(r => r.id !== item.id))}
+                      className="w-7 h-7 rounded-xl flex items-center justify-center flex-shrink-0"
+                      style={{ background: 'rgba(255,107,95,0.12)' }}
+                    >
+                      <Trash2 size={13} color="#FF6B5F" />
+                    </motion.button>
+                  </div>
                 </div>
               ))}
             </div>
