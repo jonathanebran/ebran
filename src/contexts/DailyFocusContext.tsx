@@ -25,6 +25,7 @@ interface DailyFocusContextValue {
   addItem: (item: DailyFocusItem) => void;
   toggleItem: (id: string) => void;
   updateItem: (id: string, updates: Partial<DailyFocusItem>) => void;
+  deleteItem: (id: string) => void;
 }
 
 const DailyFocusContext = createContext<DailyFocusContextValue | null>(null);
@@ -50,8 +51,12 @@ export function DailyFocusProvider({ children }: { children: ReactNode }) {
     setItems(prev => prev.map(i => i.id === id ? { ...i, ...updates } : i));
   }
 
+  function deleteItem(id: string) {
+    setItems(prev => prev.filter(i => i.id !== id));
+  }
+
   return (
-    <DailyFocusContext.Provider value={{ items, addItem, toggleItem, updateItem }}>
+    <DailyFocusContext.Provider value={{ items, addItem, toggleItem, updateItem, deleteItem }}>
       {children}
     </DailyFocusContext.Provider>
   );

@@ -1,6 +1,7 @@
 import { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Plus, RefreshCw, ChevronDown, ChevronUp, X } from 'lucide-react';
+import { motion, AnimatePresence, useMotionValue, useTransform, animate } from 'framer-motion';
+import type { PanInfo } from 'framer-motion';
+import { Plus, RefreshCw, ChevronDown, ChevronUp, X, Trash2 } from 'lucide-react';
 import { Header } from '../components/Header';
 import { Chip } from '../components/Chip';
 import { GlassCard } from '../components/GlassCard';
@@ -44,6 +45,49 @@ function nextRestockDate(recurrence: string): string {
   const [, m, day] = d.toISOString().split('T')[0].split('-');
   const months = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
   return `${parseInt(day)} ${months[parseInt(m) - 1]}`;
+}
+
+// ─── Swipe-to-delete row wrapper ─────────────────────────────────────────────
+
+function SwipeToDelete({ children, onDelete }: {
+  children: React.ReactNode;
+  onDelete: () => void;
+}) {
+  const x = useMotionValue(0);
+  const deleteOpacity = useTransform(x, [-90, -15], [1, 0]);
+
+  const handleDragEnd = (_: PointerEvent | MouseEvent | TouchEvent, info: PanInfo) => {
+    if (info.offset.x < -80 || info.velocity.x < -600) {
+      animate(x, -500, {
+        duration: 0.22,
+        ease: 'easeOut',
+        onComplete: onDelete,
+      });
+    } else {
+      animate(x, 0, { type: 'spring', stiffness: 450, damping: 36 });
+    }
+  };
+
+  return (
+    <div className="relative overflow-hidden">
+      <motion.div
+        className="absolute inset-0 flex items-center justify-end pr-5"
+        style={{ background: '#FF6B5F', opacity: deleteOpacity }}
+      >
+        <Trash2 size={15} color="#fff" />
+      </motion.div>
+      <motion.div
+        drag="x"
+        dragConstraints={{ left: -300, right: 0 }}
+        dragElastic={{ left: 0.15, right: 0 }}
+        dragMomentum={false}
+        style={{ x, background: '#111', position: 'relative', zIndex: 1 }}
+        onDragEnd={handleDragEnd}
+      >
+        {children}
+      </motion.div>
+    </div>
+  );
 }
 
 // ─── Bottom sheet: Add item ───────────────────────────────────────────────────
@@ -252,7 +296,7 @@ function RestockPrompt({ item, onConfirm, onDismiss }: {
 // ─── Main page ────────────────────────────────────────────────────────────────
 
 export function DailyFocus() {
-  const { items, addItem, toggleItem, updateItem } = useDailyFocus();
+  const { items, addItem, toggleItem, updateItem, deleteItem } = useDailyFocus();
 
   const [activeTab, setActiveTab] = useState<Tab>('Hoje');
   const [restockQueue, setRestockQueue] = useState<DailyFocusItem[]>(() =>
@@ -321,9 +365,13 @@ export function DailyFocus() {
       <div className="px-5 mt-4 flex flex-col gap-3">
         {/* Active items list */}
         {pendingItems.length > 0 ? (
-          <GlassCard padding="px-4 py-1">
+          <GlassCard padding="py-1">
             {pendingItems.map(item => (
-              <ChecklistItem key={item.id} item={item} onToggle={toggle} />
+              <SwipeToDelete key={item.id} onDelete={() => deleteItem(item.id)}>
+                <div className="px-4">
+                  <ChecklistItem item={item} onToggle={toggle} />
+                </div>
+              </SwipeToDelete>
             ))}
           </GlassCard>
         ) : doneItems.length === 0 ? (
@@ -358,9 +406,13 @@ export function DailyFocus() {
                   transition={{ duration: 0.22 }}
                   style={{ overflow: 'hidden' }}
                 >
-                  <GlassCard padding="px-4 py-1">
+                  <GlassCard padding="py-1">
                     {doneItems.map(item => (
-                      <ChecklistItem key={item.id} item={item} onToggle={toggle} />
+                      <SwipeToDelete key={item.id} onDelete={() => deleteItem(item.id)}>
+                        <div className="px-4">
+                          <ChecklistItem key={item.id} item={item} onToggle={toggle} />
+                        </div>
+                      </SwipeToDelete>
                     ))}
                   </GlassCard>
                 </motion.div>
