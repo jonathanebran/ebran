@@ -5,13 +5,21 @@ interface AppLogoProps {
 
 export function AppLogo({ size = 36, className = '' }: AppLogoProps) {
   return (
-    <img
-      src="/logo.png"
-      width={size}
-      height={size}
-      alt="Ebran"
-      className={`flex-shrink-0 rounded-xl object-cover ${className}`}
-      style={{ width: size, height: size }}
-    />
+    <div
+      className={`flex-shrink-0 rounded-xl overflow-hidden ${className}`}
+      style={{ width: size, height: size, minWidth: size }}
+    >
+      <img
+        src="/logo.png"
+        alt="Ebran"
+        style={{
+          width: '100%',
+          height: '100%',
+          transform: 'scale(1.45)',
+          objectFit: 'cover',
+          display: 'block',
+        }}
+      />
+    </div>
   );
 }
