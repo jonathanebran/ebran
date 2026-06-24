@@ -13,425 +13,60 @@ export const mockUser: User = {
   created_at: '2024-01-01T00:00:00Z',
 };
 
-export const mockGoals: Goal[] = [
-  {
-    id: 'goal-1',
-    user_id: 'user-1',
-    title: 'Londres 2026',
-    description: 'Viagem dos sonhos para Londres em 2026',
-    type: 'travel',
-    category: 'Viagem',
-    target_amount: 10000,
-    current_amount: 6200,
-    reserved_amount: 6200,
-    start_date: '2024-01-01',
-    end_date: '2026-06-01',
-    desired_date: '2026-06-01',
-    recurrence: 'monthly',
-    priority: 'high',
-    status: 'active',
-    image_url: 'https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?w=300&h=200&fit=crop&auto=format',
-    tags: ['viagem', 'internacional', 'sonho'],
-    created_at: '2024-01-01T00:00:00Z',
-    updated_at: '2025-06-01T00:00:00Z',
-  },
-  {
-    id: 'goal-2',
-    user_id: 'user-1',
-    title: 'Carro dos Sonhos',
-    description: 'Carro próprio para maior mobilidade',
-    type: 'financial',
-    category: 'Transporte',
-    target_amount: 80000,
-    current_amount: 15000,
-    reserved_amount: 15000,
-    end_date: '2027-12-01',
-    recurrence: 'monthly',
-    priority: 'medium',
-    status: 'active',
-    image_url: 'https://images.unsplash.com/photo-1555215695-3004980ad54e?w=300&h=200&fit=crop&auto=format',
-    tags: ['carro', 'mobilidade'],
-    created_at: '2024-06-01T00:00:00Z',
-    updated_at: '2025-06-01T00:00:00Z',
-  },
-  {
-    id: 'goal-3',
-    user_id: 'user-1',
-    title: 'Apartamento',
-    description: 'Entrada para o apartamento próprio',
-    type: 'financial',
-    category: 'Moradia',
-    target_amount: 60000,
-    current_amount: 8000,
-    reserved_amount: 8000,
-    end_date: '2028-01-01',
-    recurrence: 'monthly',
-    priority: 'high',
-    status: 'active',
-    image_url: 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=300&h=200&fit=crop&auto=format',
-    tags: ['moradia', 'investimento'],
-    created_at: '2024-01-01T00:00:00Z',
-    updated_at: '2025-06-01T00:00:00Z',
-  },
-  {
-    id: 'goal-4',
-    user_id: 'user-1',
-    title: 'Reserva de Emergência',
-    description: '6 meses de despesas como reserva',
-    type: 'financial',
-    category: 'Finanças',
-    target_amount: 30000,
-    current_amount: 12000,
-    reserved_amount: 12000,
-    end_date: '2026-01-01',
-    recurrence: 'monthly',
-    priority: 'urgent',
-    status: 'active',
-    image_url: 'https://images.unsplash.com/photo-1567427018141-0584cfcbf1b8?w=300&h=200&fit=crop&auto=format',
-    tags: ['reserva', 'segurança'],
-    created_at: '2024-01-01T00:00:00Z',
-    updated_at: '2025-06-01T00:00:00Z',
-  },
-  {
-    id: 'goal-5',
-    user_id: 'user-1',
-    title: 'Botox',
-    description: 'Procedimento estético planejado',
-    type: 'care',
-    category: 'Cuidado Pessoal',
-    target_amount: 900,
-    current_amount: 0,
-    reserved_amount: 0,
-    desired_date: '2025-10-01',
-    recurrence: 'once',
-    priority: 'medium',
-    status: 'planning',
-    tags: ['estética', 'cuidado'],
-    created_at: '2025-06-01T00:00:00Z',
-    updated_at: '2025-06-01T00:00:00Z',
-  },
-  {
-    id: 'goal-6',
-    user_id: 'user-1',
-    title: 'PRP Capilar',
-    description: 'Tratamento capilar com PRP',
-    type: 'care',
-    category: 'Cuidado Pessoal',
-    target_amount: 1500,
-    current_amount: 300,
-    reserved_amount: 300,
-    desired_date: '2025-09-01',
-    recurrence: 'once',
-    priority: 'medium',
-    status: 'active',
-    tags: ['cabelo', 'tratamento'],
-    created_at: '2025-01-01T00:00:00Z',
-    updated_at: '2025-06-01T00:00:00Z',
-  },
-  {
-    id: 'goal-7',
-    user_id: 'user-1',
-    title: 'Tênis de Corrida',
-    description: 'Tênis novo para treinos de corrida',
-    type: 'small',
-    category: 'Treino',
-    target_amount: 650,
-    current_amount: 200,
-    reserved_amount: 200,
-    desired_date: '2025-07-15',
-    recurrence: 'once',
-    priority: 'high',
-    status: 'active',
-    tags: ['treino', 'corrida'],
-    created_at: '2025-05-01T00:00:00Z',
-    updated_at: '2025-06-01T00:00:00Z',
-  },
-  {
-    id: 'goal-8',
-    user_id: 'user-1',
-    title: 'PS5',
-    description: 'PlayStation 5 para lazer',
-    type: 'wish',
-    category: 'Lazer',
-    target_amount: 4500,
-    current_amount: 500,
-    reserved_amount: 500,
-    recurrence: 'once',
-    priority: 'low',
-    status: 'planning',
-    tags: ['games', 'lazer'],
-    created_at: '2025-01-01T00:00:00Z',
-    updated_at: '2025-06-01T00:00:00Z',
-  },
-  {
-    id: 'goal-9',
-    user_id: 'user-1',
-    title: 'Mochila',
-    description: 'Mochila nova para o dia a dia',
-    type: 'small',
-    category: 'Acessórios',
-    target_amount: 350,
-    current_amount: 100,
-    reserved_amount: 100,
-    desired_date: '2025-07-01',
-    recurrence: 'once',
-    priority: 'medium',
-    status: 'active',
-    tags: ['acessório'],
-    created_at: '2025-04-01T00:00:00Z',
-    updated_at: '2025-06-01T00:00:00Z',
-  },
-  {
-    id: 'goal-10',
-    user_id: 'user-1',
-    title: 'Kit Treino',
-    description: 'Roupas e acessórios para treino',
-    type: 'small',
-    category: 'Treino',
-    target_amount: 500,
-    current_amount: 0,
-    reserved_amount: 0,
-    recurrence: 'once',
-    priority: 'medium',
-    status: 'planning',
-    tags: ['treino', 'roupas'],
-    created_at: '2025-06-01T00:00:00Z',
-    updated_at: '2025-06-01T00:00:00Z',
-  },
-];
-
-export const mockGoalContributions: GoalContribution[] = [
-  { id: 'c-1', goal_id: 'goal-1', user_id: 'user-1', amount: 1000, note: 'Aporte mensal', created_at: '2025-05-01T00:00:00Z' },
-  { id: 'c-2', goal_id: 'goal-1', user_id: 'user-1', amount: 500, note: 'Extra de freela', created_at: '2025-05-15T00:00:00Z' },
-  { id: 'c-3', goal_id: 'goal-1', user_id: 'user-1', amount: 800, note: 'Aporte junho', created_at: '2025-06-01T00:00:00Z' },
-];
-
-export const mockWorkRecords: WorkRecord[] = [
-  {
-    id: 'w-1',
-    user_id: 'user-1',
-    description: 'Projeto Website — Empresa ABC',
-    amount: 2350,
-    payment_method: 'pix',
-    date: '2025-06-17',
-    time: '18:22',
-    status: 'received',
-    tags: ['website', 'freela'],
-    created_at: '2025-06-17T18:22:00Z',
-  },
-  {
-    id: 'w-2',
-    user_id: 'user-1',
-    description: 'Identidade visual — Startup X',
-    amount: 1800,
-    payment_method: 'transfer',
-    date: '2025-06-14',
-    status: 'received',
-    tags: ['design'],
-    created_at: '2025-06-14T00:00:00Z',
-  },
-  {
-    id: 'w-3',
-    user_id: 'user-1',
-    description: 'Consultoria de marketing',
-    amount: 1200,
-    payment_method: 'pix',
-    date: '2025-06-10',
-    status: 'received',
-    tags: ['marketing'],
-    created_at: '2025-06-10T00:00:00Z',
-  },
-];
+export const mockGoals: Goal[] = [];
+export const mockGoalContributions: GoalContribution[] = [];
+export const mockWorkRecords: WorkRecord[] = [];
 
 export const mockWorkSummary = {
-  monthly_revenue: 8750,
-  monthly_goal: 15000,
-  services_count: 28,
-  average_ticket: 312.5,
+  monthly_revenue: 0,
+  monthly_goal: 0,
+  services_count: 0,
+  average_ticket: 0,
 };
 
-export const mockPhotoSessions: PhotoSession[] = [
-  // June 2026 (10 sessions)
-  { id: 's-01', client: 'Ana Lima', service_type: 'Ensaio Retrato', date: '2026-06-15', time: '09:00' },
-  { id: 's-02', client: 'Mariana e Pedro', service_type: 'Ensaio Casal', date: '2026-06-12', time: '14:00' },
-  { id: 's-03', client: 'TechSoft Ltda', service_type: 'Fotografia Corporativa', date: '2026-06-10', time: '10:00' },
-  { id: 's-04', client: 'Beatriz Costa', service_type: 'Aniversário/Debutante', date: '2026-06-07', time: '09:30' },
-  { id: 's-05', client: 'Studio Moda', service_type: 'Fotografia de Produto', date: '2026-06-05', time: '15:00' },
-  { id: 's-06', client: 'Lucas e Fernanda', service_type: 'Ensaio Casal', date: '2026-06-01', time: '09:00' },
-  // May 2026 (9 sessions)
-  { id: 's-07', client: 'Família Rodrigues', service_type: 'Ensaio Família', date: '2026-05-31', time: '10:00' },
-  { id: 's-08', client: 'Sofia Mendes', service_type: 'Ensaio Retrato', date: '2026-05-28', time: '14:30' },
-  { id: 's-09', client: 'Rafael Souza', service_type: 'Ensaio Retrato', date: '2026-05-25', time: '09:00' },
-  { id: 's-10', client: 'Camila e Henrique', service_type: 'Ensaio Casal', date: '2026-05-20', time: '10:00' },
-  { id: 's-11', client: 'Isabela Ferreira', service_type: 'Aniversário/Debutante', date: '2026-05-15', time: '09:00' },
-  { id: 's-12', client: 'André Santos', service_type: 'Fotografia Corporativa', date: '2026-05-11', time: '14:00' },
-  { id: 's-13', client: 'Vitória e Guilherme', service_type: 'Ensaio Casal', date: '2026-05-08', time: '10:30' },
-  { id: 's-14', client: 'Bruna Oliveira', service_type: 'Ensaio Retrato', date: '2026-05-04', time: '09:00' },
-  { id: 's-15', client: 'Nexus Digital', service_type: 'Fotografia de Produto', date: '2026-05-01', time: '15:00' },
-  // April 2026 (6 sessions)
-  { id: 's-16', client: 'Larissa Costa', service_type: 'Ensaio Retrato', date: '2026-04-26', time: '09:00' },
-  { id: 's-17', client: 'Família Alves', service_type: 'Ensaio Família', date: '2026-04-22', time: '14:00' },
-  { id: 's-18', client: 'Carlos e Maria', service_type: 'Ensaio Casal', date: '2026-04-19', time: '10:00' },
-  { id: 's-19', client: 'Patricia Lima', service_type: 'Ensaio Retrato', date: '2026-04-12', time: '09:00' },
-  { id: 's-20', client: 'Digital Agency', service_type: 'Fotografia Corporativa', date: '2026-04-08', time: '10:00' },
-  { id: 's-21', client: 'Daniela e Marco', service_type: 'Ensaio Casal', date: '2026-04-04', time: '14:30' },
-  // March 2026 (3 sessions)
-  { id: 's-22', client: 'Julia Soares', service_type: 'Aniversário/Debutante', date: '2026-03-28', time: '09:30' },
-  { id: 's-23', client: 'Loja Trend', service_type: 'Fotografia de Produto', date: '2026-03-22', time: '10:00' },
-  { id: 's-24', client: 'Família Pereira', service_type: 'Ensaio Família', date: '2026-03-19', time: '14:00' },
-];
+export const mockPhotoSessions: PhotoSession[] = [];
 
-export const mockFinanceRecords: FinanceRecord[] = [
-  {
-    id: 'f-1',
-    user_id: 'user-1',
-    type: 'income',
-    description: 'Serviços de freela',
-    amount: 8750,
-    category: 'work',
-    date: '2025-06-17',
-    status: 'confirmed',
-    created_at: '2025-06-17T00:00:00Z',
-  },
-  {
-    id: 'f-2',
-    user_id: 'user-1',
-    type: 'income',
-    description: 'Outros',
-    amount: 1100,
-    category: 'work',
-    date: '2025-06-17',
-    status: 'confirmed',
-    created_at: '2025-06-17T00:00:00Z',
-  },
-  {
-    id: 'f-3',
-    user_id: 'user-1',
-    type: 'expense',
-    description: 'Alimentação',
-    amount: 1200,
-    category: 'food',
-    date: '2025-06-17',
-    status: 'confirmed',
-    created_at: '2025-06-17T00:00:00Z',
-  },
-  {
-    id: 'f-4',
-    user_id: 'user-1',
-    type: 'expense',
-    description: 'Consulta psicóloga',
-    amount: 300,
-    category: 'care',
-    subcategory: 'Terapia',
-    date: '2025-06-12',
-    status: 'confirmed',
-    created_at: '2025-06-12T00:00:00Z',
-  },
-];
+export const mockFinanceRecords: FinanceRecord[] = [];
 
 export const mockFinanceSummary = {
-  income: 9850,
-  expenses: 5500,
-  balance: 4350,
-  savings_rate: 44.2,
+  income: 0,
+  expenses: 0,
+  balance: 0,
+  savings_rate: 0,
 };
 
-export const mockDailyFocusItems: DailyFocusItem[] = [
-  { id: 'df-1', user_id: 'user-1', name: 'Frango', category: 'market', status: 'pending', priority: 'high', recurrence: 'weekly', next_restock_date: '2025-06-20', estimated_price: 25, created_at: '2025-06-17T00:00:00Z' },
-  { id: 'df-2', user_id: 'user-1', name: 'Ovos', category: 'market', status: 'pending', priority: 'high', recurrence: 'weekly', next_restock_date: '2025-06-20', estimated_price: 15, created_at: '2025-06-17T00:00:00Z' },
-  { id: 'df-3', user_id: 'user-1', name: 'Banana', category: 'market', status: 'done', priority: 'medium', recurrence: 'weekly', estimated_price: 8, created_at: '2025-06-17T00:00:00Z' },
-  { id: 'df-4', user_id: 'user-1', name: 'Whey Protein', category: 'market', status: 'pending', priority: 'high', recurrence: 'monthly', next_restock_date: '2025-07-01', estimated_price: 120, created_at: '2025-06-17T00:00:00Z' },
-  { id: 'df-5', user_id: 'user-1', name: 'Creatina', category: 'market', status: 'pending', priority: 'medium', recurrence: 'monthly', next_restock_date: '2025-07-10', estimated_price: 60, created_at: '2025-06-17T00:00:00Z' },
-  { id: 'df-6', user_id: 'user-1', name: 'Protetor Solar', category: 'care', status: 'pending', priority: 'high', recurrence: 'monthly', next_restock_date: '2025-07-05', estimated_price: 45, created_at: '2025-06-17T00:00:00Z' },
-  { id: 'df-7', user_id: 'user-1', name: 'Hidratante', category: 'care', status: 'pending', priority: 'medium', recurrence: 'biweekly', next_restock_date: '2025-07-01', estimated_price: 35, note: '45 dias', created_at: '2025-06-17T00:00:00Z' },
-  { id: 'df-8', user_id: 'user-1', name: 'Pasta de Dente', category: 'care', status: 'done', priority: 'medium', recurrence: 'monthly', next_restock_date: '2025-07-17', estimated_price: 12, created_at: '2025-06-17T00:00:00Z' },
-  { id: 'df-9', user_id: 'user-1', name: 'Sabonete Facial', category: 'care', status: 'pending', priority: 'high', recurrence: 'monthly', next_restock_date: '2025-07-01', estimated_price: 28, created_at: '2025-06-17T00:00:00Z' },
-  { id: 'df-10', user_id: 'user-1', name: 'Passar pano na sala', category: 'home', status: 'pending', priority: 'low', recurrence: 'weekly', created_at: '2025-06-17T00:00:00Z' },
-  { id: 'df-11', user_id: 'user-1', name: 'Treino A — Peito e Tríceps', category: 'workout', status: 'done', priority: 'high', recurrence: 'weekly', created_at: '2025-06-17T00:00:00Z' },
-];
-
+export const mockDailyFocusItems: DailyFocusItem[] = [];
 export const mockRestockSuggestions = mockDailyFocusItems.filter(i => i.recurrence && i.next_restock_date);
 
-export const mockHealthToday = {
-  water: { current: 2.0, target: 3.0, unit: 'L' },
-  workout: { done: true, type: 'Peito e Tríceps' },
-  sleep: { hours: 7, minutes: 15 },
-  skincare_morning: { done: true },
+export const mockHealthToday: {
+  water: { current: number; target: number; unit: string };
+  workout: { done: boolean; type: string };
+  sleep: { hours: number; minutes: number };
+  skincare_morning: { done: boolean };
+  skincare_night: { done: boolean };
+  next_appointment: { title: string; date: string; time: string } | null;
+} = {
+  water: { current: 0, target: 3.0, unit: 'L' },
+  workout: { done: false, type: '' },
+  sleep: { hours: 0, minutes: 0 },
+  skincare_morning: { done: false },
   skincare_night: { done: false },
-  next_appointment: { title: 'Psicóloga', date: '2025-06-19', time: '15:00' },
+  next_appointment: null,
 };
 
-export const mockAppointments: Appointment[] = [
-  {
-    id: 'ap-1',
-    user_id: 'user-1',
-    title: 'Psicóloga',
-    professional: 'Dra. Ana',
-    specialty: 'Psicologia',
-    date: '2025-06-19',
-    time: '15:00',
-    status: 'scheduled',
-    created_at: '2025-06-01T00:00:00Z',
-  },
-  {
-    id: 'ap-2',
-    user_id: 'user-1',
-    title: 'Dermatologista',
-    professional: 'Dr. Carlos',
-    specialty: 'Dermatologia',
-    date: '2025-07-03',
-    time: '10:00',
-    status: 'scheduled',
-    created_at: '2025-06-01T00:00:00Z',
-  },
-];
-
-export const mockMedications: Medication[] = [
-  {
-    id: 'med-1',
-    user_id: 'user-1',
-    name: 'Minoxidil',
-    dose: '1ml',
-    frequency: 'daily',
-    reminder_time: '22:00',
-    status: 'active',
-    created_at: '2025-01-01T00:00:00Z',
-  },
-];
-
-export const mockWishlistItems: WishlistItem[] = [
-  { id: 'w-1', user_id: 'user-1', title: 'PS5', category: 'Lazer', estimated_price: 4500, priority: 'low', created_at: '2025-01-01T00:00:00Z' },
-  { id: 'w-2', user_id: 'user-1', title: 'Tênis Nike Air Max', category: 'Moda', estimated_price: 800, priority: 'medium', created_at: '2025-03-01T00:00:00Z' },
-  { id: 'w-3', user_id: 'user-1', title: 'Perfume Sauvage', category: 'Cuidado', estimated_price: 450, priority: 'low', created_at: '2025-04-01T00:00:00Z' },
-  { id: 'w-4', user_id: 'user-1', title: 'iPad Pro', category: 'Eletrônico', estimated_price: 7000, priority: 'medium', created_at: '2025-02-01T00:00:00Z' },
-  { id: 'w-5', user_id: 'user-1', title: 'Jaqueta de couro', category: 'Moda', estimated_price: 600, priority: 'low', created_at: '2025-05-01T00:00:00Z' },
-];
-
-export const mockCareProducts: CareProduct[] = [
-  { id: 'cp-1', user_id: 'user-1', name: 'Protetor Solar FPS 70', category: 'Rosto', price: 45, frequency: 'monthly', status: 'in_use', created_at: '2025-06-01T00:00:00Z' },
-  { id: 'cp-2', user_id: 'user-1', name: 'Hidratante Corporal', category: 'Corpo', price: 35, frequency: 'monthly', status: 'in_use', created_at: '2025-06-01T00:00:00Z' },
-  { id: 'cp-3', user_id: 'user-1', name: 'Sabonete Facial', category: 'Rosto', price: 28, frequency: 'monthly', status: 'in_use', created_at: '2025-06-01T00:00:00Z' },
-  { id: 'cp-4', user_id: 'user-1', name: 'Minoxidil', category: 'Cabelo', price: 80, frequency: 'monthly', status: 'in_use', created_at: '2025-01-01T00:00:00Z' },
-];
+export const mockAppointments: Appointment[] = [];
+export const mockMedications: Medication[] = [];
+export const mockWishlistItems: WishlistItem[] = [];
+export const mockCareProducts: CareProduct[] = [];
 
 export const mockGoogleIntegrations: GoogleIntegration[] = [
-  { id: 'gi-1', user_id: 'user-1', service: 'calendar', connected: true, account_email: 'jonathan1704.si@gmail.com', permissions: ['read', 'create_events'], sync_frequency: 'realtime', created_at: '2025-01-01T00:00:00Z' },
-  { id: 'gi-2', user_id: 'user-1', service: 'drive', connected: true, account_email: 'jonathan1704.si@gmail.com', permissions: ['upload', 'read'], sync_frequency: 'realtime', default_folder: 'Ebran / Anexos', created_at: '2025-01-01T00:00:00Z' },
+  { id: 'gi-1', user_id: 'user-1', service: 'calendar', connected: false, permissions: [], sync_frequency: 'manual', created_at: '2025-01-01T00:00:00Z' },
+  { id: 'gi-2', user_id: 'user-1', service: 'drive', connected: false, permissions: [], sync_frequency: 'manual', created_at: '2025-01-01T00:00:00Z' },
   { id: 'gi-3', user_id: 'user-1', service: 'tasks', connected: false, permissions: [], sync_frequency: 'manual', created_at: '2025-01-01T00:00:00Z' },
   { id: 'gi-4', user_id: 'user-1', service: 'keep', connected: false, permissions: [], sync_frequency: 'manual', created_at: '2025-01-01T00:00:00Z' },
   { id: 'gi-5', user_id: 'user-1', service: 'gmail', connected: false, permissions: [], sync_frequency: 'manual', created_at: '2025-01-01T00:00:00Z' },
 ];
 
-export const mockRecentActivity = [
-  { id: 'a-1', icon: 'briefcase', title: 'Novo atendimento – Projeto Website', subtitle: 'Empresa ABC', time: 'Hoje, 20:43', color: '#FF9F3D' },
-  { id: 'a-2', icon: 'dollar-sign', title: 'Pagamento recebido', subtitle: 'R$ 2.350,00 via Pix', time: 'Hoje, 18:22', color: '#22c55e' },
-  { id: 'a-3', icon: 'target', title: 'Meta "Londres 2026" atualizada', subtitle: 'Progresso: 62%', time: 'Hoje, 16:10', color: '#FF6B5F' },
-];
+export const mockRecentActivity: { id: string; icon: string; title: string; subtitle: string; time: string; color: string }[] = [];
 
-export const mockEconomyMode = [
-  { id: 'em-1', title: 'Tênis de Corrida', category: 'Treino', price: 650, recommendation: 'buy_now' as const, reason: 'Impacto direto no treino e saúde', priority: 'high' as const },
-  { id: 'em-2', title: 'Cuecas', category: 'Vestuário', price: 80, recommendation: 'buy_now' as const, reason: 'Necessidade básica de rotina', priority: 'high' as const },
-  { id: 'em-3', title: 'Calça Jeans', category: 'Moda', price: 200, recommendation: 'buy_later' as const, reason: 'Não urgente, pode esperar', priority: 'medium' as const },
-  { id: 'em-4', title: 'Mochila', category: 'Acessórios', price: 350, recommendation: 'research' as const, reason: 'Pesquisar melhor custo-benefício', priority: 'medium' as const },
-  { id: 'em-5', title: 'PS5', category: 'Lazer', price: 4500, recommendation: 'save_as_goal' as const, reason: 'Valor alto — melhor virar meta', priority: 'low' as const },
-];
+export const mockEconomyMode: { id: string; title: string; category: string; price: number; recommendation: 'buy_now' | 'buy_later' | 'research' | 'save_as_goal'; reason: string; priority: 'high' | 'medium' | 'low' }[] = [];

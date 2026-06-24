@@ -119,9 +119,11 @@ export function Home() {
                 <p className="text-[#6F6F6F] text-[10px]">{mockHealthToday.water.target}L meta</p>
               </div>
               <div className="flex flex-col items-center gap-1 rounded-2xl py-3" style={{ background: 'rgba(255,255,255,0.04)' }}>
-                <Dumbbell size={18} color="#22c55e" />
+                <Dumbbell size={18} color={mockHealthToday.workout.done ? '#22c55e' : '#6F6F6F'} />
                 <p className="text-[#F7F7F7] text-xs font-bold">Treino</p>
-                <p className="text-[#22c55e] text-[10px]">Concluído</p>
+                <p className="text-[10px]" style={{ color: mockHealthToday.workout.done ? '#22c55e' : '#6F6F6F' }}>
+                  {mockHealthToday.workout.done ? 'Concluído' : 'Pendente'}
+                </p>
               </div>
               <div className="flex flex-col items-center gap-1 rounded-2xl py-3" style={{ background: 'rgba(255,255,255,0.04)' }}>
                 <Moon size={18} color="#a78bfa" />
@@ -138,29 +140,33 @@ export function Home() {
             <span className="text-[#F7F7F7] font-semibold text-sm">Atividade recente</span>
             <button className="text-xs font-semibold" style={{ color: '#FF9F3D' }}>Ver todas</button>
           </div>
-          <div className="flex flex-col gap-2">
-            {mockRecentActivity.map(item => (
-              <div
-                key={item.id}
-                className="flex items-center gap-3 rounded-xl p-3"
-                style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)' }}
-              >
+          {mockRecentActivity.length === 0 ? (
+            <p className="text-[#6F6F6F] text-sm text-center py-4">Nenhuma atividade ainda.</p>
+          ) : (
+            <div className="flex flex-col gap-2">
+              {mockRecentActivity.map(item => (
                 <div
-                  className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0"
-                  style={{ background: `${item.color}22` }}
+                  key={item.id}
+                  className="flex items-center gap-3 rounded-xl p-3"
+                  style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)' }}
                 >
-                  {item.icon === 'briefcase' && <Briefcase size={16} color={item.color} />}
-                  {item.icon === 'dollar-sign' && <span style={{ color: item.color, fontSize: 15, fontWeight: 'bold' }}>$</span>}
-                  {item.icon === 'target' && <span style={{ color: item.color, fontSize: 15 }}>◎</span>}
+                  <div
+                    className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0"
+                    style={{ background: `${item.color}22` }}
+                  >
+                    {item.icon === 'briefcase' && <Briefcase size={16} color={item.color} />}
+                    {item.icon === 'dollar-sign' && <span style={{ color: item.color, fontSize: 15, fontWeight: 'bold' }}>$</span>}
+                    {item.icon === 'target' && <span style={{ color: item.color, fontSize: 15 }}>◎</span>}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-[#F7F7F7] text-xs font-medium truncate">{item.title}</p>
+                    <p className="text-[#6F6F6F] text-[10px]">{item.subtitle}</p>
+                  </div>
+                  <span className="text-[#6F6F6F] text-[10px] flex-shrink-0">{item.time}</span>
                 </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-[#F7F7F7] text-xs font-medium truncate">{item.title}</p>
-                  <p className="text-[#6F6F6F] text-[10px]">{item.subtitle}</p>
-                </div>
-                <span className="text-[#6F6F6F] text-[10px] flex-shrink-0">{item.time}</span>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </motion.div>
       </motion.div>
     </div>

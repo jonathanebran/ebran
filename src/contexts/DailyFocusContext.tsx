@@ -1,9 +1,8 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 import type { ReactNode } from 'react';
 import type { DailyFocusItem } from '../lib/types';
-import { mockDailyFocusItems } from '../data/mockData';
 
-const FOCUS_KEY = 'ebran:dailyfocus:v1';
+const FOCUS_KEY = 'ebran:dailyfocus:v2';
 
 function loadFromStorage<T>(key: string, fallback: T): T {
   try {
@@ -32,7 +31,7 @@ const DailyFocusContext = createContext<DailyFocusContextValue | null>(null);
 
 export function DailyFocusProvider({ children }: { children: ReactNode }) {
   const [items, setItems] = useState<DailyFocusItem[]>(() =>
-    loadFromStorage(FOCUS_KEY, mockDailyFocusItems)
+    loadFromStorage<DailyFocusItem[]>(FOCUS_KEY, [])
   );
 
   useEffect(() => { saveToStorage(FOCUS_KEY, items); }, [items]);
