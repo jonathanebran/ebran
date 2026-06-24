@@ -19,6 +19,8 @@ import { Profile } from './pages/Profile';
 import { ConnectedAccounts } from './pages/ConnectedAccounts';
 import { GooglePermissions } from './pages/GooglePermissions';
 import { EconomyMode } from './pages/EconomyMode';
+import { MeuPerfil } from './pages/MeuPerfil';
+import { Configuracoes } from './pages/Configuracoes';
 import { Login } from './pages/Login';
 import { Signup } from './pages/Signup';
 
@@ -55,6 +57,8 @@ function AppContent() {
             <Route path="/contas" element={<ConnectedAccounts />} />
             <Route path="/permissoes-google" element={<GooglePermissions />} />
             <Route path="/modo-economia" element={<EconomyMode />} />
+            <Route path="/meu-perfil" element={<MeuPerfil />} />
+            <Route path="/configuracoes" element={<Configuracoes />} />
             <Route path="/entrar" element={<Login />} />
             <Route path="/cadastro" element={<Signup />} />
           </Routes>
