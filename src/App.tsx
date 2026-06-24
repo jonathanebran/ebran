@@ -1,7 +1,11 @@
+import React from 'react';
 import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import { AuthProvider } from './contexts/AuthContext';
 import { GoalsProvider } from './contexts/GoalsContext';
+import { DailyFocusProvider } from './contexts/DailyFocusContext';
+import { PinLockProvider, usePinLock } from './contexts/PinLockContext';
+import { PinLock } from './pages/PinLock';
 import { BottomNav } from './components/BottomNav';
 import { Home } from './pages/Home';
 import { DailyFocus } from './pages/DailyFocus';
@@ -18,6 +22,8 @@ import { Profile } from './pages/Profile';
 import { ConnectedAccounts } from './pages/ConnectedAccounts';
 import { GooglePermissions } from './pages/GooglePermissions';
 import { EconomyMode } from './pages/EconomyMode';
+import { MeuPerfil } from './pages/MeuPerfil';
+import { Configuracoes } from './pages/Configuracoes';
 import { Login } from './pages/Login';
 import { Signup } from './pages/Signup';
 
@@ -54,6 +60,8 @@ function AppContent() {
             <Route path="/contas" element={<ConnectedAccounts />} />
             <Route path="/permissoes-google" element={<GooglePermissions />} />
             <Route path="/modo-economia" element={<EconomyMode />} />
+            <Route path="/meu-perfil" element={<MeuPerfil />} />
+            <Route path="/configuracoes" element={<Configuracoes />} />
             <Route path="/entrar" element={<Login />} />
             <Route path="/cadastro" element={<Signup />} />
           </Routes>
@@ -65,14 +73,26 @@ function AppContent() {
   );
 }
 
+function PinGate({ children }: { children: React.ReactNode }) {
+  const { isLocked } = usePinLock();
+  if (isLocked) return <PinLock />;
+  return <>{children}</>;
+}
+
 export default function App() {
   return (
-    <BrowserRouter>
-      <AuthProvider>
-        <GoalsProvider>
-          <AppContent />
-        </GoalsProvider>
-      </AuthProvider>
-    </BrowserRouter>
+    <PinLockProvider>
+      <PinGate>
+        <BrowserRouter>
+          <AuthProvider>
+            <GoalsProvider>
+              <DailyFocusProvider>
+                <AppContent />
+              </DailyFocusProvider>
+            </GoalsProvider>
+          </AuthProvider>
+        </BrowserRouter>
+      </PinGate>
+    </PinLockProvider>
   );
 }
