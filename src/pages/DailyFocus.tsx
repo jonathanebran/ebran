@@ -1,11 +1,12 @@
 import { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Plus, RefreshCw, ChevronDown, ChevronUp, X } from 'lucide-react';
+import { motion, AnimatePresence, useMotionValue, useTransform, animate } from 'framer-motion';
+import type { PanInfo } from 'framer-motion';
+import { Plus, RefreshCw, ChevronDown, ChevronUp, X, Trash2 } from 'lucide-react';
 import { Header } from '../components/Header';
 import { Chip } from '../components/Chip';
 import { GlassCard } from '../components/GlassCard';
 import { ChecklistItem } from '../components/ChecklistItem';
-import { mockDailyFocusItems } from '../data/mockData';
+import { useDailyFocus } from '../contexts/DailyFocusContext';
 import type { DailyFocusItem } from '../lib/types';
 
 const tabs = ['Hoje', 'Mercado', 'Casa', 'Treino', 'Cuidado'] as const;
@@ -36,7 +37,7 @@ const recurrenceOptions = [
 ] as const;
 
 function nextRestockDate(recurrence: string): string {
-  const d = new Date('2026-06-17');
+  const d = new Date();
   if (recurrence === 'daily') d.setDate(d.getDate() + 1);
   else if (recurrence === 'weekly') d.setDate(d.getDate() + 7);
   else if (recurrence === 'biweekly') d.setDate(d.getDate() + 15);
@@ -44,6 +45,49 @@ function nextRestockDate(recurrence: string): string {
   const [, m, day] = d.toISOString().split('T')[0].split('-');
   const months = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
   return `${parseInt(day)} ${months[parseInt(m) - 1]}`;
+}
+
+// ─── Swipe-to-delete row wrapper ─────────────────────────────────────────────
+
+function SwipeToDelete({ children, onDelete }: {
+  children: React.ReactNode;
+  onDelete: () => void;
+}) {
+  const x = useMotionValue(0);
+  const deleteOpacity = useTransform(x, [-90, -15], [1, 0]);
+
+  const handleDragEnd = (_: PointerEvent | MouseEvent | TouchEvent, info: PanInfo) => {
+    if (info.offset.x < -80 || info.velocity.x < -600) {
+      animate(x, -500, {
+        duration: 0.22,
+        ease: 'easeOut',
+        onComplete: onDelete,
+      });
+    } else {
+      animate(x, 0, { type: 'spring', stiffness: 450, damping: 36 });
+    }
+  };
+
+  return (
+    <div className="relative overflow-hidden">
+      <motion.div
+        className="absolute inset-0 flex items-center justify-end pr-5"
+        style={{ background: '#FF6B5F', opacity: deleteOpacity }}
+      >
+        <Trash2 size={15} color="#fff" />
+      </motion.div>
+      <motion.div
+        drag="x"
+        dragConstraints={{ left: -300, right: 0 }}
+        dragElastic={{ left: 0.15, right: 0 }}
+        dragMomentum={false}
+        style={{ x, background: '#111', position: 'relative', zIndex: 1 }}
+        onDragEnd={handleDragEnd}
+      >
+        {children}
+      </motion.div>
+    </div>
+  );
 }
 
 // ─── Bottom sheet: Add item ───────────────────────────────────────────────────
@@ -55,7 +99,7 @@ function AddItemSheet({ onClose, onSave }: {
   const [name, setName] = useState('');
   const [category, setCategory] = useState<string>('market');
   const [recurrence, setRecurrence] = useState<string>('once');
-  const [price, setPrice] = useState('');
+  const [note, setNote] = useState('');
 
   const handleSave = () => {
     if (!name.trim()) return;
@@ -65,14 +109,14 @@ function AddItemSheet({ onClose, onSave }: {
       status: 'pending',
       priority: 'medium',
       recurrence: recurrence as DailyFocusItem['recurrence'],
-      estimated_price: price ? parseFloat(price) : undefined,
+      note: note.trim() || undefined,
     });
     onClose();
   };
 
   return (
     <motion.div
-      className="fixed inset-0 z-50 flex items-end"
+      className="fixed inset-0 z-[100] flex items-end"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
@@ -80,8 +124,13 @@ function AddItemSheet({ onClose, onSave }: {
       onClick={onClose}
     >
       <motion.div
-        className="w-full max-w-[430px] mx-auto rounded-t-3xl p-6 pb-10"
-        style={{ background: 'rgba(15,15,15,0.98)', border: '0.5px solid rgba(255,255,255,0.1)' }}
+        className="w-full max-w-[430px] mx-auto rounded-t-3xl p-6 overflow-y-auto"
+        style={{
+          background: 'rgba(15,15,15,0.98)',
+          border: '0.5px solid rgba(255,255,255,0.1)',
+          paddingBottom: 'max(40px, env(safe-area-inset-bottom, 0px))',
+          maxHeight: '90vh',
+        }}
         initial={{ y: 120, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         exit={{ y: 120, opacity: 0 }}
@@ -145,11 +194,10 @@ function AddItemSheet({ onClose, onSave }: {
         </div>
 
         <input
-          type="number"
-          inputMode="decimal"
-          placeholder="Valor aproximado (opcional)"
-          value={price}
-          onChange={e => setPrice(e.target.value)}
+          type="text"
+          placeholder="Observações (opcional)"
+          value={note}
+          onChange={e => setNote(e.target.value)}
           className="w-full rounded-2xl px-4 py-3 mb-5 text-[#F7F7F7] text-sm outline-none"
           style={{ background: 'rgba(255,255,255,0.05)', border: '0.5px solid rgba(255,255,255,0.08)' }}
         />
@@ -188,7 +236,7 @@ function RestockPrompt({ item, onConfirm, onDismiss }: {
 
   return (
     <motion.div
-      className="fixed inset-0 z-50 flex items-end"
+      className="fixed inset-0 z-[100] flex items-end"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
@@ -196,8 +244,12 @@ function RestockPrompt({ item, onConfirm, onDismiss }: {
       onClick={onDismiss}
     >
       <motion.div
-        className="w-full max-w-[430px] mx-auto rounded-t-3xl p-6 pb-10"
-        style={{ background: 'rgba(15,15,15,0.98)', border: '0.5px solid rgba(255,255,255,0.1)' }}
+        className="w-full max-w-[430px] mx-auto rounded-t-3xl p-6"
+        style={{
+          background: 'rgba(15,15,15,0.98)',
+          border: '0.5px solid rgba(255,255,255,0.1)',
+          paddingBottom: 'max(40px, env(safe-area-inset-bottom, 0px))',
+        }}
         initial={{ y: 80, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         exit={{ y: 80, opacity: 0 }}
@@ -243,13 +295,12 @@ function RestockPrompt({ item, onConfirm, onDismiss }: {
 
 // ─── Main page ────────────────────────────────────────────────────────────────
 
-let nextId = 100;
-
 export function DailyFocus() {
+  const { items, addItem, toggleItem, updateItem, deleteItem } = useDailyFocus();
+
   const [activeTab, setActiveTab] = useState<Tab>('Hoje');
-  const [items, setItems] = useState<DailyFocusItem[]>(mockDailyFocusItems);
-  const [restockQueue, setRestockQueue] = useState<DailyFocusItem[]>(
-    mockDailyFocusItems.filter(i => i.recurrence && i.next_restock_date && i.status !== 'done')
+  const [restockQueue, setRestockQueue] = useState<DailyFocusItem[]>(() =>
+    items.filter(i => i.recurrence && i.next_restock_date && i.status !== 'done')
   );
   const [showDone, setShowDone] = useState(false);
   const [showAddSheet, setShowAddSheet] = useState(false);
@@ -263,9 +314,8 @@ export function DailyFocus() {
   const toggle = (id: string) => {
     const item = items.find(i => i.id === id);
     if (!item) return;
-    const newStatus = item.status === 'done' ? 'pending' : 'done';
-    setItems(prev => prev.map(i => i.id === id ? { ...i, status: newStatus } : i));
-    if (newStatus === 'done' && item.recurrence && item.recurrence !== 'once') {
+    toggleItem(id);
+    if (item.status !== 'done' && item.recurrence && item.recurrence !== 'once') {
       setRestockPrompt(item);
     }
   };
@@ -273,6 +323,7 @@ export function DailyFocus() {
   const handleRestockConfirm = () => {
     if (!restockPrompt) return;
     const restock = nextRestockDate(restockPrompt.recurrence ?? '');
+    updateItem(restockPrompt.id, { next_restock_date: restock });
     setRestockQueue(prev => [
       ...prev.filter(r => r.id !== restockPrompt.id),
       { ...restockPrompt, next_restock_date: restock, status: 'pending' },
@@ -281,19 +332,16 @@ export function DailyFocus() {
   };
 
   const handleAddItem = (data: Omit<DailyFocusItem, 'id' | 'user_id' | 'created_at'>) => {
-    const newItem: DailyFocusItem = {
+    addItem({
       ...data,
-      id: `df-new-${++nextId}`,
+      id: `df-${Date.now()}`,
       user_id: 'user-1',
       created_at: new Date().toISOString(),
-    };
-    setItems(prev => [newItem, ...prev]);
+    });
   };
 
   const handleAddFromRestock = (suggestion: DailyFocusItem) => {
-    setItems(prev => prev.map(i =>
-      i.id === suggestion.id ? { ...i, status: 'pending' } : i
-    ));
+    updateItem(suggestion.id, { status: 'pending' });
     setRestockQueue(prev => prev.filter(r => r.id !== suggestion.id));
   };
 
@@ -317,9 +365,13 @@ export function DailyFocus() {
       <div className="px-5 mt-4 flex flex-col gap-3">
         {/* Active items list */}
         {pendingItems.length > 0 ? (
-          <GlassCard padding="px-4 py-1">
+          <GlassCard padding="py-1">
             {pendingItems.map(item => (
-              <ChecklistItem key={item.id} item={item} onToggle={toggle} />
+              <SwipeToDelete key={item.id} onDelete={() => deleteItem(item.id)}>
+                <div className="px-4">
+                  <ChecklistItem item={item} onToggle={toggle} />
+                </div>
+              </SwipeToDelete>
             ))}
           </GlassCard>
         ) : doneItems.length === 0 ? (
@@ -354,9 +406,13 @@ export function DailyFocus() {
                   transition={{ duration: 0.22 }}
                   style={{ overflow: 'hidden' }}
                 >
-                  <GlassCard padding="px-4 py-1">
+                  <GlassCard padding="py-1">
                     {doneItems.map(item => (
-                      <ChecklistItem key={item.id} item={item} onToggle={toggle} />
+                      <SwipeToDelete key={item.id} onDelete={() => deleteItem(item.id)}>
+                        <div className="px-4">
+                          <ChecklistItem key={item.id} item={item} onToggle={toggle} />
+                        </div>
+                      </SwipeToDelete>
                     ))}
                   </GlassCard>
                 </motion.div>
@@ -386,18 +442,28 @@ export function DailyFocus() {
                         : item.recurrence === 'monthly' ? 'Mensal'
                         : item.recurrence === 'biweekly' ? '15 dias'
                         : item.recurrence}
-                      {item.estimated_price ? ` · ~R$ ${item.estimated_price}` : ''}
+                      {item.note ? ` · ${item.note}` : ''}
                       {item.next_restock_date ? ` · Próximo: ${item.next_restock_date}` : ''}
                     </p>
                   </div>
-                  <motion.button
-                    whileTap={{ scale: 0.94 }}
-                    onClick={() => handleAddFromRestock(item)}
-                    className="text-xs font-medium px-3 py-1.5 rounded-xl flex-shrink-0"
-                    style={{ background: 'rgba(255,159,61,0.15)', color: '#FF9F3D' }}
-                  >
-                    Adicionar
-                  </motion.button>
+                  <div className="flex items-center gap-2 flex-shrink-0">
+                    <motion.button
+                      whileTap={{ scale: 0.94 }}
+                      onClick={() => handleAddFromRestock(item)}
+                      className="text-xs font-medium px-3 py-1.5 rounded-xl"
+                      style={{ background: 'rgba(255,159,61,0.15)', color: '#FF9F3D' }}
+                    >
+                      Adicionar
+                    </motion.button>
+                    <motion.button
+                      whileTap={{ scale: 0.9 }}
+                      onClick={() => setRestockQueue(prev => prev.filter(r => r.id !== item.id))}
+                      className="w-7 h-7 rounded-xl flex items-center justify-center flex-shrink-0"
+                      style={{ background: 'rgba(255,107,95,0.12)' }}
+                    >
+                      <Trash2 size={13} color="#FF6B5F" />
+                    </motion.button>
+                  </div>
                 </div>
               ))}
             </div>

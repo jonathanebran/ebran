@@ -1,18 +1,14 @@
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, User, Settings, Target, Bell, Shield, Lock, Link2, HelpCircle, LogOut, ChevronRight } from 'lucide-react';
+import { ArrowLeft, User, Settings, Target, Link2, LogOut, ChevronRight } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { GlassCard } from '../components/GlassCard';
 import { mockUser } from '../data/mockData';
 
 const menuItems = [
-  { icon: User, label: 'Meu perfil', to: '/perfil', color: '#FF9F3D' },
-  { icon: Settings, label: 'Configurações', to: '/perfil', color: '#A8A8A8' },
+  { icon: User, label: 'Meu perfil', to: '/meu-perfil', color: '#FF9F3D' },
+  { icon: Settings, label: 'Configurações', to: '/configuracoes', color: '#A8A8A8' },
   { icon: Target, label: 'Metas financeiras', to: '/metas', color: '#FF6B5F' },
-  { icon: Bell, label: 'Notificações', to: '/perfil', color: '#FFD84A' },
-  { icon: Shield, label: 'Privacidade', to: '/perfil', color: '#a78bfa' },
-  { icon: Lock, label: 'Segurança', to: '/perfil', color: '#A8A8A8' },
   { icon: Link2, label: 'Conectar contas', to: '/contas', color: '#4285F4' },
-  { icon: HelpCircle, label: 'Ajuda e suporte', to: '/perfil', color: '#A8A8A8' },
 ];
 
 export function Profile() {

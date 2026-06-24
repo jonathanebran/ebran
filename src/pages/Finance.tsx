@@ -24,7 +24,6 @@ function ResumoTab() {
   const { income, expenses, balance, savings_rate } = mockFinanceSummary;
   return (
     <div className="flex flex-col gap-3">
-      {/* Integration note */}
       <div
         className="flex items-center gap-3 rounded-2xl px-4 py-3"
         style={{ background: 'rgba(255,159,61,0.08)', border: '0.5px solid rgba(255,159,61,0.2)' }}
@@ -73,51 +72,42 @@ function LancamentosTab() {
   const allRecords = [...mockFinanceRecords].sort((a, b) => b.date.localeCompare(a.date));
   return (
     <GlassCard>
-      <p className="text-[#A8A8A8] text-xs font-semibold uppercase tracking-wider mb-3">Junho 2025</p>
-      {allRecords.map(rec => (
-        <div key={rec.id} className="flex items-center gap-3 py-3 border-b" style={{ borderColor: 'rgba(255,255,255,0.06)' }}>
-          <div
-            className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0"
-            style={{ background: rec.type === 'income' ? '#22c55e18' : '#FF6B5F18' }}
-          >
-            {rec.type === 'income'
-              ? <TrendingUp size={15} color="#22c55e" />
-              : <TrendingDown size={15} color="#FF6B5F" />}
+      <p className="text-[#A8A8A8] text-xs font-semibold uppercase tracking-wider mb-3">Lançamentos</p>
+      {allRecords.length === 0 ? (
+        <p className="text-[#6F6F6F] text-sm text-center py-6">Nenhum lançamento registrado.</p>
+      ) : (
+        allRecords.map(rec => (
+          <div key={rec.id} className="flex items-center gap-3 py-3 border-b" style={{ borderColor: 'rgba(255,255,255,0.06)' }}>
+            <div
+              className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0"
+              style={{ background: rec.type === 'income' ? '#22c55e18' : '#FF6B5F18' }}
+            >
+              {rec.type === 'income'
+                ? <TrendingUp size={15} color="#22c55e" />
+                : <TrendingDown size={15} color="#FF6B5F" />}
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-[#F7F7F7] text-sm font-medium truncate">{rec.description}</p>
+              <p className="text-[#6F6F6F] text-xs">{categoryLabels[rec.category] ?? rec.category} · {rec.date}</p>
+            </div>
+            <p className="font-bold text-sm flex-shrink-0" style={{ color: rec.type === 'income' ? '#22c55e' : '#FF6B5F' }}>
+              {rec.type === 'income' ? '+' : '-'}{formatCurrency(rec.amount)}
+            </p>
           </div>
-          <div className="flex-1 min-w-0">
-            <p className="text-[#F7F7F7] text-sm font-medium truncate">{rec.description}</p>
-            <p className="text-[#6F6F6F] text-xs">{categoryLabels[rec.category] ?? rec.category} · {rec.date}</p>
-          </div>
-          <p className="font-bold text-sm flex-shrink-0" style={{ color: rec.type === 'income' ? '#22c55e' : '#FF6B5F' }}>
-            {rec.type === 'income' ? '+' : '-'}{formatCurrency(rec.amount)}
-          </p>
-        </div>
-      ))}
+        ))
+      )}
     </GlassCard>
   );
 }
 
 function CategoriasTab() {
-  const categories = [
-    { cat: 'work', amount: 8750, pct: 89 },
-    { cat: 'food', amount: 1200, pct: 22 },
-    { cat: 'care', amount: 600, pct: 12 },
-    { cat: 'transport', amount: 350, pct: 7 },
-    { cat: 'subscriptions', amount: 250, pct: 5 },
-    { cat: 'therapy', amount: 300, pct: 6 },
-  ];
-
   return (
     <GlassCard>
-      {categories.map(({ cat, amount, pct }) => (
-        <div key={cat} className="mb-4">
-          <div className="flex justify-between text-sm mb-1.5">
-            <span className="text-[#A8A8A8]">{categoryLabels[cat] ?? cat}</span>
-            <span className="text-[#F7F7F7] font-semibold">{formatCurrency(amount)}</span>
-          </div>
-          <ProgressBar value={pct} height={4} />
-        </div>
-      ))}
+      <p className="text-[#A8A8A8] text-xs font-semibold uppercase tracking-wider mb-3">Categorias</p>
+      <div className="flex flex-col items-center justify-center py-8 gap-2">
+        <p className="text-[#6F6F6F] text-sm text-center">Nenhum registro para calcular categorias.</p>
+        <p className="text-[#6F6F6F] text-xs text-center px-4">Adicione lançamentos para ver o breakdown por categoria.</p>
+      </div>
     </GlassCard>
   );
 }
@@ -129,7 +119,7 @@ function TrabalhoTab() {
       <GlassCard>
         <div className="flex items-center gap-2 mb-3">
           <Briefcase size={16} color="#FF9F3D" />
-          <span className="text-[#F7F7F7] font-semibold text-sm">Faturamento junho</span>
+          <span className="text-[#F7F7F7] font-semibold text-sm">Faturamento do mês</span>
         </div>
         <p className="text-[#F7F7F7] font-bold text-3xl">{formatCurrency(mockWorkSummary.monthly_revenue)}</p>
         <p className="text-[#6F6F6F] text-xs mt-1">Meta: {formatCurrency(mockWorkSummary.monthly_goal)}</p>
@@ -141,15 +131,19 @@ function TrabalhoTab() {
       </GlassCard>
       <GlassCard>
         <p className="text-[#A8A8A8] text-xs font-semibold uppercase tracking-wider mb-3">Registros recentes</p>
-        {mockWorkRecords.slice(0, 3).map(r => (
-          <div key={r.id} className="flex items-center justify-between py-3 border-b" style={{ borderColor: 'rgba(255,255,255,0.06)' }}>
-            <div>
-              <p className="text-[#F7F7F7] text-sm font-medium">{r.description}</p>
-              <p className="text-[#6F6F6F] text-xs">{r.date} · {r.payment_method?.toUpperCase()}</p>
+        {mockWorkRecords.length === 0 ? (
+          <p className="text-[#6F6F6F] text-sm text-center py-4">Nenhum registro de trabalho.</p>
+        ) : (
+          mockWorkRecords.slice(0, 3).map(r => (
+            <div key={r.id} className="flex items-center justify-between py-3 border-b" style={{ borderColor: 'rgba(255,255,255,0.06)' }}>
+              <div>
+                <p className="text-[#F7F7F7] text-sm font-medium">{r.description}</p>
+                <p className="text-[#6F6F6F] text-xs">{r.date} · {r.payment_method?.toUpperCase()}</p>
+              </div>
+              <p className="text-[#22c55e] font-bold text-sm">+{formatCurrency(r.amount)}</p>
             </div>
-            <p className="text-[#22c55e] font-bold text-sm">+{formatCurrency(r.amount)}</p>
-          </div>
-        ))}
+          ))
+        )}
       </GlassCard>
     </div>
   );
@@ -161,12 +155,12 @@ function CuidadoTab() {
       <GlassCard>
         <div className="flex justify-between items-center mb-3">
           <p className="text-[#F7F7F7] font-semibold text-sm">Gastos cuidado pessoal</p>
-          <p className="text-[#FF9F3D] font-bold">{formatCurrency(600)}</p>
+          <p className="text-[#FF9F3D] font-bold">{formatCurrency(0)}</p>
         </div>
         {[
-          { label: 'Produtos', value: 188 },
-          { label: 'Consultas', value: 300 },
-          { label: 'Medicamentos', value: 80 },
+          { label: 'Produtos', value: 0 },
+          { label: 'Consultas', value: 0 },
+          { label: 'Medicamentos', value: 0 },
           { label: 'Procedimentos', value: 0 },
         ].map(({ label, value }) => (
           <div key={label} className="flex justify-between py-2.5 border-b" style={{ borderColor: 'rgba(255,255,255,0.06)' }}>

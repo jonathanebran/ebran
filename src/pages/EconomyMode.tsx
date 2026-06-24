@@ -63,6 +63,11 @@ export function EconomyMode() {
 
         <GlassCard>
           <p className="text-[#F7F7F7] font-semibold text-sm mb-4">Priorização atual</p>
+          {mockEconomyMode.length === 0 ? (
+            <p className="text-[#6F6F6F] text-sm text-center py-6">
+              Nenhum item para priorizar ainda.
+            </p>
+          ) : (
           <div className="flex flex-col gap-0">
             {mockEconomyMode.map((item, i) => (
               <div
@@ -98,6 +103,7 @@ export function EconomyMode() {
               </div>
             ))}
           </div>
+          )}
         </GlassCard>
       </div>
     </div>

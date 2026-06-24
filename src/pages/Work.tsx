@@ -1,86 +1,11 @@
-import React, { useState, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Plus, Camera, Sparkles, TrendingUp, TrendingDown, Target } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { GlassCard } from '../components/GlassCard';
 import { Chip } from '../components/Chip';
 import { mockPhotoSessions } from '../data/mockData';
-import { formatCurrency } from '../lib/utils';
 import type { PhotoSession } from '../lib/types';
-
-// ─── Work Goals data ──────────────────────────────────────────────────────────
-
-interface TaskItem { label: string; done: boolean }
-
-interface WorkGoal {
-  id: string;
-  title: string;
-  description: string;
-  icon: string;
-  category: string;
-  color: string;
-  target?: number;
-  current?: number;
-  unit?: string;
-  deadline?: string;
-  tasks?: TaskItem[];
-}
-
-const workGoals: WorkGoal[] = [
-  {
-    id: 'wg-europa',
-    title: 'Viagem Europa',
-    description: 'Trabalhar e fotografar em Portugal e Espanha',
-    icon: '✈️',
-    category: 'Viagem',
-    color: '#FF9F3D',
-    target: 15000,
-    current: 4200,
-    deadline: 'Dez 2025',
-  },
-  {
-    id: 'wg-fotos',
-    title: 'Novos conteúdos',
-    description: 'Sessões fotográficas para portfólio e redes',
-    icon: '📷',
-    category: 'Conteúdo',
-    color: '#FFD84A',
-    target: 20,
-    current: 7,
-    unit: 'sessões',
-    deadline: 'Mensal',
-  },
-  {
-    id: 'wg-site',
-    title: 'Atualizar o site',
-    description: 'Fotos, vídeos e textos sempre frescos',
-    icon: '🌐',
-    category: 'Marketing',
-    color: '#FF6B5F',
-    tasks: [
-      { label: 'Upload de 10 novas fotos', done: false },
-      { label: 'Gravar reels e vídeos', done: false },
-      { label: 'Atualizar depoimentos', done: true },
-      { label: 'Novo texto de apresentação', done: false },
-      { label: 'Atualizar preços e pacotes', done: true },
-    ],
-  },
-  {
-    id: 'wg-cuidado',
-    title: 'Cuidados pessoais',
-    description: 'Estética e bem-estar para imagem profissional',
-    icon: '✨',
-    category: 'Beleza',
-    color: '#FF2F7D',
-    tasks: [
-      { label: 'Skincare rotina diária', done: true },
-      { label: 'Procedimento estético trimestral', done: false },
-      { label: 'Treino 5× por semana', done: false },
-      { label: 'Cabelo — manutenção mensal', done: false },
-      { label: 'Hidratação 3L/dia', done: true },
-    ],
-  },
-];
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -112,7 +37,7 @@ function AtendimentosTab() {
   const navigate = useNavigate();
   const [period, setPeriod] = useState<30 | 60 | 90>(30);
 
-  const todayMs = new Date('2026-06-17').getTime();
+  const todayMs = Date.now();
   const startMs = todayMs - period * 86_400_000;
   const prevStartMs = startMs - period * 86_400_000;
 
@@ -250,122 +175,21 @@ function AtendimentosTab() {
 
 // ─── Work Goals tab ───────────────────────────────────────────────────────────
 
-function WorkGoalCard({ goal }: { goal: WorkGoal }) {
-  const [tasks, setTasks] = useState<TaskItem[]>(goal.tasks ?? []);
-
-  const toggleTask = (i: number) => {
-    setTasks(prev => prev.map((t, idx) => idx === i ? { ...t, done: !t.done } : t));
-  };
-
-  const isMoney = goal.target !== undefined && !goal.unit;
-  const isCount = goal.target !== undefined && !!goal.unit;
-  const pct = goal.target ? Math.round(((goal.current ?? 0) / goal.target) * 100) : 0;
-  const tasksDone = tasks.filter(t => t.done).length;
-  const tasksPct = tasks.length ? Math.round((tasksDone / tasks.length) * 100) : 0;
-
-  return (
-    <GlassCard>
-      <div className="flex items-start gap-3 mb-3">
-        <span style={{ fontSize: 26 }}>{goal.icon}</span>
-        <div className="flex-1">
-          <div className="flex items-center gap-2">
-            <span className="text-[#F7F7F7] font-bold text-sm">{goal.title}</span>
-            <span
-              className="text-[10px] px-2 py-0.5 rounded-xl font-medium"
-              style={{ background: `${goal.color}22`, color: goal.color }}
-            >
-              {goal.category}
-            </span>
-          </div>
-          <p className="text-[#6F6F6F] text-xs mt-0.5">{goal.description}</p>
-        </div>
-        {goal.deadline && <span className="text-[10px] text-[#6F6F6F]">{goal.deadline}</span>}
-      </div>
-
-      {(isMoney || isCount) && (
-        <>
-          <div className="flex justify-between text-xs mb-1.5">
-            <span className="text-[#A8A8A8]">
-              {isMoney
-                ? `${formatCurrency(goal.current ?? 0)} de ${formatCurrency(goal.target!)}`
-                : `${goal.current} de ${goal.target} ${goal.unit}`}
-            </span>
-            <span className="font-bold" style={{ color: goal.color }}>{pct}%</span>
-          </div>
-          <div className="h-1.5 rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.07)' }}>
-            <div
-              className="h-full rounded-full transition-all duration-700"
-              style={{
-                width: `${Math.max(2, pct)}%`,
-                background: `linear-gradient(90deg, ${goal.color}99, ${goal.color})`,
-                boxShadow: `0 0 8px ${goal.color}70`,
-              }}
-            />
-          </div>
-        </>
-      )}
-
-      {tasks.length > 0 && (
-        <>
-          <div className="flex justify-between text-xs mb-2">
-            <span className="text-[#A8A8A8]">{tasksDone} de {tasks.length} concluídos</span>
-            <span className="font-bold" style={{ color: goal.color }}>{tasksPct}%</span>
-          </div>
-          <div className="h-1.5 rounded-full overflow-hidden mb-3" style={{ background: 'rgba(255,255,255,0.07)' }}>
-            <div
-              className="h-full rounded-full transition-all duration-700"
-              style={{
-                width: `${Math.max(2, tasksPct)}%`,
-                background: `linear-gradient(90deg, ${goal.color}99, ${goal.color})`,
-                boxShadow: `0 0 8px ${goal.color}70`,
-              }}
-            />
-          </div>
-          <div className="flex flex-col gap-1">
-            {tasks.map((task, i) => (
-              <motion.button
-                key={task.label}
-                whileTap={{ scale: 0.97 }}
-                onClick={() => toggleTask(i)}
-                className="flex items-center gap-3 py-2 text-left"
-              >
-                <div
-                  className="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 transition-all"
-                  style={{
-                    background: task.done
-                      ? `linear-gradient(135deg, ${goal.color}, #FF2F7D)`
-                      : 'rgba(255,255,255,0.08)',
-                    border: task.done ? 'none' : '1px solid rgba(255,255,255,0.15)',
-                  }}
-                >
-                  {task.done && <span style={{ fontSize: 10, color: '#000' }}>✓</span>}
-                </div>
-                <span
-                  className="text-sm flex-1"
-                  style={{
-                    color: task.done ? '#6F6F6F' : '#F7F7F7',
-                    textDecoration: task.done ? 'line-through' : 'none',
-                  }}
-                >
-                  {task.label}
-                </span>
-              </motion.button>
-            ))}
-          </div>
-        </>
-      )}
-    </GlassCard>
-  );
-}
-
 function MetasTab() {
   return (
-    <div className="flex flex-col gap-3">
-      <div className="flex items-center gap-2 py-2">
-        <Target size={15} color="#FF9F3D" />
-        <span className="text-[#A8A8A8] text-xs">Metas profissionais e de desenvolvimento</span>
-      </div>
-      {workGoals.map(g => <WorkGoalCard key={g.id} goal={g} />)}
+    <div className="flex flex-col items-center justify-center py-16 gap-4">
+      <Target size={32} color="#FF9F3D" />
+      <p className="text-[#6F6F6F] text-sm text-center px-6">
+        Nenhuma meta de trabalho cadastrada ainda.
+      </p>
+      <motion.button
+        whileTap={{ scale: 0.95 }}
+        className="flex items-center gap-2 px-5 py-3 rounded-2xl"
+        style={{ background: 'rgba(255,159,61,0.12)', border: '1px dashed rgba(255,159,61,0.35)' }}
+      >
+        <Plus size={16} color="#FF9F3D" />
+        <span className="text-[#FF9F3D] text-sm font-semibold">Nova meta</span>
+      </motion.button>
     </div>
   );
 }
@@ -375,14 +199,33 @@ function MetasTab() {
 function AIAnalysisTab() {
   const sessions = mockPhotoSessions;
 
-  // Sessions by month (last 6 months from Jun 2026)
-  const byMonth = useMemo(() => {
-    const months = ['Jan','Fev','Mar','Abr','Mai','Jun'];
-    const counts = [0, 0, 3, 6, 9, 6]; // derived from mock data
-    return months.map((label, i) => ({ label, value: counts[i] }));
-  }, []);
+  if (sessions.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center py-16 gap-4">
+        <span style={{ fontSize: 32 }}>📊</span>
+        <p className="text-[#F7F7F7] font-semibold text-base text-center">Sem dados suficientes</p>
+        <p className="text-[#6F6F6F] text-sm text-center px-6">
+          Registre atendimentos para ver análises e insights aqui.
+        </p>
+      </div>
+    );
+  }
 
-  // Peak hours — count sessions by hour bucket
+  // Sessions by month (last 6 months)
+  const byMonth = useMemo(() => {
+    const now = new Date();
+    return Array.from({ length: 6 }, (_, i) => {
+      const d = new Date(now.getFullYear(), now.getMonth() - (5 - i), 1);
+      const label = d.toLocaleString('pt-BR', { month: 'short' });
+      const value = sessions.filter(s => {
+        const sd = new Date(s.date);
+        return sd.getFullYear() === d.getFullYear() && sd.getMonth() === d.getMonth();
+      }).length;
+      return { label, value };
+    });
+  }, [sessions]);
+
+  // Peak hours
   const peakHours = useMemo(() => {
     const buckets: Record<string, number> = {};
     sessions.forEach(s => {
@@ -406,11 +249,13 @@ function AIAnalysisTab() {
     return days.map((label, i) => ({ label, count: counts[i] }));
   }, [sessions]);
 
-  const maxHour = Math.max(...peakHours.map(h => h.count));
-  const maxDay = Math.max(...byDayOfWeek.map(d => d.count));
+  const maxHour = peakHours.length > 0 ? Math.max(...peakHours.map(h => h.count)) : 1;
+  const maxDay = Math.max(...byDayOfWeek.map(d => d.count), 1);
 
-  const topHour = peakHours.reduce((a, b) => (a.count > b.count ? a : b), peakHours[0]);
-  const topDay = byDayOfWeek.reduce((a, b) => (a.count > b.count ? a : b), byDayOfWeek[0]);
+  const topHour = peakHours.length > 0
+    ? peakHours.reduce((a, b) => (a.count > b.count ? a : b))
+    : null;
+  const topDay = byDayOfWeek.reduce((a, b) => (a.count > b.count ? a : b));
   const totalSessions = sessions.length;
   const lastMonthCount = byMonth[byMonth.length - 1].value;
   const prevMonthCount = byMonth[byMonth.length - 2].value;
@@ -419,37 +264,31 @@ function AIAnalysisTab() {
     : 0;
 
   const insights = [
-    {
+    topHour && {
       icon: '🕘',
-      title: `Horário de pico: ${topHour?.label}`,
-      desc: `Você é mais procurado às ${topHour?.label}. Reserve esta faixa para seus melhores clientes e evite outros compromissos neste horário.`,
+      title: `Horário de pico: ${topHour.label}`,
+      desc: `Você é mais procurado às ${topHour.label}. Reserve esta faixa para seus melhores clientes.`,
       color: '#FF9F3D',
     },
     {
       icon: '📅',
-      title: `Dia mais movimentado: ${topDay?.label}`,
-      desc: `${topDay?.label} é seu dia mais procurado (${topDay?.count} sessões). Garanta disponibilidade neste dia toda semana.`,
+      title: `Dia mais movimentado: ${topDay.label}`,
+      desc: `${topDay.label} é seu dia mais procurado (${topDay.count} sessões).`,
       color: '#FFD84A',
     },
     {
       icon: monthTrend >= 0 ? '📈' : '📉',
       title: monthTrend >= 0 ? 'Crescimento em alta' : 'Volume caindo',
-      desc: `Este mês você tem ${lastMonthCount} sessões registradas — ${Math.abs(monthTrend)}% ${monthTrend >= 0 ? 'acima' : 'abaixo'} do mês anterior (${prevMonthCount} sessões).`,
+      desc: `Este mês você tem ${lastMonthCount} sessões — ${Math.abs(monthTrend)}% ${monthTrend >= 0 ? 'acima' : 'abaixo'} do mês anterior.`,
       color: monthTrend >= 0 ? '#22c55e' : '#FF6B5F',
     },
     {
       icon: '💡',
       title: 'Dica de agenda',
-      desc: `Você fez ${totalSessions} atendimentos nos últimos 90 dias. Para crescer, considere abrir 2 horários extras por semana nas manhãs de sábado.`,
+      desc: `Você fez ${totalSessions} atendimentos registrados. Para crescer, considere abrir horários extras nas manhãs de sábado.`,
       color: '#FF6B5F',
     },
-    {
-      icon: '✈️',
-      title: 'Meta Europa',
-      desc: `Com ${lastMonthCount} sessões/mês e crescimento consistente, você está no caminho certo para alcançar seus objetivos profissionais na Europa.`,
-      color: '#FF2F7D',
-    },
-  ];
+  ].filter(Boolean) as { icon: string; title: string; desc: string; color: string }[];
 
   return (
     <div className="flex flex-col gap-3">
@@ -469,9 +308,8 @@ function AIAnalysisTab() {
         </div>
         <div className="flex items-end gap-2 h-20">
           {byMonth.map((m, i) => {
-            const h = byMonth[byMonth.length - 1].value > 0
-              ? Math.max(8, Math.round((m.value / Math.max(...byMonth.map(x => x.value))) * 100))
-              : 8;
+            const maxVal = Math.max(...byMonth.map(x => x.value), 1);
+            const h = Math.max(8, Math.round((m.value / maxVal) * 100));
             const isLast = i === byMonth.length - 1;
             return (
               <div key={m.label} className="flex-1 flex flex-col items-center gap-1.5">
@@ -497,37 +335,39 @@ function AIAnalysisTab() {
       </GlassCard>
 
       {/* Peak hours */}
-      <GlassCard>
-        <div className="flex items-center gap-2 mb-3">
-          <span style={{ fontSize: 16 }}>🕘</span>
-          <p className="text-[#F7F7F7] font-semibold text-sm">Horários de pico</p>
-        </div>
-        <div className="flex flex-col gap-2.5">
-          {peakHours.map(h => (
-            <div key={h.label} className="flex items-center gap-3">
-              <span className="text-[#A8A8A8] text-xs w-8 text-right">{h.label}</span>
-              <div className="flex-1 h-5 rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.06)' }}>
-                <motion.div
-                  initial={{ width: 0 }}
-                  animate={{ width: `${Math.max(6, Math.round((h.count / maxHour) * 100))}%` }}
-                  transition={{ duration: 0.6, ease: 'easeOut' }}
-                  className="h-full rounded-full flex items-center justify-end pr-2"
-                  style={{
-                    background: h.count === maxHour
-                      ? 'linear-gradient(90deg, #FF9F3D99, #FF9F3D)'
-                      : 'rgba(255,255,255,0.12)',
-                    boxShadow: h.count === maxHour ? '0 0 8px #FF9F3D60' : 'none',
-                  }}
-                >
-                  <span className="text-[9px] font-bold" style={{ color: h.count === maxHour ? '#000' : '#6F6F6F' }}>
-                    {h.count}
-                  </span>
-                </motion.div>
+      {peakHours.length > 0 && (
+        <GlassCard>
+          <div className="flex items-center gap-2 mb-3">
+            <span style={{ fontSize: 16 }}>🕘</span>
+            <p className="text-[#F7F7F7] font-semibold text-sm">Horários de pico</p>
+          </div>
+          <div className="flex flex-col gap-2.5">
+            {peakHours.map(h => (
+              <div key={h.label} className="flex items-center gap-3">
+                <span className="text-[#A8A8A8] text-xs w-8 text-right">{h.label}</span>
+                <div className="flex-1 h-5 rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.06)' }}>
+                  <motion.div
+                    initial={{ width: 0 }}
+                    animate={{ width: `${Math.max(6, Math.round((h.count / maxHour) * 100))}%` }}
+                    transition={{ duration: 0.6, ease: 'easeOut' }}
+                    className="h-full rounded-full flex items-center justify-end pr-2"
+                    style={{
+                      background: h.count === maxHour
+                        ? 'linear-gradient(90deg, #FF9F3D99, #FF9F3D)'
+                        : 'rgba(255,255,255,0.12)',
+                      boxShadow: h.count === maxHour ? '0 0 8px #FF9F3D60' : 'none',
+                    }}
+                  >
+                    <span className="text-[9px] font-bold" style={{ color: h.count === maxHour ? '#000' : '#6F6F6F' }}>
+                      {h.count}
+                    </span>
+                  </motion.div>
+                </div>
               </div>
-            </div>
-          ))}
-        </div>
-      </GlassCard>
+            ))}
+          </div>
+        </GlassCard>
+      )}
 
       {/* Busiest days */}
       <GlassCard>
@@ -596,7 +436,7 @@ export function Work() {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<Tab>('Atendimentos');
 
-  const tabContent: Record<Tab, React.ReactElement> = {
+  const tabContent = {
     Atendimentos: <AtendimentosTab />,
     Metas: <MetasTab />,
     'Análise IA': <AIAnalysisTab />,

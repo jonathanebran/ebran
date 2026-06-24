@@ -1,5 +1,4 @@
 import { useNavigate } from 'react-router-dom';
-import { MoreHorizontal } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { GlassCard } from './GlassCard';
 import { ProgressRing } from './ProgressRing';
@@ -111,12 +110,6 @@ export function GoalCard({ goal, variant = 'default' }: GoalCardProps) {
               </div>
               <div className="flex items-center gap-1.5 flex-shrink-0 mt-0.5">
                 <ProgressRing value={pct} size={44} strokeWidth={3.5} label={`${pct}%`} />
-                <motion.button
-                  whileTap={{ scale: 0.9 }}
-                  onClick={e => e.stopPropagation()}
-                >
-                  <MoreHorizontal size={16} color="#4A4A4A" />
-                </motion.button>
               </div>
             </div>
 
@@ -168,9 +161,6 @@ export function GoalCard({ goal, variant = 'default' }: GoalCardProps) {
             <h3 className="text-[#F7F7F7] font-bold text-base">{goal.title}</h3>
           </div>
         </div>
-        <motion.button whileTap={{ scale: 0.9 }} onClick={e => e.stopPropagation()}>
-          <MoreHorizontal size={18} color="#6F6F6F" />
-        </motion.button>
       </div>
 
       <div className="flex items-center justify-between mb-2">

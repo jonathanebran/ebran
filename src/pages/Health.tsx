@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Droplets, Dumbbell, Moon, Heart, Pill, Calendar } from 'lucide-react';
+import { Droplets, Dumbbell, Moon, Heart, Pill, Calendar, Plus } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Header } from '../components/Header';
 import { Chip } from '../components/Chip';
@@ -58,12 +58,6 @@ function GoogleFitBanner() {
 
 function RoutineTab() {
   const waterPct = (mockHealthToday.water.current / mockHealthToday.water.target) * 100;
-  const routineItems = [
-    { label: 'Skincare manhã', done: mockHealthToday.skincare_morning.done, icon: '🌅' },
-    { label: 'Skincare noite', done: mockHealthToday.skincare_night.done, icon: '🌙' },
-    { label: 'Minoxidil', done: true, icon: '💊' },
-    { label: 'Alongamento', done: false, icon: '🤸' },
-  ];
 
   return (
     <div className="flex flex-col gap-3">
@@ -91,21 +85,20 @@ function RoutineTab() {
         <DotProgress value={mockHealthToday.sleep.hours} max={9} color="#a78bfa" />
       </GlassCard>
 
-      {/* Rotina */}
+      {/* Hábitos do dia */}
       <GlassCard>
         <p className="text-[#F7F7F7] font-semibold text-sm mb-3">Hábitos do dia</p>
-        {routineItems.map(item => (
-          <div key={item.label} className="flex items-center gap-3 py-2.5 border-b" style={{ borderColor: 'rgba(255,255,255,0.06)' }}>
-            <span>{item.icon}</span>
-            <span className="flex-1 text-sm" style={{ color: item.done ? '#6F6F6F' : '#F7F7F7', textDecoration: item.done ? 'line-through' : 'none' }}>{item.label}</span>
-            <div
-              className="w-5 h-5 rounded-full flex items-center justify-center"
-              style={{ background: item.done ? 'linear-gradient(135deg, #FFD84A, #FF2F7D)' : 'rgba(255,255,255,0.08)' }}
-            >
-              {item.done && <span style={{ fontSize: 10 }}>✓</span>}
-            </div>
-          </div>
-        ))}
+        <div className="flex flex-col items-center justify-center py-6 gap-3">
+          <p className="text-[#6F6F6F] text-sm">Nenhum hábito cadastrado.</p>
+          <motion.button
+            whileTap={{ scale: 0.95 }}
+            className="flex items-center gap-2 px-4 py-2 rounded-2xl"
+            style={{ background: 'rgba(255,159,61,0.10)', border: '1px dashed rgba(255,159,61,0.35)' }}
+          >
+            <Plus size={14} color="#FF9F3D" />
+            <span className="text-[#FF9F3D] text-xs font-semibold">Adicionar hábito</span>
+          </motion.button>
+        </div>
       </GlassCard>
     </div>
   );
@@ -115,23 +108,21 @@ function WorkoutTab() {
   return (
     <div className="flex flex-col gap-3">
       <GlassCard>
-        <div className="flex items-center gap-2 mb-3">
+        <div className="flex items-center gap-2 mb-4">
           <Dumbbell size={16} color="#22c55e" />
           <span className="text-[#F7F7F7] font-semibold text-sm">Treino de Hoje</span>
-          <div className="ml-auto px-2.5 py-1 rounded-xl" style={{ background: '#22c55e22' }}>
-            <span className="text-xs text-[#22c55e] font-semibold">Concluído</span>
-          </div>
         </div>
-        <p className="text-[#A8A8A8] text-sm">Treino A — Peito e Tríceps</p>
-      </GlassCard>
-      <GlassCard>
-        <p className="text-[#F7F7F7] font-semibold text-sm mb-3">Grupo muscular da semana</p>
-        {['Segunda: Peito/Tríceps', 'Terça: Costas/Bíceps', 'Quarta: Pernas', 'Quinta: Ombros', 'Sexta: Full Body'].map((d, i) => (
-          <div key={d} className="flex items-center justify-between py-2.5 border-b" style={{ borderColor: 'rgba(255,255,255,0.06)' }}>
-            <span className="text-sm text-[#A8A8A8]">{d}</span>
-            {i === 0 && <span className="text-xs text-[#22c55e] font-semibold">✓</span>}
-          </div>
-        ))}
+        <div className="flex flex-col items-center justify-center py-6 gap-3">
+          <p className="text-[#6F6F6F] text-sm">Nenhum treino registrado hoje.</p>
+          <motion.button
+            whileTap={{ scale: 0.95 }}
+            className="flex items-center gap-2 px-4 py-2 rounded-2xl"
+            style={{ background: 'rgba(34,197,94,0.10)', border: '1px dashed rgba(34,197,94,0.35)' }}
+          >
+            <Plus size={14} color="#22c55e" />
+            <span className="text-[#22c55e] text-xs font-semibold">Registrar treino</span>
+          </motion.button>
+        </div>
       </GlassCard>
     </div>
   );
@@ -143,9 +134,9 @@ function MacrosTab() {
       <GlassCard>
         <p className="text-[#F7F7F7] font-semibold text-sm mb-3">Macros do dia</p>
         {[
-          { label: 'Proteína', value: 130, target: 180, unit: 'g', color: '#FF9F3D' },
-          { label: 'Água', value: 2.0, target: 3.0, unit: 'L', color: '#4285F4' },
-          { label: 'Calorias', value: 1800, target: 2400, unit: 'kcal', color: '#22c55e' },
+          { label: 'Proteína', value: 0, target: 180, unit: 'g', color: '#FF9F3D' },
+          { label: 'Água', value: mockHealthToday.water.current, target: mockHealthToday.water.target, unit: 'L', color: '#4285F4' },
+          { label: 'Calorias', value: 0, target: 2400, unit: 'kcal', color: '#22c55e' },
         ].map(m => (
           <div key={m.label} className="mb-3">
             <div className="flex justify-between text-xs mb-1.5">
@@ -158,9 +149,9 @@ function MacrosTab() {
       </GlassCard>
       <GlassCard>
         <p className="text-[#F7F7F7] font-semibold text-sm mb-3">Suplementos</p>
-        {['Whey Protein (30g)', 'Creatina (5g)', 'Vitamina D'].map(s => (
-          <div key={s} className="py-2.5 border-b text-sm text-[#A8A8A8]" style={{ borderColor: 'rgba(255,255,255,0.06)' }}>{s}</div>
-        ))}
+        <div className="flex flex-col items-center justify-center py-4 gap-2">
+          <p className="text-[#6F6F6F] text-sm">Nenhum suplemento cadastrado.</p>
+        </div>
       </GlassCard>
     </div>
   );
@@ -171,21 +162,35 @@ function EsteticaTab() {
     <div className="flex flex-col gap-3">
       <GlassCard>
         <p className="text-[#F7F7F7] font-semibold text-sm mb-3">Produtos em uso</p>
-        {mockCareProducts.map(p => (
-          <div key={p.id} className="flex items-center justify-between py-3 border-b" style={{ borderColor: 'rgba(255,255,255,0.06)' }}>
-            <div>
-              <p className="text-[#F7F7F7] text-sm">{p.name}</p>
-              <p className="text-[#6F6F6F] text-xs">{p.category}</p>
-            </div>
-            <span className="text-xs px-2 py-1 rounded-xl text-[#22c55e]" style={{ background: '#22c55e18' }}>Em uso</span>
+        {mockCareProducts.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-6 gap-3">
+            <p className="text-[#6F6F6F] text-sm">Nenhum produto cadastrado.</p>
+            <motion.button
+              whileTap={{ scale: 0.95 }}
+              className="flex items-center gap-2 px-4 py-2 rounded-2xl"
+              style={{ background: 'rgba(255,159,61,0.10)', border: '1px dashed rgba(255,159,61,0.35)' }}
+            >
+              <Plus size={14} color="#FF9F3D" />
+              <span className="text-[#FF9F3D] text-xs font-semibold">Adicionar produto</span>
+            </motion.button>
           </div>
-        ))}
+        ) : (
+          mockCareProducts.map(p => (
+            <div key={p.id} className="flex items-center justify-between py-3 border-b" style={{ borderColor: 'rgba(255,255,255,0.06)' }}>
+              <div>
+                <p className="text-[#F7F7F7] text-sm">{p.name}</p>
+                <p className="text-[#6F6F6F] text-xs">{p.category}</p>
+              </div>
+              <span className="text-xs px-2 py-1 rounded-xl text-[#22c55e]" style={{ background: '#22c55e18' }}>Em uso</span>
+            </div>
+          ))
+        )}
       </GlassCard>
       <GlassCard>
         <p className="text-[#F7F7F7] font-semibold text-sm mb-3">Procedimentos planejados</p>
-        {['Botox — Out 2025', 'PRP Capilar — Set 2025', 'Limpeza de pele — Jul 2025'].map(p => (
-          <div key={p} className="py-2.5 border-b text-sm text-[#A8A8A8]" style={{ borderColor: 'rgba(255,255,255,0.06)' }}>{p}</div>
-        ))}
+        <div className="flex flex-col items-center justify-center py-4 gap-2">
+          <p className="text-[#6F6F6F] text-sm">Nenhum procedimento planejado.</p>
+        </div>
       </GlassCard>
     </div>
   );
@@ -205,7 +210,7 @@ function MenteTab() {
               key={i}
               whileTap={{ scale: 0.8 }}
               className="text-2xl"
-              style={{ opacity: i === 3 ? 1 : 0.4 }}
+              style={{ opacity: 0.4 }}
             >{emoji}</motion.button>
           ))}
         </div>
@@ -213,9 +218,9 @@ function MenteTab() {
       </GlassCard>
       <GlassCard>
         <p className="text-[#F7F7F7] font-semibold text-sm mb-3">Profissionais</p>
-        {['Psicóloga — Qui 15:00', 'Psiquiatra — Sem consulta agendada'].map(p => (
-          <div key={p} className="py-2.5 border-b text-sm text-[#A8A8A8]" style={{ borderColor: 'rgba(255,255,255,0.06)' }}>{p}</div>
-        ))}
+        <div className="flex flex-col items-center justify-center py-4 gap-2">
+          <p className="text-[#6F6F6F] text-sm">Nenhum profissional cadastrado.</p>
+        </div>
       </GlassCard>
     </div>
   );
@@ -224,21 +229,38 @@ function MenteTab() {
 function ConsultasTab() {
   return (
     <div className="flex flex-col gap-3">
-      {mockAppointments.map(ap => (
-        <GlassCard key={ap.id} padding="p-4">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: 'rgba(255,111,95,0.12)' }}>
-              <Calendar size={18} color="#FF9F3D" />
-            </div>
-            <div className="flex-1">
-              <p className="text-[#F7F7F7] font-semibold text-sm">{ap.title}</p>
-              {ap.professional && <p className="text-[#A8A8A8] text-xs">{ap.professional}</p>}
-              <p className="text-[#6F6F6F] text-xs">{ap.date} · {ap.time}</p>
-            </div>
-            <span className="text-xs px-2 py-1 rounded-xl text-[#FF9F3D]" style={{ background: 'rgba(255,159,61,0.12)' }}>Agendada</span>
+      {mockAppointments.length === 0 ? (
+        <GlassCard>
+          <div className="flex flex-col items-center justify-center py-10 gap-3">
+            <Calendar size={28} color="#6F6F6F" />
+            <p className="text-[#6F6F6F] text-sm">Nenhuma consulta agendada.</p>
+            <motion.button
+              whileTap={{ scale: 0.95 }}
+              className="flex items-center gap-2 px-4 py-2 rounded-2xl"
+              style={{ background: 'rgba(255,159,61,0.10)', border: '1px dashed rgba(255,159,61,0.35)' }}
+            >
+              <Plus size={14} color="#FF9F3D" />
+              <span className="text-[#FF9F3D] text-xs font-semibold">Agendar consulta</span>
+            </motion.button>
           </div>
         </GlassCard>
-      ))}
+      ) : (
+        mockAppointments.map(ap => (
+          <GlassCard key={ap.id} padding="p-4">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: 'rgba(255,111,95,0.12)' }}>
+                <Calendar size={18} color="#FF9F3D" />
+              </div>
+              <div className="flex-1">
+                <p className="text-[#F7F7F7] font-semibold text-sm">{ap.title}</p>
+                {ap.professional && <p className="text-[#A8A8A8] text-xs">{ap.professional}</p>}
+                <p className="text-[#6F6F6F] text-xs">{ap.date} · {ap.time}</p>
+              </div>
+              <span className="text-xs px-2 py-1 rounded-xl text-[#FF9F3D]" style={{ background: 'rgba(255,159,61,0.12)' }}>Agendada</span>
+            </div>
+          </GlassCard>
+        ))
+      )}
     </div>
   );
 }
@@ -246,21 +268,38 @@ function ConsultasTab() {
 function MedicamentosTab() {
   return (
     <div className="flex flex-col gap-3">
-      {mockMedications.map(med => (
-        <GlassCard key={med.id} padding="p-4">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: 'rgba(255,111,95,0.12)' }}>
-              <Pill size={18} color="#FF9F3D" />
-            </div>
-            <div className="flex-1">
-              <p className="text-[#F7F7F7] font-semibold text-sm">{med.name}</p>
-              <p className="text-[#A8A8A8] text-xs">{med.dose} · {med.frequency === 'daily' ? 'Diário' : med.frequency}</p>
-              {med.reminder_time && <p className="text-[#6F6F6F] text-xs">Lembrete: {med.reminder_time}</p>}
-            </div>
-            <span className="text-xs px-2 py-1 rounded-xl text-[#22c55e]" style={{ background: '#22c55e18' }}>Ativo</span>
+      {mockMedications.length === 0 ? (
+        <GlassCard>
+          <div className="flex flex-col items-center justify-center py-10 gap-3">
+            <Pill size={28} color="#6F6F6F" />
+            <p className="text-[#6F6F6F] text-sm">Nenhum medicamento cadastrado.</p>
+            <motion.button
+              whileTap={{ scale: 0.95 }}
+              className="flex items-center gap-2 px-4 py-2 rounded-2xl"
+              style={{ background: 'rgba(255,159,61,0.10)', border: '1px dashed rgba(255,159,61,0.35)' }}
+            >
+              <Plus size={14} color="#FF9F3D" />
+              <span className="text-[#FF9F3D] text-xs font-semibold">Adicionar medicamento</span>
+            </motion.button>
           </div>
         </GlassCard>
-      ))}
+      ) : (
+        mockMedications.map(med => (
+          <GlassCard key={med.id} padding="p-4">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: 'rgba(255,111,95,0.12)' }}>
+                <Pill size={18} color="#FF9F3D" />
+              </div>
+              <div className="flex-1">
+                <p className="text-[#F7F7F7] font-semibold text-sm">{med.name}</p>
+                <p className="text-[#A8A8A8] text-xs">{med.dose} · {med.frequency === 'daily' ? 'Diário' : med.frequency}</p>
+                {med.reminder_time && <p className="text-[#6F6F6F] text-xs">Lembrete: {med.reminder_time}</p>}
+              </div>
+              <span className="text-xs px-2 py-1 rounded-xl text-[#22c55e]" style={{ background: '#22c55e18' }}>Ativo</span>
+            </div>
+          </GlassCard>
+        ))
+      )}
     </div>
   );
 }
