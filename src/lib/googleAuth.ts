@@ -42,27 +42,31 @@ export function hasPublicApi(service: string): boolean {
   return service in SERVICE_SCOPES;
 }
 
-function loadGIS(): Promise<void> {
-  return new Promise((resolve, reject) => {
-    if (typeof (window as unknown as Record<string, unknown>).google !== 'undefined') {
-      resolve();
-      return;
-    }
-    if (document.getElementById('gsi-script')) {
-      const existing = document.getElementById('gsi-script') as HTMLScriptElement;
-      existing.addEventListener('load', () => resolve());
-      existing.addEventListener('error', reject);
-      return;
-    }
+// ─── GIS loading ──────────────────────────────────────────────────────────────
+
+let gisReady: Promise<void> | null = null;
+
+export function loadGIS(): Promise<void> {
+  if (gisReady) return gisReady;
+  gisReady = new Promise<void>((resolve, reject) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    if (typeof (window as any).google !== 'undefined') { resolve(); return; }
     const script = document.createElement('script');
-    script.id = 'gsi-script';
     script.src = 'https://accounts.google.com/gsi/client';
     script.async = true;
     script.onload = () => resolve();
-    script.onerror = reject;
+    script.onerror = () => { gisReady = null; reject(new Error('GIS load failed')); };
     document.head.appendChild(script);
   });
+  return gisReady;
 }
+
+// ─── Token clients ─────────────────────────────────────────────────────────────
+// Must be created BEFORE the user taps, then called synchronously ON the tap.
+// iOS Safari only allows popups in direct synchronous response to user gestures.
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const activeClients: Record<string, any> = {};
 
 async function fetchUserEmail(token: string): Promise<string> {
   try {
@@ -74,68 +78,77 @@ async function fetchUserEmail(token: string): Promise<string> {
   } catch { return 'Conta Google'; }
 }
 
-async function requestToken(
-  service: string,
-  silent: boolean
-): Promise<{ success: boolean; email?: string }> {
-  const scope = SERVICE_SCOPES[service];
-  if (!scope) return { success: false };
+// Call on component mount. Loads GIS and pre-creates one client per service.
+export async function preInitClients(
+  onResult: (service: string, result: { success: boolean; email?: string }) => void
+): Promise<void> {
+  try { await loadGIS(); } catch { return; }
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const g = (window as any).google;
 
-  try { await loadGIS(); } catch { return { success: false }; }
-
-  return new Promise((resolve) => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const g = (window as any).google;
-    const client = g.accounts.oauth2.initTokenClient({
+  for (const service of Object.keys(SERVICE_SCOPES)) {
+    const scope = SERVICE_SCOPES[service];
+    activeClients[service] = g.accounts.oauth2.initTokenClient({
       client_id: CLIENT_ID,
       scope: `${scope} https://www.googleapis.com/auth/userinfo.email`,
-      prompt: silent ? '' : undefined,
       callback: async (response: { access_token?: string; error?: string; expires_in?: number }) => {
         if (response.error || !response.access_token) {
-          resolve({ success: false });
+          onResult(service, { success: false });
           return;
         }
-        // Reuse stored email on silent refresh to avoid extra fetch
-        const existingToken = getStoredToken(service);
-        const email = existingToken?.email ?? await fetchUserEmail(response.access_token);
+        const existing = getStoredToken(service);
+        const email = existing?.email ?? await fetchUserEmail(response.access_token);
         const expiry = Date.now() + (response.expires_in ?? 3600) * 1000;
         localStorage.setItem(tokenKey(service), JSON.stringify({ token: response.access_token, expiry, email }));
-        resolve({ success: true, email });
+        onResult(service, { success: true, email });
       },
-      error_callback: () => resolve({ success: false }),
+      error_callback: () => onResult(service, { success: false }),
     });
-    client.requestAccessToken();
-  });
+  }
 }
 
-export async function connectService(service: string): Promise<{ success: boolean; email?: string }> {
-  return requestToken(service, false);
+// Call SYNCHRONOUSLY inside a click handler — iOS Safari requires this.
+export function requestTokenSync(service: string, firstTime = false): boolean {
+  const client = activeClients[service];
+  if (!client) return false;
+  client.requestAccessToken({ prompt: firstTime ? 'consent' : '' });
+  return true;
 }
 
-// Silently refreshes a token without showing a popup.
-// Works if the user is still signed in to Google and has previously granted access.
-export async function silentRefreshService(service: string): Promise<boolean> {
-  const result = await requestToken(service, true);
-  return result.success;
-}
+// ─── Background silent refresh ────────────────────────────────────────────────
 
-// Returns all services that have stored (possibly expired) tokens
-export function getConnectedServices(): string[] {
-  return Object.keys(SERVICE_SCOPES).filter(s => !!localStorage.getItem(tokenKey(s)));
-}
-
-// Refresh all services whose tokens expire within the next 10 minutes
 export async function refreshExpiringTokens(): Promise<void> {
   const TEN_MIN = 10 * 60 * 1000;
-  const services = Object.keys(SERVICE_SCOPES);
-  for (const service of services) {
+  try { await loadGIS(); } catch { return; }
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const g = (window as any).google;
+
+  for (const service of Object.keys(SERVICE_SCOPES)) {
     const raw = localStorage.getItem(tokenKey(service));
     if (!raw) continue;
     try {
       const data = JSON.parse(raw) as TokenData;
-      if (data.expiry - Date.now() < TEN_MIN) {
-        await silentRefreshService(service);
-      }
+      if (data.expiry - Date.now() > TEN_MIN) continue;
+      await new Promise<void>(resolve => {
+        const client = g.accounts.oauth2.initTokenClient({
+          client_id: CLIENT_ID,
+          scope: `${SERVICE_SCOPES[service]} https://www.googleapis.com/auth/userinfo.email`,
+          prompt: '',
+          callback: (response: { access_token?: string; expires_in?: number }) => {
+            if (response.access_token) {
+              const expiry = Date.now() + (response.expires_in ?? 3600) * 1000;
+              localStorage.setItem(tokenKey(service), JSON.stringify({ token: response.access_token, expiry, email: data.email }));
+            }
+            resolve();
+          },
+          error_callback: () => resolve(),
+        });
+        client.requestAccessToken({ prompt: '' });
+      });
     } catch { continue; }
   }
+}
+
+export function getConnectedServices(): string[] {
+  return Object.keys(SERVICE_SCOPES).filter(s => !!localStorage.getItem(tokenKey(s)));
 }

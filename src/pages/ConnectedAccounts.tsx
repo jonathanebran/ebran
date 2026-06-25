@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Loader2 } from 'lucide-react';
 import { motion } from 'framer-motion';
@@ -6,22 +6,18 @@ import { GlassCard } from '../components/GlassCard';
 import { mockGoogleIntegrations } from '../data/mockData';
 import type { GoogleIntegration } from '../lib/types';
 import {
-  connectService,
+  preInitClients,
+  requestTokenSync,
   disconnectService,
   isServiceConnected,
   getStoredToken,
   hasPublicApi,
 } from '../lib/googleAuth';
 
-// Hydrate integrations from stored tokens
 function hydrateIntegrations(base: GoogleIntegration[]): GoogleIntegration[] {
   return base.map(i => {
     const token = getStoredToken(i.service);
-    return {
-      ...i,
-      connected: !!token,
-      account_email: token?.email,
-    };
+    return { ...i, connected: !!token, account_email: token?.email };
   });
 }
 
@@ -39,22 +35,39 @@ export function ConnectedAccounts() {
     () => hydrateIntegrations(mockGoogleIntegrations)
   );
   const [loading, setLoading] = useState<string | null>(null);
+  const [clientsReady, setClientsReady] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const refresh = useCallback(() => {
     setIntegrations(hydrateIntegrations(mockGoogleIntegrations));
   }, []);
 
-  const handleConnect = async (service: string) => {
-    if (!hasPublicApi(service)) return;
+  // Pre-init GIS clients on mount so requestAccessToken can be called synchronously on tap
+  useEffect(() => {
+    preInitClients((service, result) => {
+      setLoading(prev => prev === service ? null : prev);
+      if (result.success) {
+        refresh();
+        setError(null);
+      } else {
+        setError('Não foi possível conectar. Tente novamente.');
+      }
+    }).then(() => setClientsReady(true));
+  }, [refresh]);
+
+  // This is called directly from the tap handler — synchronous to satisfy iOS Safari
+  const handleConnect = (service: string) => {
+    if (!clientsReady) {
+      setError('Aguarde um momento e tente novamente.');
+      return;
+    }
     setLoading(service);
     setError(null);
-    const result = await connectService(service);
-    setLoading(null);
-    if (result.success) {
-      refresh();
-    } else {
-      setError('Não foi possível conectar. Verifique se os popups estão permitidos e tente novamente.');
+    const firstTime = !isServiceConnected(service);
+    const triggered = requestTokenSync(service, firstTime);
+    if (!triggered) {
+      setLoading(null);
+      setError('Erro ao abrir autenticação. Recarregue a página.');
     }
   };
 
@@ -78,7 +91,6 @@ export function ConnectedAccounts() {
       <div className="px-5 flex flex-col gap-3">
         <p className="text-[#A8A8A8] text-sm mb-1">Integre seu ecossistema Google</p>
 
-        {/* Connected account header */}
         {connectedCount > 0 && connectedEmail && (
           <GlassCard>
             <div className="flex items-center gap-3">
@@ -93,14 +105,15 @@ export function ConnectedAccounts() {
                 <p className="text-[#A8A8A8] text-xs">{connectedEmail}</p>
                 <div className="flex items-center gap-1 mt-0.5">
                   <div className="w-1.5 h-1.5 rounded-full bg-[#22c55e]" />
-                  <span className="text-xs text-[#22c55e]">{connectedCount} serviço{connectedCount > 1 ? 's' : ''} conectado{connectedCount > 1 ? 's' : ''}</span>
+                  <span className="text-xs text-[#22c55e]">
+                    {connectedCount} serviço{connectedCount > 1 ? 's' : ''} conectado{connectedCount > 1 ? 's' : ''}
+                  </span>
                 </div>
               </div>
             </div>
           </GlassCard>
         )}
 
-        {/* Error message */}
         {error && (
           <div
             className="px-4 py-3 rounded-2xl text-xs"
@@ -110,7 +123,6 @@ export function ConnectedAccounts() {
           </div>
         )}
 
-        {/* Services */}
         <div className="flex flex-col gap-2">
           {integrations.map(integration => {
             const info = serviceInfo[integration.service];
@@ -125,7 +137,7 @@ export function ConnectedAccounts() {
                 style={{
                   background: 'rgba(18,18,18,0.72)',
                   border: `1px solid ${isConnected ? 'rgba(34,197,94,0.3)' : 'rgba(255,255,255,0.08)'}`,
-                  opacity: noApi ? 0.5 : 1,
+                  opacity: noApi ? 0.45 : 1,
                 }}
               >
                 <div
@@ -151,11 +163,14 @@ export function ConnectedAccounts() {
                 </div>
 
                 {noApi ? (
-                  <span className="text-[10px] text-[#3F3F3F] font-medium px-2 py-1 rounded-lg" style={{ background: 'rgba(255,255,255,0.04)' }}>
+                  <span
+                    className="text-[10px] text-[#3F3F3F] font-medium px-2 py-1 rounded-lg flex-shrink-0"
+                    style={{ background: 'rgba(255,255,255,0.04)' }}
+                  >
                     Em breve
                   </span>
                 ) : isLoading ? (
-                  <div className="px-3 py-1.5">
+                  <div className="px-3 py-1.5 flex-shrink-0">
                     <Loader2 size={16} color="#FF9F3D" className="animate-spin" />
                   </div>
                 ) : isConnected ? (
@@ -182,8 +197,8 @@ export function ConnectedAccounts() {
           })}
         </div>
 
-        <p className="text-[#3F3F3F] text-[10px] text-center px-4 mt-2">
-          Ao conectar, o Google solicitará permissão para acessar os dados selecionados. Você pode revogar o acesso a qualquer momento.
+        <p className="text-[#3F3F3F] text-[10px] text-center px-4 mt-1">
+          Ao conectar, o Google solicitará permissão. Você pode revogar o acesso a qualquer momento.
         </p>
       </div>
     </div>
