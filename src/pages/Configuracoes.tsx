@@ -125,12 +125,29 @@ function PinSetupOverlay({ onDone, onCancel }: { onDone: () => void; onCancel: (
   );
 }
 
+// ─── Notification prefs storage ───────────────────────────────────────────────
+
+const NOTIF_KEY = 'ebran:notif:v1';
+
+interface NotifPrefs { foco: boolean; metas: boolean; financas: boolean; saude: boolean }
+
+function loadNotifPrefs(): NotifPrefs {
+  try {
+    const raw = localStorage.getItem(NOTIF_KEY);
+    return raw ? JSON.parse(raw) : { foco: true, metas: true, financas: false, saude: true };
+  } catch { return { foco: true, metas: true, financas: false, saude: true }; }
+}
+
+function saveNotifPrefs(prefs: NotifPrefs) {
+  try { localStorage.setItem(NOTIF_KEY, JSON.stringify(prefs)); } catch {}
+}
+
 // ─── Main settings page ────────────────────────────────────────────────────────
 
 const AUTO_LOCK_OPTIONS = [
-  { label: '1 minuto', value: 1 },
-  { label: '5 minutos', value: 5 },
-  { label: '15 minutos', value: 15 },
+  { label: '1 min', value: 1 },
+  { label: '5 min', value: 5 },
+  { label: '15 min', value: 15 },
   { label: 'Nunca', value: 0 },
 ];
 
@@ -138,10 +155,13 @@ export function Configuracoes() {
   const navigate = useNavigate();
   const { hasPinSet, removePin, setAutoLockMinutes, autoLockMinutes } = usePinLock();
 
-  const [notifFoco, setNotifFoco] = useState(true);
-  const [notifMetas, setNotifMetas] = useState(true);
-  const [notifFinancas, setNotifFinancas] = useState(false);
-  const [notifSaude, setNotifSaude] = useState(true);
+  const [notifs, setNotifs] = useState<NotifPrefs>(loadNotifPrefs);
+
+  const updateNotif = (key: keyof NotifPrefs, value: boolean) => {
+    const next = { ...notifs, [key]: value };
+    setNotifs(next);
+    saveNotifPrefs(next);
+  };
 
   const [setupMode, setSetupMode] = useState<'create' | 'change' | null>(null);
 
@@ -171,18 +191,22 @@ export function Configuracoes() {
         <GlassCard>
           <p className="text-[#A8A8A8] text-xs font-semibold uppercase tracking-wider mb-4">Notificações</p>
           <div className="flex flex-col gap-4">
-            {[
-              { label: 'Foco diário', desc: 'Lembretes de itens pendentes', value: notifFoco, onChange: setNotifFoco },
-              { label: 'Metas', desc: 'Atualizações de progresso', value: notifMetas, onChange: setNotifMetas },
-              { label: 'Finanças', desc: 'Alertas de lançamentos', value: notifFinancas, onChange: setNotifFinancas },
-              { label: 'Saúde', desc: 'Lembretes de hábitos e medicamentos', value: notifSaude, onChange: setNotifSaude },
-            ].map(item => (
-              <div key={item.label} className="flex items-center justify-between gap-4">
+            {([
+              { key: 'foco' as const, label: 'Foco diário', desc: 'Lembretes de itens pendentes' },
+              { key: 'metas' as const, label: 'Metas', desc: 'Atualizações de progresso' },
+              { key: 'financas' as const, label: 'Finanças', desc: 'Alertas de lançamentos' },
+              { key: 'saude' as const, label: 'Saúde', desc: 'Lembretes de hábitos e medicamentos' },
+            ]).map(item => (
+              <div key={item.key} className="flex items-center justify-between gap-4">
                 <div className="flex-1">
                   <p className="text-[#F7F7F7] text-sm font-medium">{item.label}</p>
                   <p className="text-[#6F6F6F] text-xs mt-0.5">{item.desc}</p>
                 </div>
-                <ToggleSwitch value={item.value} onChange={item.onChange} size="sm" />
+                <ToggleSwitch
+                  value={notifs[item.key]}
+                  onChange={v => updateNotif(item.key, v)}
+                  size="sm"
+                />
               </div>
             ))}
           </div>
@@ -247,24 +271,8 @@ export function Configuracoes() {
           )}
         </GlassCard>
 
-        {/* Sobre o app */}
-        <GlassCard>
-          <p className="text-[#A8A8A8] text-xs font-semibold uppercase tracking-wider mb-3">Sobre o app</p>
-          {[
-            { label: 'Versão', value: '1.0.0' },
-            { label: 'Idioma', value: 'Português (BR)' },
-            { label: 'Tema', value: 'Escuro' },
-          ].map(({ label, value }, i, arr) => (
-            <div
-              key={label}
-              className="flex items-center justify-between py-3"
-              style={{ borderBottom: i < arr.length - 1 ? '1px solid rgba(255,255,255,0.06)' : 'none' }}
-            >
-              <span className="text-[#A8A8A8] text-sm">{label}</span>
-              <span className="text-[#F7F7F7] text-sm">{value}</span>
-            </div>
-          ))}
-        </GlassCard>
+        {/* Versão */}
+        <p className="text-center text-[#3F3F3F] text-xs pb-2">ebran v1.0.0</p>
       </div>
 
       {/* PIN Setup Overlay */}
