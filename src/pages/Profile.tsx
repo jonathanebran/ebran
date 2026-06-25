@@ -1,8 +1,12 @@
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, User, Settings, Target, Link2, LogOut, ChevronRight } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { GlassCard } from '../components/GlassCard';
 import { mockUser } from '../data/mockData';
+
+const PROFILE_KEY = 'ebran:profile:v1';
+const AVATAR_KEY = 'ebran:avatar:v1';
 
 const menuItems = [
   { icon: User, label: 'Meu perfil', to: '/meu-perfil', color: '#FF9F3D' },
@@ -13,6 +17,19 @@ const menuItems = [
 
 export function Profile() {
   const navigate = useNavigate();
+  const [avatar, setAvatar] = useState<string | null>(null);
+  const [displayName, setDisplayName] = useState(mockUser.name);
+
+  useEffect(() => {
+    setAvatar(localStorage.getItem(AVATAR_KEY));
+    try {
+      const raw = localStorage.getItem(PROFILE_KEY);
+      if (raw) {
+        const data = JSON.parse(raw) as { name: string };
+        if (data.name) setDisplayName(data.name);
+      }
+    } catch { /* keep default */ }
+  }, []);
 
   return (
     <div className="flex flex-col min-h-screen pb-10" style={{ background: '#000' }}>
@@ -27,16 +44,20 @@ export function Profile() {
         {/* Avatar */}
         <div className="flex flex-col items-center py-6">
           <div
-            className="w-20 h-20 rounded-[22px] flex items-center justify-center mb-3"
+            className="w-20 h-20 rounded-[22px] flex items-center justify-center mb-3 overflow-hidden"
             style={{
               background: 'rgba(28,28,30,0.85)',
               border: '2px solid rgba(255,111,95,0.5)',
               boxShadow: '0 0 24px rgba(255,111,95,0.2)',
             }}
           >
-            <User size={32} color="#A8A8A8" />
+            {avatar ? (
+              <img src={avatar} alt="avatar" className="w-full h-full object-cover" />
+            ) : (
+              <User size={32} color="#A8A8A8" />
+            )}
           </div>
-          <h2 className="text-[#F7F7F7] font-bold text-xl">{mockUser.name}</h2>
+          <h2 className="text-[#F7F7F7] font-bold text-xl">{displayName}</h2>
           <p className="text-[#A8A8A8] text-sm mt-1">{mockUser.email}</p>
           <div
             className="mt-2 px-3 py-1 rounded-full text-xs font-semibold"
@@ -46,7 +67,7 @@ export function Profile() {
               color: '#FF9F3D',
             }}
           >
-            {mockUser.brand}
+            Ebran
           </div>
         </div>
 
