@@ -17,7 +17,7 @@ export function GlassCard({ children, className = '', onClick, active = false, p
       onClick={onClick}
       className={`rounded-2xl overflow-hidden ${padding} ${className}`}
       style={{
-        background: 'rgba(18,18,18,0.72)',
+        background: 'rgba(18,18,18,var(--glass-opacity,0.72))',
         backdropFilter: 'blur(20px)',
         WebkitBackdropFilter: 'blur(20px)',
         border: active

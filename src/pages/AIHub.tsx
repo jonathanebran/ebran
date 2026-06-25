@@ -20,6 +20,24 @@ interface Message {
   result?: ReturnType<typeof classifyAICommand>;
 }
 
+const DESTINATION_ROUTES: Record<string, string> = {
+  finance:        '/financas',
+  goals:          '/metas',
+  daily_focus:    '/foco',
+  health:         '/saude',
+  work:           '/trabalho',
+  work_and_goals: '/trabalho',
+  ai_hub:         '/ai-hub',
+};
+
+const ACTION_ROUTES: Record<string, string> = {
+  'Ir para Finanças':    '/financas',
+  'Ir para Metas':       '/metas',
+  'Ir para Foco diário': '/foco',
+  'Ir para Saúde':       '/saude',
+  'Ir para Trabalho':    '/trabalho',
+};
+
 export function AIHub() {
   const navigate = useNavigate();
   const [input, setInput] = useState('');
@@ -73,22 +91,40 @@ export function AIHub() {
                     <p className="text-[#F7F7F7] text-sm leading-relaxed">{msg.content}</p>
                     {msg.result && (
                       <div className="mt-3 flex flex-col gap-1.5">
-                        {msg.result.suggestedActions.filter(Boolean).map((action, i) => (
-                          <div
-                            key={i}
-                            className="flex items-center gap-2 rounded-xl px-3 py-2"
-                            style={{ background: 'rgba(255,159,61,0.08)' }}
-                          >
-                            <div className="w-1 h-1 rounded-full flex-shrink-0" style={{ background: '#FF9F3D' }} />
-                            <p className="text-xs text-[#A8A8A8]">{action}</p>
-                          </div>
-                        ))}
+                        {msg.result.suggestedActions.filter(Boolean).map((action, i) => {
+                          const dest = ACTION_ROUTES[action];
+                          return dest ? (
+                            <motion.button
+                              key={i}
+                              whileTap={{ scale: 0.97 }}
+                              onClick={() => navigate(dest)}
+                              className="flex items-center gap-2 rounded-xl px-3 py-2 text-left w-full"
+                              style={{ background: 'rgba(255,159,61,0.1)', border: '1px solid rgba(255,159,61,0.2)' }}
+                            >
+                              <div className="w-1 h-1 rounded-full flex-shrink-0" style={{ background: '#FF9F3D' }} />
+                              <p className="text-xs text-[#FF9F3D] font-medium">{action}</p>
+                            </motion.button>
+                          ) : (
+                            <div
+                              key={i}
+                              className="flex items-center gap-2 rounded-xl px-3 py-2"
+                              style={{ background: 'rgba(255,159,61,0.06)' }}
+                            >
+                              <div className="w-1 h-1 rounded-full flex-shrink-0" style={{ background: '#FF9F3D' }} />
+                              <p className="text-xs text-[#A8A8A8]">{action}</p>
+                            </div>
+                          );
+                        })}
                         {msg.result.confirmationRequired && (
                           <motion.button
                             whileTap={{ scale: 0.96 }}
+                            onClick={() => {
+                              const route = DESTINATION_ROUTES[msg.result!.suggestedDestination] ?? '/';
+                              navigate(route);
+                            }}
                             className="mt-1 py-2 rounded-xl text-xs font-semibold text-center"
                             style={{
-                              background: 'linear-gradient(135deg, #FFD84A, #FF2F7D)',
+                              background: 'linear-gradient(135deg, var(--color-start,#FFD84A), var(--color-end,#FF2F7D))',
                               color: '#000',
                             }}
                           >

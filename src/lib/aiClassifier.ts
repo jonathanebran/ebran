@@ -3,6 +3,43 @@ import type { AIClassifierResult } from './types';
 export function classifyAICommand(input: string): AIClassifierResult {
   const lower = input.toLowerCase();
 
+  // Income: "recebi", "ganhei", "entrou"
+  if (lower.includes('recebi') || lower.includes('ganhei') || (lower.includes('entrou') && (lower.includes('pix') || lower.includes('reais') || lower.includes('r$')))) {
+    const valueMatch = input.match(/(\d+[\.,]?\d*)/);
+    const value = valueMatch ? parseFloat(valueMatch[1].replace(',', '.')) : 0;
+    const method = lower.includes('pix') ? 'Pix' : lower.includes('transferência') ? 'Transferência' : lower.includes('dinheiro') ? 'Dinheiro' : 'Outro';
+    return {
+      intent: 'register_income',
+      module: 'finance',
+      action: 'create_finance_record',
+      extractedData: { type: 'income', amount: value, method },
+      suggestedDestination: 'finance',
+      confirmationRequired: true,
+      suggestedActions: [
+        `Registrar entrada: R$ ${value}`,
+        `Método: ${method}`,
+        'Categoria: Receita',
+      ],
+    };
+  }
+
+  // Goal annotation: "anotar nas metas", "adicionar meta", "criar meta"
+  if (lower.includes('meta') && (lower.includes('anotar') || lower.includes('adicionar') || lower.includes('criar') || lower.includes('quero') || lower.includes('nova'))) {
+    return {
+      intent: 'create_goal',
+      module: 'goals',
+      action: 'create_goal',
+      extractedData: { input },
+      suggestedDestination: 'goals',
+      confirmationRequired: true,
+      suggestedActions: [
+        'Criar nova meta',
+        'Definir valor e prazo',
+        'Escolher categoria',
+      ],
+    };
+  }
+
   // Finance + work + goal combination
   if (lower.includes('recebi') && lower.includes('pix') && lower.includes('jogar')) {
     const valueMatch = input.match(/R?\$?\s*(\d+[\.,]?\d*)/g);
@@ -51,7 +88,7 @@ export function classifyAICommand(input: string): AIClassifierResult {
   }
 
   // Care procedure / botox
-  if (lower.includes('botox') || lower.includes('prp') || lower.includes('laser') || lower.includes('limpeza de pele') || lower.includes('dermatologista')) {
+  if (lower.includes('botox') || lower.includes('prp') || lower.includes('laser') || lower.includes('limpeza de pele') || (lower.includes('dermatologista') && !lower.includes('paguei'))) {
     const monthMatch = input.match(/(\d+)\s*mes/i);
     const months = monthMatch ? parseInt(monthMatch[1]) : 3;
     const valueMatch = input.match(/(\d+[\.,]?\d*)\s*reais?/i);
@@ -69,7 +106,7 @@ export function classifyAICommand(input: string): AIClassifierResult {
         deadline: deadline.toISOString().split('T')[0],
         monthly_suggestion: Math.ceil(value / months),
       },
-      suggestedDestination: 'goals_care',
+      suggestedDestination: 'goals',
       confirmationRequired: true,
       suggestedActions: [
         `Criar meta de cuidado: R$ ${value}`,
@@ -81,7 +118,7 @@ export function classifyAICommand(input: string): AIClassifierResult {
   }
 
   // Appointment / psychology
-  if (lower.includes('psicólog') || lower.includes('psiquiatr') || lower.includes('dentista') || lower.includes('dermatologista')) {
+  if (lower.includes('psicólog') || lower.includes('psiquiatr') || lower.includes('dentista') || (lower.includes('dermatologista') && !lower.includes('paguei'))) {
     const dayMatch = input.match(/(segunda|terça|quarta|quinta|sexta|sábado|domingo)/i);
     const timeMatch = input.match(/(\d{1,2})h(?:(\d{2})?)?/i);
     const specialty = lower.includes('psicólog') ? 'Psicólogo(a)'
@@ -97,7 +134,7 @@ export function classifyAICommand(input: string): AIClassifierResult {
         day: dayMatch?.[1] ?? null,
         time: timeMatch ? `${timeMatch[1]}:${timeMatch[2] ?? '00'}` : null,
       },
-      suggestedDestination: 'health_consultations',
+      suggestedDestination: 'health',
       confirmationRequired: true,
       suggestedActions: [
         `Criar consulta: ${specialty}`,
@@ -125,7 +162,7 @@ export function classifyAICommand(input: string): AIClassifierResult {
         category: isDerma || isPsych ? 'care' : 'general',
         description: input,
       },
-      suggestedDestination: isDerma || isPsych ? 'finance_care' : 'finance',
+      suggestedDestination: 'finance',
       confirmationRequired: true,
       suggestedActions: [
         `Registrar despesa: R$ ${value}`,
@@ -135,7 +172,26 @@ export function classifyAICommand(input: string): AIClassifierResult {
     };
   }
 
-  // Generic / fallback
+  // Work / faturamento
+  if (lower.includes('atendimento') || lower.includes('cliente') || lower.includes('faturei') || lower.includes('cobrei') || lower.includes('serviço')) {
+    const valueMatch = input.match(/(\d+[\.,]?\d*)/);
+    const value = valueMatch ? parseFloat(valueMatch[1].replace(',', '.')) : 0;
+    return {
+      intent: 'register_work_record',
+      module: 'work',
+      action: 'create_work_record',
+      extractedData: { amount: value, description: input },
+      suggestedDestination: 'work',
+      confirmationRequired: true,
+      suggestedActions: [
+        value > 0 ? `Registrar R$ ${value} em Trabalho` : 'Registrar atendimento',
+        'Definir tipo de serviço',
+        'Vincular ao cliente',
+      ],
+    };
+  }
+
+  // Generic fallback — show navigation options
   return {
     intent: 'general_query',
     module: 'ai_hub',
@@ -144,8 +200,10 @@ export function classifyAICommand(input: string): AIClassifierResult {
     suggestedDestination: 'ai_hub',
     confirmationRequired: false,
     suggestedActions: [
-      'Processar com IA',
-      'Escolher destino manualmente',
+      'Ir para Finanças',
+      'Ir para Metas',
+      'Ir para Foco diário',
+      'Ir para Saúde',
     ],
   };
 }

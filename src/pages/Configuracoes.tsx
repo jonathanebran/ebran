@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Delete, Shield } from 'lucide-react';
+import { ArrowLeft, Delete, Shield, Palette } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { GlassCard } from '../components/GlassCard';
 import { ToggleSwitch } from '../components/ToggleSwitch';
 import { usePinLock } from '../contexts/PinLockContext';
+import { useTheme, THEMES } from '../contexts/ThemeContext';
 
 // ─── Inline PIN setup numpad ───────────────────────────────────────────────────
 
@@ -154,6 +155,7 @@ const AUTO_LOCK_OPTIONS = [
 export function Configuracoes() {
   const navigate = useNavigate();
   const { hasPinSet, removePin, setAutoLockMinutes, autoLockMinutes } = usePinLock();
+  const { themeId, glassOpacity, setTheme, setGlassOpacity } = useTheme();
 
   const [notifs, setNotifs] = useState<NotifPrefs>(loadNotifPrefs);
 
@@ -165,7 +167,6 @@ export function Configuracoes() {
 
   const [setupMode, setSetupMode] = useState<'create' | 'change' | null>(null);
 
-  // Keep local toggle state in sync with context
   const [pinEnabled, setPinEnabled] = useState(hasPinSet);
   useEffect(() => { setPinEnabled(hasPinSet); }, [hasPinSet]);
 
@@ -219,7 +220,6 @@ export function Configuracoes() {
             <p className="text-[#A8A8A8] text-xs font-semibold uppercase tracking-wider">Segurança</p>
           </div>
 
-          {/* PIN toggle */}
           <div className="flex items-center justify-between gap-4 pb-4" style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
             <div className="flex-1">
               <p className="text-[#F7F7F7] text-sm font-medium">Bloqueio por PIN</p>
@@ -228,10 +228,8 @@ export function Configuracoes() {
             <ToggleSwitch value={pinEnabled} onChange={handlePinToggle} size="sm" />
           </div>
 
-          {/* PIN options — shown only when PIN is set */}
           {hasPinSet && (
             <div className="flex flex-col gap-3 pt-4">
-              {/* Change PIN */}
               <motion.button
                 whileTap={{ backgroundColor: 'rgba(255,159,61,0.08)' }}
                 onClick={() => setSetupMode('change')}
@@ -242,7 +240,6 @@ export function Configuracoes() {
                 <span className="text-[#FF9F3D] text-sm font-medium">Alterar</span>
               </motion.button>
 
-              {/* Auto-lock time */}
               <div>
                 <p className="text-[#F7F7F7] text-sm mb-3">Bloqueio automático</p>
                 <div className="flex flex-wrap gap-2">
@@ -271,11 +268,72 @@ export function Configuracoes() {
           )}
         </GlassCard>
 
-        {/* Versão */}
+        {/* Aparência */}
+        <GlassCard>
+          <div className="flex items-center gap-2 mb-4">
+            <Palette size={14} color="var(--color-accent,#FF9F3D)" />
+            <p className="text-[#A8A8A8] text-xs font-semibold uppercase tracking-wider">Aparência</p>
+          </div>
+
+          <p className="text-[#F7F7F7] text-sm mb-3">Tema de cor</p>
+          <div className="flex flex-wrap gap-2 mb-5">
+            {THEMES.map(t => (
+              <motion.button
+                key={t.id}
+                whileTap={{ scale: 0.88 }}
+                onClick={() => setTheme(t.id)}
+                className="flex flex-col items-center gap-1"
+                style={{ minWidth: 52 }}
+              >
+                <div
+                  className="w-10 h-10 rounded-2xl flex items-center justify-center"
+                  style={{
+                    background: `linear-gradient(135deg, ${t.start}, ${t.end})`,
+                    border: themeId === t.id
+                      ? '2px solid rgba(255,255,255,0.85)'
+                      : '2px solid rgba(255,255,255,0.08)',
+                    boxShadow: themeId === t.id ? '0 0 14px rgba(255,255,255,0.25)' : 'none',
+                  }}
+                >
+                  <span style={{ fontSize: 18 }}>{t.emoji}</span>
+                </div>
+                <span
+                  className="text-[9px] font-medium"
+                  style={{ color: themeId === t.id ? '#F7F7F7' : '#6F6F6F' }}
+                >
+                  {t.label}
+                </span>
+              </motion.button>
+            ))}
+          </div>
+
+          <div>
+            <div className="flex items-center justify-between mb-2">
+              <p className="text-[#F7F7F7] text-sm">Opacidade do vidro</p>
+              <span className="text-[#6F6F6F] text-xs">{Math.round(glassOpacity * 100)}%</span>
+            </div>
+            <input
+              type="range"
+              min={0.15}
+              max={0.95}
+              step={0.05}
+              value={glassOpacity}
+              onChange={e => setGlassOpacity(parseFloat(e.target.value))}
+              className="w-full h-1.5 rounded-full appearance-none cursor-pointer"
+              style={{
+                background: `linear-gradient(to right, var(--color-accent,#FF9F3D) 0%, var(--color-accent,#FF9F3D) ${((glassOpacity - 0.15) / 0.8) * 100}%, rgba(255,255,255,0.1) ${((glassOpacity - 0.15) / 0.8) * 100}%, rgba(255,255,255,0.1) 100%)`,
+              }}
+            />
+            <div className="flex justify-between mt-1">
+              <span className="text-[#6F6F6F] text-[10px]">Transparente</span>
+              <span className="text-[#6F6F6F] text-[10px]">Sólido</span>
+            </div>
+          </div>
+        </GlassCard>
+
         <p className="text-center text-[#3F3F3F] text-xs pb-2">ebran v1.0.0</p>
       </div>
 
-      {/* PIN Setup Overlay */}
       {setupMode && (
         <PinSetupOverlay
           onDone={() => setSetupMode(null)}

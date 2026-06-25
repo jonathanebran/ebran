@@ -1,17 +1,18 @@
 import { NavLink } from 'react-router-dom';
-import { Target, Briefcase, PieChart, ListChecks } from 'lucide-react';
+import { Home, Target, Briefcase, PieChart, ListChecks } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { AppLogo } from './AppLogo';
 import { motion } from 'framer-motion';
 
 const leftItems = [
-  { to: '/foco', icon: ListChecks, label: 'Foco', exact: false },
-  { to: '/metas', icon: Target, label: 'Metas', exact: false },
+  { to: '/',        icon: Home,       label: 'Home',  exact: true  },
+  { to: '/foco',    icon: ListChecks, label: 'Foco',  exact: false },
+  { to: '/metas',   icon: Target,     label: 'Metas', exact: false },
 ];
 
 const rightItems = [
-  { to: '/trabalho', icon: Briefcase, label: 'Trab.', exact: false },
-  { to: '/financas', icon: PieChart, label: 'Finan.', exact: false },
+  { to: '/trabalho', icon: Briefcase, label: 'Trab.',  exact: false },
+  { to: '/financas', icon: PieChart,  label: 'Finan.', exact: false },
 ];
 
 interface NavItemProps {
@@ -27,7 +28,7 @@ function NavItem({ to, icon: Icon, label, exact }: NavItemProps) {
       to={to}
       end={exact}
       className="relative flex flex-col items-center tap-scale"
-      style={{ padding: '6px 14px 4px', minWidth: 58 }}
+      style={{ padding: '6px 10px 4px', minWidth: 50 }}
     >
       {({ isActive }) => (
         <>
@@ -53,7 +54,7 @@ function NavItem({ to, icon: Icon, label, exact }: NavItemProps) {
             className="relative z-10 font-semibold mt-0.5"
             style={{
               fontSize: 9,
-              color: isActive ? '#FF9F3D' : 'rgba(255,255,255,0.38)',
+              color: isActive ? 'var(--color-accent,#FF9F3D)' : 'rgba(255,255,255,0.38)',
               letterSpacing: '0.01em',
             }}
           >
@@ -106,9 +107,9 @@ export function BottomNav() {
                   <svg width="54" height="54" className="absolute inset-0" style={{ overflow: 'visible' }}>
                     <defs>
                       <linearGradient id="ai-ring" x1="0%" y1="0%" x2="100%" y2="100%">
-                        <stop offset="0%" stopColor="#FFD84A" />
-                        <stop offset="50%" stopColor="#FF6B5F" />
-                        <stop offset="100%" stopColor="#FF2F7D" />
+                        <stop offset="0%"   style={{ stopColor: 'var(--color-start,#FFD84A)' }} />
+                        <stop offset="50%"  style={{ stopColor: 'var(--color-mid,#FF6B5F)' }} />
+                        <stop offset="100%" style={{ stopColor: 'var(--color-end,#FF2F7D)' }} />
                       </linearGradient>
                     </defs>
                     {isActive && (
@@ -138,7 +139,7 @@ export function BottomNav() {
                 </div>
                 <span
                   className="font-semibold"
-                  style={{ fontSize: 9, marginTop: 2, color: isActive ? '#FF9F3D' : 'rgba(255,255,255,0.38)', letterSpacing: '0.01em' }}
+                  style={{ fontSize: 9, marginTop: 2, color: isActive ? 'var(--color-accent,#FF9F3D)' : 'rgba(255,255,255,0.38)', letterSpacing: '0.01em' }}
                 >
                   AI
                 </span>
@@ -153,10 +154,9 @@ export function BottomNav() {
           <svg width="0" height="0" className="absolute">
             <defs>
               <linearGradient id="nav-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stopColor="#FFD84A" />
-                <stop offset="35%" stopColor="#FF9F3D" />
-                <stop offset="65%" stopColor="#FF6B5F" />
-                <stop offset="100%" stopColor="#FF2F7D" />
+                <stop offset="0%"   style={{ stopColor: 'var(--color-start,#FFD84A)' }} />
+                <stop offset="35%"  style={{ stopColor: 'var(--color-mid,#FF9F3D)' }} />
+                <stop offset="100%" style={{ stopColor: 'var(--color-end,#FF2F7D)' }} />
               </linearGradient>
             </defs>
           </svg>
