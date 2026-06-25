@@ -6,6 +6,7 @@ import { GoalsProvider } from './contexts/GoalsContext';
 import { DailyFocusProvider } from './contexts/DailyFocusContext';
 import { PinLockProvider, usePinLock } from './contexts/PinLockContext';
 import { PinLock } from './pages/PinLock';
+import { useGoogleAutoRefresh } from './hooks/useGoogleAutoRefresh';
 import { BottomNav } from './components/BottomNav';
 import { Home } from './pages/Home';
 import { DailyFocus } from './pages/DailyFocus';
@@ -30,6 +31,7 @@ import { Signup } from './pages/Signup';
 const mainRoutes = ['/', '/metas', '/ai-hub', '/trabalho', '/financas', '/foco', '/saude', '/perfil'];
 
 function AppContent() {
+  useGoogleAutoRefresh();
   const location = useLocation();
   const showNav = mainRoutes.some(r => location.pathname === r);
 

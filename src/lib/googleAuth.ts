@@ -74,15 +74,14 @@ async function fetchUserEmail(token: string): Promise<string> {
   } catch { return 'Conta Google'; }
 }
 
-export async function connectService(service: string): Promise<{ success: boolean; email?: string }> {
+async function requestToken(
+  service: string,
+  silent: boolean
+): Promise<{ success: boolean; email?: string }> {
   const scope = SERVICE_SCOPES[service];
   if (!scope) return { success: false };
 
-  try {
-    await loadGIS();
-  } catch {
-    return { success: false };
-  }
+  try { await loadGIS(); } catch { return { success: false }; }
 
   return new Promise((resolve) => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -90,12 +89,15 @@ export async function connectService(service: string): Promise<{ success: boolea
     const client = g.accounts.oauth2.initTokenClient({
       client_id: CLIENT_ID,
       scope: `${scope} https://www.googleapis.com/auth/userinfo.email`,
+      prompt: silent ? '' : undefined,
       callback: async (response: { access_token?: string; error?: string; expires_in?: number }) => {
         if (response.error || !response.access_token) {
           resolve({ success: false });
           return;
         }
-        const email = await fetchUserEmail(response.access_token);
+        // Reuse stored email on silent refresh to avoid extra fetch
+        const existingToken = getStoredToken(service);
+        const email = existingToken?.email ?? await fetchUserEmail(response.access_token);
         const expiry = Date.now() + (response.expires_in ?? 3600) * 1000;
         localStorage.setItem(tokenKey(service), JSON.stringify({ token: response.access_token, expiry, email }));
         resolve({ success: true, email });
@@ -104,4 +106,36 @@ export async function connectService(service: string): Promise<{ success: boolea
     });
     client.requestAccessToken();
   });
+}
+
+export async function connectService(service: string): Promise<{ success: boolean; email?: string }> {
+  return requestToken(service, false);
+}
+
+// Silently refreshes a token without showing a popup.
+// Works if the user is still signed in to Google and has previously granted access.
+export async function silentRefreshService(service: string): Promise<boolean> {
+  const result = await requestToken(service, true);
+  return result.success;
+}
+
+// Returns all services that have stored (possibly expired) tokens
+export function getConnectedServices(): string[] {
+  return Object.keys(SERVICE_SCOPES).filter(s => !!localStorage.getItem(tokenKey(s)));
+}
+
+// Refresh all services whose tokens expire within the next 10 minutes
+export async function refreshExpiringTokens(): Promise<void> {
+  const TEN_MIN = 10 * 60 * 1000;
+  const services = Object.keys(SERVICE_SCOPES);
+  for (const service of services) {
+    const raw = localStorage.getItem(tokenKey(service));
+    if (!raw) continue;
+    try {
+      const data = JSON.parse(raw) as TokenData;
+      if (data.expiry - Date.now() < TEN_MIN) {
+        await silentRefreshService(service);
+      }
+    } catch { continue; }
+  }
 }
