@@ -4,15 +4,12 @@ import type { LucideIcon } from 'lucide-react';
 import { AppLogo } from './AppLogo';
 import { motion } from 'framer-motion';
 
-const leftItems = [
-  { to: '/',        icon: Home,       label: 'Home',  exact: true  },
-  { to: '/foco',    icon: ListChecks, label: 'Foco',  exact: false },
-  { to: '/metas',   icon: Target,     label: 'Metas', exact: false },
-];
-
-const rightItems = [
-  { to: '/trabalho', icon: Briefcase, label: 'Trab.',  exact: false },
-  { to: '/financas', icon: PieChart,  label: 'Finan.', exact: false },
+const navItems = [
+  { to: '/',         icon: Home,       label: 'Home',   exact: true  },
+  { to: '/foco',     icon: ListChecks, label: 'Foco',   exact: false },
+  { to: '/metas',    icon: Target,     label: 'Metas',  exact: false },
+  { to: '/trabalho', icon: Briefcase,  label: 'Trab.',  exact: false },
+  { to: '/financas', icon: PieChart,   label: 'Finan.', exact: false },
 ];
 
 interface NavItemProps {
@@ -28,7 +25,7 @@ function NavItem({ to, icon: Icon, label, exact }: NavItemProps) {
       to={to}
       end={exact}
       className="relative flex flex-col items-center tap-scale"
-      style={{ padding: '6px 10px 4px', minWidth: 50 }}
+      style={{ padding: '6px 12px 4px', minWidth: 54 }}
     >
       {({ isActive }) => (
         <>
@@ -66,10 +63,70 @@ function NavItem({ to, icon: Icon, label, exact }: NavItemProps) {
   );
 }
 
+// Floating AI button — sits above the nav bar on the right side
+function AIFloatingButton() {
+  return (
+    <div
+      className="fixed z-50"
+      style={{
+        right: 16,
+        bottom: 'calc(max(16px, env(safe-area-inset-bottom, 16px)) + 78px)',
+      }}
+    >
+      <NavLink to="/ai-hub" className="tap-scale block">
+        {({ isActive }) => (
+          <motion.div
+            initial={{ scale: 0, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ type: 'spring', stiffness: 380, damping: 30, delay: 0.15 }}
+            className="relative flex items-center justify-center"
+            style={{ width: 56, height: 56 }}
+          >
+            <svg width="56" height="56" className="absolute inset-0" style={{ overflow: 'visible' }}>
+              <defs>
+                <linearGradient id="ai-fab-ring" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%"   style={{ stopColor: 'var(--color-start,#FFD84A)' }} />
+                  <stop offset="50%"  style={{ stopColor: 'var(--color-mid,#FF6B5F)' }} />
+                  <stop offset="100%" style={{ stopColor: 'var(--color-end,#FF2F7D)' }} />
+                </linearGradient>
+              </defs>
+              {isActive && (
+                <circle cx="28" cy="28" r="27" fill="none" stroke="url(#ai-fab-ring)" strokeWidth={10} opacity={0.12} />
+              )}
+              <circle
+                cx="28" cy="28" r="26"
+                fill="none"
+                stroke="url(#ai-fab-ring)"
+                strokeWidth={isActive ? 2.2 : 1.6}
+                opacity={isActive ? 1 : 0.85}
+              />
+            </svg>
+            <div
+              className="relative z-10 flex items-center justify-center rounded-full"
+              style={{
+                width: 48, height: 48,
+                background: isActive ? 'rgba(255,100,60,0.18)' : 'rgba(12,12,12,0.82)',
+                backdropFilter: 'blur(24px)',
+                WebkitBackdropFilter: 'blur(24px)',
+                border: '0.5px solid rgba(255,255,255,0.1)',
+                boxShadow: '0 8px 28px rgba(0,0,0,0.55)',
+              }}
+            >
+              <AppLogo size={26} />
+            </div>
+          </motion.div>
+        )}
+      </NavLink>
+    </div>
+  );
+}
+
 export function BottomNav() {
   return (
     <>
       <div style={{ height: 'max(90px, calc(env(safe-area-inset-bottom, 0px) + 80px))' }} />
+
+      <AIFloatingButton />
 
       <div
         className="fixed left-0 right-0 z-50 flex justify-center"
@@ -91,63 +148,7 @@ export function BottomNav() {
             padding: '4px 6px',
           }}
         >
-          {leftItems.map(item => (
-            <NavItem key={item.to} {...item} />
-          ))}
-
-          {/* AI center */}
-          <NavLink
-            to="/ai-hub"
-            className="relative flex flex-col items-center tap-scale"
-            style={{ padding: '0 10px', marginTop: -18 }}
-          >
-            {({ isActive }) => (
-              <>
-                <div className="relative flex items-center justify-center" style={{ width: 54, height: 54 }}>
-                  <svg width="54" height="54" className="absolute inset-0" style={{ overflow: 'visible' }}>
-                    <defs>
-                      <linearGradient id="ai-ring" x1="0%" y1="0%" x2="100%" y2="100%">
-                        <stop offset="0%"   style={{ stopColor: 'var(--color-start,#FFD84A)' }} />
-                        <stop offset="50%"  style={{ stopColor: 'var(--color-mid,#FF6B5F)' }} />
-                        <stop offset="100%" style={{ stopColor: 'var(--color-end,#FF2F7D)' }} />
-                      </linearGradient>
-                    </defs>
-                    {isActive && (
-                      <circle cx="27" cy="27" r="26" fill="none" stroke="url(#ai-ring)" strokeWidth={10} opacity={0.12} />
-                    )}
-                    <circle
-                      cx="27" cy="27" r="25"
-                      fill="none"
-                      stroke="url(#ai-ring)"
-                      strokeWidth={isActive ? 2 : 1.5}
-                      opacity={isActive ? 1 : 0.7}
-                    />
-                  </svg>
-                  <motion.div
-                    animate={{ background: isActive ? 'rgba(255,100,60,0.18)' : 'rgba(12,12,12,0.72)' }}
-                    transition={{ duration: 0.25 }}
-                    className="relative z-10 flex items-center justify-center rounded-full"
-                    style={{
-                      width: 46, height: 46,
-                      backdropFilter: 'blur(24px)',
-                      WebkitBackdropFilter: 'blur(24px)',
-                      border: '0.5px solid rgba(255,255,255,0.1)',
-                    }}
-                  >
-                    <AppLogo size={24} />
-                  </motion.div>
-                </div>
-                <span
-                  className="font-semibold"
-                  style={{ fontSize: 9, marginTop: 2, color: isActive ? 'var(--color-accent,#FF9F3D)' : 'rgba(255,255,255,0.38)', letterSpacing: '0.01em' }}
-                >
-                  AI
-                </span>
-              </>
-            )}
-          </NavLink>
-
-          {rightItems.map(item => (
+          {navItems.map(item => (
             <NavItem key={item.to} {...item} />
           ))}
 
