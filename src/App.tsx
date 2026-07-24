@@ -6,6 +6,7 @@ import { GoalsProvider } from './contexts/GoalsContext';
 import { DailyFocusProvider } from './contexts/DailyFocusContext';
 import { PinLockProvider, usePinLock } from './contexts/PinLockContext';
 import { ThemeProvider } from './contexts/ThemeContext';
+import { ErrorBoundary } from './components/ErrorBoundary';
 import { PinLock } from './pages/PinLock';
 import { useGoogleAutoRefresh } from './hooks/useGoogleAutoRefresh';
 import { BottomNav } from './components/BottomNav';
@@ -84,20 +85,22 @@ function PinGate({ children }: { children: React.ReactNode }) {
 
 export default function App() {
   return (
-    <ThemeProvider>
-      <PinLockProvider>
-        <PinGate>
-          <BrowserRouter>
-            <AuthProvider>
-              <GoalsProvider>
-                <DailyFocusProvider>
-                  <AppContent />
-                </DailyFocusProvider>
-              </GoalsProvider>
-            </AuthProvider>
-          </BrowserRouter>
-        </PinGate>
-      </PinLockProvider>
-    </ThemeProvider>
+    <ErrorBoundary>
+      <ThemeProvider>
+        <PinLockProvider>
+          <PinGate>
+            <BrowserRouter>
+              <AuthProvider>
+                <GoalsProvider>
+                  <DailyFocusProvider>
+                    <AppContent />
+                  </DailyFocusProvider>
+                </GoalsProvider>
+              </AuthProvider>
+            </BrowserRouter>
+          </PinGate>
+        </PinLockProvider>
+      </ThemeProvider>
+    </ErrorBoundary>
   );
 }

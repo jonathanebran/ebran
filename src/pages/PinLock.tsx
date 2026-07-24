@@ -109,7 +109,7 @@ export function PinLock() {
       {/* Numpad */}
       <div className="grid grid-cols-3 gap-3 w-full px-8" style={{ maxWidth: 300 }}>
         {keys.map((k, i) => {
-          if (k === '') return <div key={i} />;
+          if (k === '') return <div key={`slot-${i}`} />;
           if (k === 'del') return (
             <motion.button
               key="del"
