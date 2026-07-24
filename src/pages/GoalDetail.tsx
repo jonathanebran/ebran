@@ -91,9 +91,18 @@ export function GoalDetail() {
   const { goals, contributions: allContributions, updateGoal, deleteGoal, addContribution } = useGoals();
   const goal = goals.find(g => g.id === id);
 
+  // Todos os hooks ficam antes de qualquer return condicional: se a meta for
+  // apagada, `goal` vira undefined e a contagem de hooks não pode mudar.
+  const [modal, setModal] = useState<'add' | 'remove' | 'delete' | null>(null);
+  const [currentAmount, setCurrentAmount] = useState(goal?.current_amount ?? 0);
+
   useEffect(() => {
     if (!goal) navigate('/metas', { replace: true });
   }, [goal, navigate]);
+
+  useEffect(() => {
+    if (goal) setCurrentAmount(goal.current_amount);
+  }, [goal]);
 
   if (!goal) return null;
 
@@ -102,13 +111,6 @@ export function GoalDetail() {
     ? getMonthlySuggestion(goal.target_amount, goal.current_amount, goal.desired_date)
     : null;
   const contributions = allContributions.filter(c => c.goal_id === goal.id);
-
-  const [modal, setModal] = useState<'add' | 'remove' | 'delete' | null>(null);
-  const [currentAmount, setCurrentAmount] = useState(goal.current_amount);
-
-  useEffect(() => {
-    setCurrentAmount(goal.current_amount);
-  }, [goal.current_amount]);
 
   const handleConfirm = (value: number, note: string) => {
     let newAmount = currentAmount;

@@ -7,7 +7,7 @@ import { Chip } from '../components/Chip';
 import { mockPhotoSessions } from '../data/mockData';
 import type { PhotoSession } from '../lib/types';
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
+// ─── Helpers ───────────────────────────────────────────────────────────
 
 function formatSessionDate(dateStr: string): string {
   const [, m, d] = dateStr.split('-');
@@ -31,7 +31,7 @@ const SERVICE_ICONS: Record<string, string> = {
   'Fotografia de Produto': '📦',
 };
 
-// ─── Atendimentos tab ─────────────────────────────────────────────────────────
+// ─── Atendimentos tab ───────────────────────────────────────────────────
 
 function AtendimentosTab() {
   const navigate = useNavigate();
@@ -173,7 +173,7 @@ function AtendimentosTab() {
   );
 }
 
-// ─── Work Goals tab ───────────────────────────────────────────────────────────
+// ─── Work Goals tab ─────────────────────────────────────────────────────
 
 function MetasTab() {
   return (
@@ -194,23 +194,13 @@ function MetasTab() {
   );
 }
 
-// ─── AI Analysis tab ──────────────────────────────────────────────────────────
+// ─── AI Analysis tab ────────────────────────────────────────────────────
 
 function AIAnalysisTab() {
   const sessions = mockPhotoSessions;
 
-  if (sessions.length === 0) {
-    return (
-      <div className="flex flex-col items-center justify-center py-16 gap-4">
-        <span style={{ fontSize: 32 }}>📊</span>
-        <p className="text-[#F7F7F7] font-semibold text-base text-center">Sem dados suficientes</p>
-        <p className="text-[#6F6F6F] text-sm text-center px-6">
-          Registre atendimentos para ver análises e insights aqui.
-        </p>
-      </div>
-    );
-  }
-
+  // Hooks antes de qualquer return condicional — senão a contagem muda quando
+  // chegam dados reais e o React derruba a tela.
   // Sessions by month (last 6 months)
   const byMonth = useMemo(() => {
     const now = new Date();
@@ -249,6 +239,18 @@ function AIAnalysisTab() {
     return days.map((label, i) => ({ label, count: counts[i] }));
   }, [sessions]);
 
+  if (sessions.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center py-16 gap-4">
+        <span style={{ fontSize: 32 }}>📊</span>
+        <p className="text-[#F7F7F7] font-semibold text-base text-center">Sem dados suficientes</p>
+        <p className="text-[#6F6F6F] text-sm text-center px-6">
+          Registre atendimentos para ver análises e insights aqui.
+        </p>
+      </div>
+    );
+  }
+
   const maxHour = peakHours.length > 0 ? Math.max(...peakHours.map(h => h.count)) : 1;
   const maxDay = Math.max(...byDayOfWeek.map(d => d.count), 1);
 
@@ -257,6 +259,7 @@ function AIAnalysisTab() {
     : null;
   const topDay = byDayOfWeek.reduce((a, b) => (a.count > b.count ? a : b));
   const totalSessions = sessions.length;
+
   const lastMonthCount = byMonth[byMonth.length - 1].value;
   const prevMonthCount = byMonth[byMonth.length - 2].value;
   const monthTrend = prevMonthCount > 0
@@ -427,7 +430,7 @@ function AIAnalysisTab() {
   );
 }
 
-// ─── Main page ────────────────────────────────────────────────────────────────
+// ─── Main page ─────────────────────────────────────────────────────────
 
 const tabs = ['Atendimentos', 'Metas', 'Análise IA'] as const;
 type Tab = typeof tabs[number];
