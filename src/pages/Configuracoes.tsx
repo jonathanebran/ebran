@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Delete, Shield, Palette } from 'lucide-react';
 import { motion } from 'framer-motion';
@@ -140,7 +140,7 @@ function loadNotifPrefs(): NotifPrefs {
 }
 
 function saveNotifPrefs(prefs: NotifPrefs) {
-  try { localStorage.setItem(NOTIF_KEY, JSON.stringify(prefs)); } catch {}
+  try { localStorage.setItem(NOTIF_KEY, JSON.stringify(prefs)); } catch { /* armazenamento cheio ou indisponível */ }
 }
 
 // ─── Main settings page ────────────────────────────────────────────────────────
@@ -166,9 +166,6 @@ export function Configuracoes() {
   };
 
   const [setupMode, setSetupMode] = useState<'create' | 'change' | null>(null);
-
-  const [pinEnabled, setPinEnabled] = useState(hasPinSet);
-  useEffect(() => { setPinEnabled(hasPinSet); }, [hasPinSet]);
 
   const handlePinToggle = (enabled: boolean) => {
     if (enabled) {
@@ -225,7 +222,7 @@ export function Configuracoes() {
               <p className="text-[#F7F7F7] text-sm font-medium">Bloqueio por PIN</p>
               <p className="text-[#6F6F6F] text-xs mt-0.5">Protege o app com um PIN de 4 dígitos</p>
             </div>
-            <ToggleSwitch value={pinEnabled} onChange={handlePinToggle} size="sm" />
+            <ToggleSwitch value={hasPinSet} onChange={handlePinToggle} size="sm" />
           </div>
 
           {hasPinSet && (
