@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { User } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -14,19 +14,21 @@ interface HeaderProps {
 
 export function Header({ showGreeting = false }: HeaderProps) {
   const navigate = useNavigate();
-  const [avatar, setAvatar] = useState<string | null>(null);
-  const [firstName, setFirstName] = useState(mockUser.name.split(' ')[0]);
-
-  useEffect(() => {
-    setAvatar(localStorage.getItem(AVATAR_KEY));
+  // Lidos no inicializador (e não num efeito) para a foto já aparecer no
+  // primeiro render, sem piscar o ícone padrão antes.
+  const [avatar] = useState<string | null>(() => {
+    try { return localStorage.getItem(AVATAR_KEY); } catch { return null; }
+  });
+  const [firstName] = useState(() => {
     try {
       const raw = localStorage.getItem(PROFILE_KEY);
       if (raw) {
         const data = JSON.parse(raw) as { name: string };
-        if (data.name) setFirstName(data.name.split(' ')[0]);
+        if (data.name) return data.name.split(' ')[0];
       }
-    } catch { /* keep default */ }
-  }, []);
+    } catch { /* usa o padrão abaixo */ }
+    return mockUser.name.split(' ')[0];
+  });
 
   return (
     <div className="px-5 pt-4 pb-2">

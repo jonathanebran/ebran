@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, User, Settings, Target, Link2, LogOut, ChevronRight } from 'lucide-react';
 import { motion } from 'framer-motion';
@@ -17,19 +17,21 @@ const menuItems = [
 
 export function Profile() {
   const navigate = useNavigate();
-  const [avatar, setAvatar] = useState<string | null>(null);
-  const [displayName, setDisplayName] = useState(mockUser.name);
-
-  useEffect(() => {
-    setAvatar(localStorage.getItem(AVATAR_KEY));
+  // Lidos no inicializador (e não num efeito) para foto e nome já aparecerem
+  // no primeiro render, sem piscar os valores padrão antes.
+  const [avatar] = useState<string | null>(() => {
+    try { return localStorage.getItem(AVATAR_KEY); } catch { return null; }
+  });
+  const [displayName] = useState(() => {
     try {
       const raw = localStorage.getItem(PROFILE_KEY);
       if (raw) {
         const data = JSON.parse(raw) as { name: string };
-        if (data.name) setDisplayName(data.name);
+        if (data.name) return data.name;
       }
-    } catch { /* keep default */ }
-  }, []);
+    } catch { /* usa o padrão abaixo */ }
+    return mockUser.name;
+  });
 
   return (
     <div className="flex flex-col min-h-screen pb-10" style={{ background: '#000' }}>
