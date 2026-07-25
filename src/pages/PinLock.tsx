@@ -18,7 +18,9 @@ export function PinLock() {
     return () => clearInterval(id);
   }, [lockoutUntil]);
 
-  const isLockedOut = lockoutUntil > Date.now() && timeLeft > 0;
+  // `timeLeft` já é zerado pelo efeito quando o bloqueio expira, então não é
+  // preciso consultar o relógio durante a renderização.
+  const isLockedOut = timeLeft > 0;
 
   const handleDigit = (d: string) => {
     if (isLockedOut || pin.length >= 4) return;

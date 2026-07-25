@@ -5,7 +5,7 @@ export function classifyAICommand(input: string): AIClassifierResult {
 
   // Income: "recebi", "ganhei", "entrou"
   if (lower.includes('recebi') || lower.includes('ganhei') || (lower.includes('entrou') && (lower.includes('pix') || lower.includes('reais') || lower.includes('r$')))) {
-    const valueMatch = input.match(/(\d+[\.,]?\d*)/);
+    const valueMatch = input.match(/(\d+[.,]?\d*)/);
     const value = valueMatch ? parseFloat(valueMatch[1].replace(',', '.')) : 0;
     const method = lower.includes('pix') ? 'Pix' : lower.includes('transferência') ? 'Transferência' : lower.includes('dinheiro') ? 'Dinheiro' : 'Outro';
     return {
@@ -42,7 +42,7 @@ export function classifyAICommand(input: string): AIClassifierResult {
 
   // Finance + work + goal combination
   if (lower.includes('recebi') && lower.includes('pix') && lower.includes('jogar')) {
-    const valueMatch = input.match(/R?\$?\s*(\d+[\.,]?\d*)/g);
+    const valueMatch = input.match(/R?\$?\s*(\d+[.,]?\d*)/g);
     const values = valueMatch?.map(v => parseFloat(v.replace(/[R$\s.]/g, '').replace(',', '.'))) ?? [];
     return {
       intent: 'register_income_and_contribute_goal',
@@ -91,7 +91,7 @@ export function classifyAICommand(input: string): AIClassifierResult {
   if (lower.includes('botox') || lower.includes('prp') || lower.includes('laser') || lower.includes('limpeza de pele') || (lower.includes('dermatologista') && !lower.includes('paguei'))) {
     const monthMatch = input.match(/(\d+)\s*mes/i);
     const months = monthMatch ? parseInt(monthMatch[1]) : 3;
-    const valueMatch = input.match(/(\d+[\.,]?\d*)\s*reais?/i);
+    const valueMatch = input.match(/(\d+[.,]?\d*)\s*reais?/i);
     const value = valueMatch ? parseFloat(valueMatch[1].replace(',', '.')) : 900;
     const deadline = new Date();
     deadline.setMonth(deadline.getMonth() + months);
@@ -148,7 +148,7 @@ export function classifyAICommand(input: string): AIClassifierResult {
 
   // Finance expense
   if (lower.includes('paguei') || lower.includes('gastei') || lower.includes('comprei')) {
-    const valueMatch = input.match(/(\d+[\.,]?\d*)/);
+    const valueMatch = input.match(/(\d+[.,]?\d*)/);
     const value = valueMatch ? parseFloat(valueMatch[1].replace(',', '.')) : 0;
     const isDerma = lower.includes('dermatologista');
     const isPsych = lower.includes('psicólog') || lower.includes('psiquiatr');
@@ -174,7 +174,7 @@ export function classifyAICommand(input: string): AIClassifierResult {
 
   // Work / faturamento
   if (lower.includes('atendimento') || lower.includes('cliente') || lower.includes('faturei') || lower.includes('cobrei') || lower.includes('serviço')) {
-    const valueMatch = input.match(/(\d+[\.,]?\d*)/);
+    const valueMatch = input.match(/(\d+[.,]?\d*)/);
     const value = valueMatch ? parseFloat(valueMatch[1].replace(',', '.')) : 0;
     return {
       intent: 'register_work_record',
