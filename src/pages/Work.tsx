@@ -37,19 +37,22 @@ function AtendimentosTab() {
   const navigate = useNavigate();
   const [period, setPeriod] = useState<30 | 60 | 90>(30);
 
-  const todayMs = Date.now();
-  const startMs = todayMs - period * 86_400_000;
-  const prevStartMs = startMs - period * 86_400_000;
+  // O "agora" é fixado uma vez na montagem: assim os memos são puros e suas
+  // dependências ficam completas. Ler o relógio a cada render deixaria os
+  // memos com valores antigos, já que só `period` era declarado como dependência.
+  const [todayMs] = useState(() => Date.now());
 
-  const current = useMemo(
-    () => getSessionsInRange(mockPhotoSessions, startMs, todayMs)
-      .sort((a, b) => new Date(`${b.date}T${b.time}`).getTime() - new Date(`${a.date}T${a.time}`).getTime()),
-    [period]
-  );
-  const prev = useMemo(
-    () => getSessionsInRange(mockPhotoSessions, prevStartMs, startMs),
-    [period]
-  );
+  const current = useMemo(() => {
+    const startMs = todayMs - period * 86_400_000;
+    return getSessionsInRange(mockPhotoSessions, startMs, todayMs)
+      .sort((a, b) => new Date(`${b.date}T${b.time}`).getTime() - new Date(`${a.date}T${a.time}`).getTime());
+  }, [period, todayMs]);
+
+  const prev = useMemo(() => {
+    const startMs = todayMs - period * 86_400_000;
+    const prevStartMs = startMs - period * 86_400_000;
+    return getSessionsInRange(mockPhotoSessions, prevStartMs, startMs);
+  }, [period, todayMs]);
 
   const trendPct = prev.length > 0
     ? Math.round(((current.length - prev.length) / prev.length) * 100)
