@@ -32,7 +32,7 @@ function loadThemeData(): ThemeData {
   try {
     const raw = localStorage.getItem(THEME_KEY);
     if (raw) return JSON.parse(raw) as ThemeData;
-  } catch {}
+  } catch { /* localStorage indisponível — segue com o padrão */ }
   return { themeId: 'fogo', glassOpacity: 0.72 };
 }
 
@@ -70,7 +70,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   const save = (next: ThemeData) => {
     setData(next);
     applyThemeToDom(next.themeId, next.glassOpacity);
-    try { localStorage.setItem(THEME_KEY, JSON.stringify(next)); } catch {}
+    try { localStorage.setItem(THEME_KEY, JSON.stringify(next)); } catch { /* armazenamento cheio ou indisponível */ }
   };
 
   return (

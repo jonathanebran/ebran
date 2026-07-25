@@ -16,7 +16,7 @@ function loadFromStorage<T>(key: string, fallback: T): T {
 function saveToStorage<T>(key: string, value: T) {
   try {
     localStorage.setItem(key, JSON.stringify(value));
-  } catch {}
+  } catch { /* localStorage indisponível — segue com o padrão */ }
 }
 
 interface DailyFocusContextValue {
