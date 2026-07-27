@@ -10,11 +10,11 @@ import { chromium } from 'playwright';
 const BASE = process.env.BASE || 'http://localhost:5173';
 const ROUTES = ['/', '/foco', '/metas', '/saude', '/financas', '/trabalho', '/perfil', '/configuracoes'];
 
-// Cores do tema Fogo — não podem sobreviver a um tema frio.
-const FOGO = ['200, 45, 0', '226, 88, 0', '241, 161, 0'];
+// Cores do tema Fogo (o original do app) — não podem sobreviver a um tema frio.
+const FOGO = ['255, 216, 74', '255, 159, 61', '255, 47, 125'];
 
 const THEMES = [
-  { id: 'fogo',     accent: '241, 161, 0' },
+  { id: 'fogo',     accent: '255, 159, 61' },
   { id: 'oceano',   accent: '1, 144, 234' },
   { id: 'floresta', accent: '91, 209, 73' },
 ];

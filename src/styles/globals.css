@@ -4,14 +4,14 @@
   /* Tema — o ThemeContext sobrescreve estes valores no <html> ao trocar de
      tema. Os valores abaixo são o tema "Fogo" e servem de fallback antes do
      JavaScript rodar, evitando um flash sem cor no primeiro render. */
-  --color-start: #C82D00;
-  --color-mid: #E25800;
-  --color-end: #F1A100;
-  --color-accent: #F1A100;
-  --color-start-rgb: 200, 45, 0;
-  --color-mid-rgb: 226, 88, 0;
-  --color-end-rgb: 241, 161, 0;
-  --color-accent-rgb: 241, 161, 0;
+  --color-start: #FFD84A;
+  --color-mid: #FF9F3D;
+  --color-end: #FF2F7D;
+  --color-accent: #FF9F3D;
+  --color-start-rgb: 255, 216, 74;
+  --color-mid-rgb: 255, 159, 61;
+  --color-end-rgb: 255, 47, 125;
+  --color-accent-rgb: 255, 159, 61;
   --color-on-gradient: #000000;
   --glass-opacity: 0.72;
 

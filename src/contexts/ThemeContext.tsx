@@ -23,10 +23,12 @@ export interface ThemePreset {
 
 export const THEMES: ThemePreset[] = [
   {
+    // Fogo é o tema original do app — as mesmas cores do logo. Por isso não
+    // tem paleta própria nem recebe filtro de cor no logo.
     id: 'fogo', label: 'Fogo', emoji: '🔥',
-    start: '#C82D00', mid: '#E25800', end: '#F1A100',
-    accent: '#F1A100', onGradient: '#000000',
-    swatch: 'linear-gradient(135deg, #C82D00 0%, #E25800 50%, #F1A100 100%)',
+    start: '#FFD84A', mid: '#FF9F3D', end: '#FF2F7D',
+    accent: '#FF9F3D', onGradient: '#000000',
+    swatch: 'linear-gradient(135deg, #FFD84A 0%, #FF9F3D 35%, #FF6B5F 65%, #FF2F7D 100%)',
   },
   {
     id: 'oceano', label: 'Oceano', emoji: '🌊',
