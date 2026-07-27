@@ -70,9 +70,9 @@ function AtendimentosTab() {
             onClick={() => setPeriod(p)}
             className="flex-1 py-2.5 rounded-2xl text-sm font-semibold transition-colors"
             style={{
-              background: period === p ? 'rgba(255,159,61,0.18)' : 'rgba(255,255,255,0.05)',
-              color: period === p ? '#FF9F3D' : '#6F6F6F',
-              border: period === p ? '0.5px solid rgba(255,159,61,0.35)' : '0.5px solid rgba(255,255,255,0.06)',
+              background: period === p ? 'rgba(var(--color-accent-rgb),0.18)' : 'rgba(255,255,255,0.05)',
+              color: period === p ? 'var(--color-accent)' : '#6F6F6F',
+              border: period === p ? '0.5px solid rgba(var(--color-accent-rgb),0.35)' : '0.5px solid rgba(255,255,255,0.06)',
             }}
           >
             {p} dias
@@ -85,9 +85,9 @@ function AtendimentosTab() {
         <div className="flex items-center gap-4 mb-4">
           <div
             className="w-12 h-12 rounded-2xl flex items-center justify-center flex-shrink-0"
-            style={{ background: 'rgba(255,159,61,0.15)' }}
+            style={{ background: 'rgba(var(--color-accent-rgb),0.15)' }}
           >
-            <Camera size={22} color="#FF9F3D" />
+            <Camera size={22} color="var(--color-accent)" />
           </div>
           <div>
             <p className="text-[#A8A8A8] text-xs">Atendimentos — últimos {period} dias</p>
@@ -96,7 +96,7 @@ function AtendimentosTab() {
               {prev.length > 0 && (
                 <div
                   className="flex items-center gap-0.5 mb-0.5"
-                  style={{ color: trendPct >= 0 ? '#22c55e' : '#FF6B5F' }}
+                  style={{ color: trendPct >= 0 ? '#22c55e' : 'var(--color-danger)' }}
                 >
                   {trendPct >= 0
                     ? <TrendingUp size={14} />
@@ -143,7 +143,7 @@ function AtendimentosTab() {
             >
               <div
                 className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 text-base"
-                style={{ background: 'rgba(255,159,61,0.1)' }}
+                style={{ background: 'rgba(var(--color-accent-rgb),0.1)' }}
               >
                 {SERVICE_ICONS[s.service_type] ?? '📷'}
               </div>
@@ -166,7 +166,7 @@ function AtendimentosTab() {
         onClick={() => navigate('/novo-registro')}
         className="w-full flex items-center justify-center gap-2 rounded-2xl py-4"
         style={{
-          background: 'linear-gradient(90deg, #FFD84A, #FF9F3D 40%, #FF6B5F 70%, #FF2F7D)',
+          background: 'linear-gradient(90deg, var(--color-start), var(--color-accent) 40%, var(--color-mid) 70%, var(--color-end))',
         }}
       >
         <Plus size={18} color="#000" strokeWidth={2.5} />
@@ -181,17 +181,17 @@ function AtendimentosTab() {
 function MetasTab() {
   return (
     <div className="flex flex-col items-center justify-center py-16 gap-4">
-      <Target size={32} color="#FF9F3D" />
+      <Target size={32} color="var(--color-accent)" />
       <p className="text-[#6F6F6F] text-sm text-center px-6">
         Nenhuma meta de trabalho cadastrada ainda.
       </p>
       <motion.button
         whileTap={{ scale: 0.95 }}
         className="flex items-center gap-2 px-5 py-3 rounded-2xl"
-        style={{ background: 'rgba(255,159,61,0.12)', border: '1px dashed rgba(255,159,61,0.35)' }}
+        style={{ background: 'rgba(var(--color-accent-rgb),0.12)', border: '1px dashed rgba(var(--color-accent-rgb),0.35)' }}
       >
-        <Plus size={16} color="#FF9F3D" />
-        <span className="text-[#FF9F3D] text-sm font-semibold">Nova meta</span>
+        <Plus size={16} color="var(--color-accent)" />
+        <span className="text-[var(--color-accent)] text-sm font-semibold">Nova meta</span>
       </motion.button>
     </div>
   );
@@ -274,25 +274,25 @@ function AIAnalysisTab() {
       icon: '🕘',
       title: `Horário de pico: ${topHour.label}`,
       desc: `Você é mais procurado às ${topHour.label}. Reserve esta faixa para seus melhores clientes.`,
-      color: '#FF9F3D',
+      color: 'var(--color-accent)',
     },
     {
       icon: '📅',
       title: `Dia mais movimentado: ${topDay.label}`,
       desc: `${topDay.label} é seu dia mais procurado (${topDay.count} sessões).`,
-      color: '#FFD84A',
+      color: 'var(--color-start)',
     },
     {
       icon: monthTrend >= 0 ? '📈' : '📉',
       title: monthTrend >= 0 ? 'Crescimento em alta' : 'Volume caindo',
       desc: `Este mês você tem ${lastMonthCount} sessões — ${Math.abs(monthTrend)}% ${monthTrend >= 0 ? 'acima' : 'abaixo'} do mês anterior.`,
-      color: monthTrend >= 0 ? '#22c55e' : '#FF6B5F',
+      color: monthTrend >= 0 ? '#22c55e' : 'var(--color-danger)',
     },
     {
       icon: '💡',
       title: 'Dica de agenda',
       desc: `Você fez ${totalSessions} atendimentos registrados. Para crescer, considere abrir horários extras nas manhãs de sábado.`,
-      color: '#FF6B5F',
+      color: 'var(--color-danger)',
     },
   ].filter(Boolean) as { icon: string; title: string; desc: string; color: string }[];
 
@@ -303,9 +303,9 @@ function AIAnalysisTab() {
         <div className="flex items-center gap-2 mb-4">
           <div
             className="w-8 h-8 rounded-xl flex items-center justify-center"
-            style={{ background: 'rgba(255,159,61,0.15)' }}
+            style={{ background: 'rgba(var(--color-accent-rgb),0.15)' }}
           >
-            <TrendingUp size={15} color="#FF9F3D" />
+            <TrendingUp size={15} color="var(--color-accent)" />
           </div>
           <div>
             <p className="text-[#F7F7F7] font-semibold text-sm">Sessões por mês</p>
@@ -327,9 +327,9 @@ function AIAnalysisTab() {
                     className="absolute bottom-0 left-0 right-0 rounded-t-lg"
                     style={{
                       background: isLast
-                        ? 'linear-gradient(180deg, #FFD84A, #FF9F3D)'
+                        ? 'linear-gradient(180deg, var(--color-start), var(--color-accent))'
                         : 'rgba(255,255,255,0.1)',
-                      boxShadow: isLast ? '0 0 12px #FF9F3D60' : 'none',
+                      boxShadow: isLast ? '0 0 12px rgba(var(--color-accent-rgb), 0.38)' : 'none',
                     }}
                   />
                 </div>
@@ -359,9 +359,9 @@ function AIAnalysisTab() {
                     className="h-full rounded-full flex items-center justify-end pr-2"
                     style={{
                       background: h.count === maxHour
-                        ? 'linear-gradient(90deg, #FF9F3D99, #FF9F3D)'
+                        ? 'linear-gradient(90deg, rgba(var(--color-accent-rgb), 0.6), var(--color-accent))'
                         : 'rgba(255,255,255,0.12)',
-                      boxShadow: h.count === maxHour ? '0 0 8px #FF9F3D60' : 'none',
+                      boxShadow: h.count === maxHour ? '0 0 8px rgba(var(--color-accent-rgb), 0.38)' : 'none',
                     }}
                   >
                     <span className="text-[9px] font-bold" style={{ color: h.count === maxHour ? '#000' : '#6F6F6F' }}>
@@ -395,13 +395,13 @@ function AIAnalysisTab() {
                     className="absolute bottom-0 left-0 right-0 rounded-t-md"
                     style={{
                       background: isTop
-                        ? 'linear-gradient(180deg, #FFD84A, #FF2F7D)'
+                        ? 'linear-gradient(180deg, var(--color-start), var(--color-end))'
                         : 'rgba(255,255,255,0.09)',
-                      boxShadow: isTop ? '0 0 10px #FF9F3D50' : 'none',
+                      boxShadow: isTop ? '0 0 10px rgba(var(--color-accent-rgb), 0.31)' : 'none',
                     }}
                   />
                 </div>
-                <span className="text-[9px]" style={{ color: isTop ? '#FF9F3D' : '#6F6F6F' }}>
+                <span className="text-[9px]" style={{ color: isTop ? 'var(--color-accent)' : '#6F6F6F' }}>
                   {d.label}
                 </span>
               </div>
@@ -412,7 +412,7 @@ function AIAnalysisTab() {
 
       {/* Insights */}
       <div className="flex items-center gap-2 mt-1 mb-1">
-        <Sparkles size={14} color="#FFD84A" />
+        <Sparkles size={14} color="var(--color-start)" />
         <span className="text-[#A8A8A8] text-xs font-medium">Insights da IA</span>
       </div>
 
@@ -459,7 +459,7 @@ export function Work() {
           whileTap={{ scale: 0.9 }}
           onClick={() => navigate('/novo-registro')}
           className="w-9 h-9 rounded-xl flex items-center justify-center"
-          style={{ background: 'linear-gradient(135deg, #FFD84A, #FF2F7D)' }}
+          style={{ background: 'linear-gradient(135deg, var(--color-start), var(--color-end))' }}
         >
           <Plus size={18} color="#000" />
         </motion.button>

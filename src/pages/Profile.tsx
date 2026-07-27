@@ -9,9 +9,9 @@ const PROFILE_KEY = 'ebran:profile:v1';
 const AVATAR_KEY = 'ebran:avatar:v1';
 
 const menuItems = [
-  { icon: User, label: 'Meu perfil', to: '/meu-perfil', color: '#FF9F3D' },
+  { icon: User, label: 'Meu perfil', to: '/meu-perfil', color: 'var(--color-accent)' },
   { icon: Settings, label: 'Configurações', to: '/configuracoes', color: '#A8A8A8' },
-  { icon: Target, label: 'Metas financeiras', to: '/metas', color: '#FF6B5F' },
+  { icon: Target, label: 'Metas financeiras', to: '/metas', color: 'var(--color-danger)' },
   { icon: Link2, label: 'Conectar contas', to: '/contas', color: '#4285F4' },
 ];
 
@@ -49,8 +49,8 @@ export function Profile() {
             className="w-20 h-20 rounded-[22px] flex items-center justify-center mb-3 overflow-hidden"
             style={{
               background: 'rgba(28,28,30,0.85)',
-              border: '2px solid rgba(255,111,95,0.5)',
-              boxShadow: '0 0 24px rgba(255,111,95,0.2)',
+              border: '2px solid rgba(var(--color-mid-rgb),0.5)',
+              boxShadow: '0 0 24px rgba(var(--color-mid-rgb),0.2)',
             }}
           >
             {avatar ? (
@@ -64,9 +64,9 @@ export function Profile() {
           <div
             className="mt-2 px-3 py-1 rounded-full text-xs font-semibold"
             style={{
-              background: 'linear-gradient(135deg, rgba(255,216,74,0.15), rgba(255,47,125,0.15))',
-              border: '1px solid rgba(255,111,95,0.3)',
-              color: '#FF9F3D',
+              background: 'linear-gradient(135deg, rgba(var(--color-start-rgb),0.15), rgba(var(--color-end-rgb),0.15))',
+              border: '1px solid rgba(var(--color-mid-rgb),0.3)',
+              color: 'var(--color-accent)',
             }}
           >
             Ebran
@@ -85,7 +85,7 @@ export function Profile() {
             >
               <div
                 className="w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0"
-                style={{ background: `${color}18` }}
+                style={{ background: `color-mix(in srgb, ${color} 9%, transparent)` }}
               >
                 <Icon size={16} color={color} />
               </div>
@@ -98,14 +98,14 @@ export function Profile() {
         {/* Logout */}
         <GlassCard padding="p-0">
           <motion.button
-            whileTap={{ backgroundColor: 'rgba(255,47,125,0.05)' }}
+            whileTap={{ backgroundColor: 'rgba(var(--color-end-rgb),0.05)' }}
             onClick={() => navigate('/entrar')}
             className="w-full flex items-center gap-3 px-4 py-4"
           >
-            <div className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ background: '#FF2F7D18' }}>
-              <LogOut size={16} color="#FF2F7D" />
+            <div className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ background: 'rgba(var(--color-end-rgb), 0.09)' }}>
+              <LogOut size={16} color="var(--color-end)" />
             </div>
-            <span className="text-[#FF2F7D] text-sm font-medium">Sair da conta</span>
+            <span className="text-[var(--color-end)] text-sm font-medium">Sair da conta</span>
           </motion.button>
         </GlassCard>
       </div>

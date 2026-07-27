@@ -66,12 +66,12 @@ export function Login() {
             placeholder="••••••••"
           />
 
-          <motion.button className="text-right text-xs mb-1" style={{ color: '#FF9F3D' }}>
+          <motion.button className="text-right text-xs mb-1" style={{ color: 'var(--color-accent)' }}>
             Esqueci a senha
           </motion.button>
 
           {error && (
-            <p className="text-xs text-center" style={{ color: '#FF6B5F' }}>{error}</p>
+            <p className="text-xs text-center" style={{ color: 'var(--color-danger)' }}>{error}</p>
           )}
 
           <PrimaryButton
@@ -97,7 +97,7 @@ export function Login() {
             className="text-sm text-center mt-3"
             style={{ color: '#A8A8A8' }}
           >
-            Não tem conta? <span style={{ color: '#FF9F3D' }}>Criar agora</span>
+            Não tem conta? <span style={{ color: 'var(--color-accent)' }}>Criar agora</span>
           </motion.button>
         </div>
       </motion.div>

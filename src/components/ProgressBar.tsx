@@ -20,7 +20,7 @@ export function ProgressBar({ value, max = 100, showLabel = false, height = 6, c
         <motion.div
           className="h-full rounded-full"
           style={{
-            background: 'linear-gradient(135deg, #FFD84A 0%, #FF9F3D 35%, #FF6B5F 65%, #FF2F7D 100%)',
+            background: 'linear-gradient(135deg, var(--color-start) 0%, var(--color-accent) 35%, var(--color-mid) 65%, var(--color-end) 100%)',
           }}
           initial={{ width: 0 }}
           animate={{ width: `${pct}%` }}
@@ -28,7 +28,7 @@ export function ProgressBar({ value, max = 100, showLabel = false, height = 6, c
         />
       </div>
       {showLabel && (
-        <span className="text-xs text-[#FF9F3D] font-semibold">{pct}%</span>
+        <span className="text-xs text-[var(--color-accent)] font-semibold">{pct}%</span>
       )}
     </div>
   );

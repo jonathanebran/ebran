@@ -42,7 +42,7 @@ export function Header({ showGreeting = false }: HeaderProps) {
           className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 overflow-hidden"
           style={{
             background: 'rgba(28,28,30,0.85)',
-            border: '1.5px solid rgba(255,111,95,0.5)',
+            border: '1.5px solid rgba(var(--color-mid-rgb),0.5)',
           }}
         >
           {avatar ? (

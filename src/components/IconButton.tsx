@@ -17,8 +17,8 @@ export function IconButton({ children, onClick, active = false, size = 'md', cla
       whileTap={{ scale: 0.92 }}
       className={`${sz} rounded-xl flex items-center justify-center flex-shrink-0 ${className}`}
       style={{
-        background: active ? 'rgba(255,111,95,0.15)' : 'rgba(255,255,255,0.06)',
-        border: active ? '1px solid rgba(255,111,95,0.5)' : '1px solid rgba(255,255,255,0.08)',
+        background: active ? 'rgba(var(--color-mid-rgb),0.15)' : 'rgba(255,255,255,0.06)',
+        border: active ? '1px solid rgba(var(--color-mid-rgb),0.5)' : '1px solid rgba(255,255,255,0.08)',
       }}
     >
       {children}

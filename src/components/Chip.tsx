@@ -16,7 +16,7 @@ export function Chip({ label, active = false, onClick, size = 'md' }: ChipProps)
       className={`${padding} rounded-full font-medium flex-shrink-0`}
       style={{
         background: active
-          ? 'linear-gradient(135deg, #FFD84A 0%, #FF9F3D 35%, #FF6B5F 65%, #FF2F7D 100%)'
+          ? 'linear-gradient(135deg, var(--color-start) 0%, var(--color-accent) 35%, var(--color-mid) 65%, var(--color-end) 100%)'
           : 'rgba(255,255,255,0.08)',
         color: active ? '#000' : '#A8A8A8',
         border: active ? 'none' : '1px solid rgba(255,255,255,0.1)',

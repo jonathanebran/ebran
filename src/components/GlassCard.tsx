@@ -21,9 +21,9 @@ export function GlassCard({ children, className = '', onClick, active = false, p
         backdropFilter: 'blur(20px)',
         WebkitBackdropFilter: 'blur(20px)',
         border: active
-          ? '1px solid rgba(255,111,95,0.65)'
+          ? '1px solid rgba(var(--color-mid-rgb),0.65)'
           : '1px solid rgba(255,255,255,0.1)',
-        boxShadow: active ? '0 0 20px rgba(255,111,95,0.12)' : 'none',
+        boxShadow: active ? '0 0 20px rgba(var(--color-mid-rgb),0.12)' : 'none',
         cursor: onClick ? 'pointer' : 'default',
       }}
     >

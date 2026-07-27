@@ -26,7 +26,7 @@ function ResumoTab() {
     <div className="flex flex-col gap-3">
       <div
         className="flex items-center gap-3 rounded-2xl px-4 py-3"
-        style={{ background: 'rgba(255,159,61,0.08)', border: '0.5px solid rgba(255,159,61,0.2)' }}
+        style={{ background: 'rgba(var(--color-accent-rgb),0.08)', border: '0.5px solid rgba(var(--color-accent-rgb),0.2)' }}
       >
         <span style={{ fontSize: 18 }}>🔗</span>
         <div>
@@ -44,23 +44,23 @@ function ResumoTab() {
         </GlassCard>
         <GlassCard padding="p-4">
           <div className="flex items-center gap-2 mb-2">
-            <TrendingDown size={14} color="#FF6B5F" />
+            <TrendingDown size={14} color="var(--color-danger)" />
             <span className="text-xs text-[#A8A8A8]">Saídas</span>
           </div>
-          <p className="text-[#FF6B5F] font-bold text-lg">{formatCurrency(expenses)}</p>
+          <p className="text-[var(--color-danger)] font-bold text-lg">{formatCurrency(expenses)}</p>
         </GlassCard>
       </div>
       <GlassCard>
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
-            <Wallet size={16} color="#FF9F3D" />
+            <Wallet size={16} color="var(--color-accent)" />
             <span className="text-[#F7F7F7] font-semibold text-sm">Saldo estimado</span>
           </div>
-          <p className="text-[#FF9F3D] font-bold text-lg">{formatCurrency(balance)}</p>
+          <p className="text-[var(--color-accent)] font-bold text-lg">{formatCurrency(balance)}</p>
         </div>
         <div className="flex justify-between text-xs mb-1.5">
           <span className="text-[#A8A8A8]">Taxa de economia</span>
-          <span className="text-[#FF9F3D] font-bold">{savings_rate}%</span>
+          <span className="text-[var(--color-accent)] font-bold">{savings_rate}%</span>
         </div>
         <ProgressBar value={savings_rate} height={5} />
       </GlassCard>
@@ -80,17 +80,17 @@ function LancamentosTab() {
           <div key={rec.id} className="flex items-center gap-3 py-3 border-b" style={{ borderColor: 'rgba(255,255,255,0.06)' }}>
             <div
               className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0"
-              style={{ background: rec.type === 'income' ? '#22c55e18' : '#FF6B5F18' }}
+              style={{ background: rec.type === 'income' ? '#22c55e18' : 'var(--color-danger)18' }}
             >
               {rec.type === 'income'
                 ? <TrendingUp size={15} color="#22c55e" />
-                : <TrendingDown size={15} color="#FF6B5F" />}
+                : <TrendingDown size={15} color="var(--color-danger)" />}
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-[#F7F7F7] text-sm font-medium truncate">{rec.description}</p>
               <p className="text-[#6F6F6F] text-xs">{categoryLabels[rec.category] ?? rec.category} · {rec.date}</p>
             </div>
-            <p className="font-bold text-sm flex-shrink-0" style={{ color: rec.type === 'income' ? '#22c55e' : '#FF6B5F' }}>
+            <p className="font-bold text-sm flex-shrink-0" style={{ color: rec.type === 'income' ? '#22c55e' : 'var(--color-danger)' }}>
               {rec.type === 'income' ? '+' : '-'}{formatCurrency(rec.amount)}
             </p>
           </div>
@@ -118,7 +118,7 @@ function TrabalhoTab() {
     <div className="flex flex-col gap-3">
       <GlassCard>
         <div className="flex items-center gap-2 mb-3">
-          <Briefcase size={16} color="#FF9F3D" />
+          <Briefcase size={16} color="var(--color-accent)" />
           <span className="text-[#F7F7F7] font-semibold text-sm">Faturamento do mês</span>
         </div>
         <p className="text-[#F7F7F7] font-bold text-3xl">{formatCurrency(mockWorkSummary.monthly_revenue)}</p>
@@ -155,7 +155,7 @@ function CuidadoTab() {
       <GlassCard>
         <div className="flex justify-between items-center mb-3">
           <p className="text-[#F7F7F7] font-semibold text-sm">Gastos cuidado pessoal</p>
-          <p className="text-[#FF9F3D] font-bold">{formatCurrency(0)}</p>
+          <p className="text-[var(--color-accent)] font-bold">{formatCurrency(0)}</p>
         </div>
         {[
           { label: 'Produtos', value: 0 },
@@ -200,7 +200,7 @@ export function Finance() {
           whileTap={{ scale: 0.9 }}
           onClick={() => navigate('/novo-registro')}
           className="w-9 h-9 rounded-xl flex items-center justify-center"
-          style={{ background: 'linear-gradient(135deg, #FFD84A, #FF2F7D)' }}
+          style={{ background: 'linear-gradient(135deg, var(--color-start), var(--color-end))' }}
         >
           <Plus size={18} color="#000" />
         </motion.button>

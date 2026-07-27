@@ -28,8 +28,8 @@ export function SecondaryButton({
       className={`${fullWidth ? 'w-full' : ''} ${sizeClasses[size]} rounded-2xl font-semibold flex items-center justify-center gap-2 ${className}`}
       style={{
         background: 'transparent',
-        border: '1.5px solid rgba(255,111,95,0.5)',
-        color: '#FF6B5F',
+        border: '1.5px solid rgba(var(--color-mid-rgb),0.5)',
+        color: 'var(--color-danger)',
         letterSpacing: '-0.01em',
       }}
     >

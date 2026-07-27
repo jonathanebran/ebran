@@ -117,7 +117,7 @@ export function ConnectedAccounts() {
         {error && (
           <div
             className="px-4 py-3 rounded-2xl text-xs"
-            style={{ background: 'rgba(255,107,95,0.1)', border: '1px solid rgba(255,107,95,0.25)', color: '#FF6B5F' }}
+            style={{ background: 'rgba(var(--color-danger-rgb),0.1)', border: '1px solid rgba(var(--color-danger-rgb),0.25)', color: 'var(--color-danger)' }}
           >
             {error}
           </div>
@@ -171,14 +171,14 @@ export function ConnectedAccounts() {
                   </span>
                 ) : isLoading ? (
                   <div className="px-3 py-1.5 flex-shrink-0">
-                    <Loader2 size={16} color="#FF9F3D" className="animate-spin" />
+                    <Loader2 size={16} color="var(--color-accent)" className="animate-spin" />
                   </div>
                 ) : isConnected ? (
                   <motion.button
                     whileTap={{ scale: 0.95 }}
                     onClick={() => handleDisconnect(integration.service)}
                     className="px-3 py-1.5 rounded-xl text-xs font-semibold flex-shrink-0"
-                    style={{ border: '1px solid rgba(255,107,95,0.4)', color: '#FF6B5F' }}
+                    style={{ border: '1px solid rgba(var(--color-danger-rgb),0.4)', color: 'var(--color-danger)' }}
                   >
                     Desconectar
                   </motion.button>

@@ -46,7 +46,7 @@ export function Home() {
           <GlassCard onClick={() => navigate('/trabalho')} padding="p-3.5">
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center gap-1.5">
-                <Briefcase size={13} color="#FF9F3D" />
+                <Briefcase size={13} color="var(--color-accent)" />
                 <span className="text-[#F7F7F7] font-semibold text-xs">Trabalho</span>
               </div>
             </div>
@@ -54,7 +54,7 @@ export function Home() {
             <p className="text-[#F7F7F7] font-bold text-base leading-tight">{formatCurrency(mockWorkSummary.monthly_revenue)}</p>
             <p className="text-[#6F6F6F] text-[10px] mb-2">Meta {formatCurrency(mockWorkSummary.monthly_goal)}</p>
             <ProgressBar value={workPct} height={4} />
-            <p className="text-[#FF9F3D] text-[10px] font-bold mt-1.5">{workPct}%</p>
+            <p className="text-[var(--color-accent)] text-[10px] font-bold mt-1.5">{workPct}%</p>
             <div className="flex justify-between mt-2 pt-2" style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
               <div>
                 <p className="text-[#6F6F6F] text-[9px]">Atendimentos</p>
@@ -86,7 +86,7 @@ export function Home() {
                 <p className="text-[#F7F7F7] text-xs font-bold">{formatCurrency(primaryGoal.current_amount)}</p>
                 <p className="text-[#6F6F6F] text-[9px]">de {formatCurrency(primaryGoal.target_amount)}</p>
                 {activeCount > 1 && (
-                  <p className="text-[#FF9F3D] text-[9px] font-semibold mt-1">+{activeCount - 1} outras</p>
+                  <p className="text-[var(--color-accent)] text-[9px] font-semibold mt-1">+{activeCount - 1} outras</p>
                 )}
               </>
             ) : (
@@ -95,9 +95,9 @@ export function Home() {
                   whileTap={{ scale: 0.9 }}
                   onClick={e => { e.stopPropagation(); navigate('/metas/nova'); }}
                   className="w-10 h-10 rounded-2xl flex items-center justify-center"
-                  style={{ background: 'rgba(255,159,61,0.15)', border: '1px dashed rgba(255,159,61,0.4)' }}
+                  style={{ background: 'rgba(var(--color-accent-rgb),0.15)', border: '1px dashed rgba(var(--color-accent-rgb),0.4)' }}
                 >
-                  <Plus size={18} color="#FF9F3D" />
+                  <Plus size={18} color="var(--color-accent)" />
                 </motion.button>
                 <p className="text-[#6F6F6F] text-[10px] text-center">Criar primeira meta</p>
               </div>
@@ -114,7 +114,7 @@ export function Home() {
             </div>
             <div className="grid grid-cols-3 gap-2">
               <div className="flex flex-col items-center gap-1 rounded-2xl py-3" style={{ background: 'rgba(255,255,255,0.04)' }}>
-                <Droplets size={18} color="#FF9F3D" />
+                <Droplets size={18} color="var(--color-accent)" />
                 <p className="text-[#F7F7F7] text-xs font-bold">{mockHealthToday.water.current}L</p>
                 <p className="text-[#6F6F6F] text-[10px]">{mockHealthToday.water.target}L meta</p>
               </div>
@@ -138,7 +138,7 @@ export function Home() {
         <motion.div variants={stagger.item}>
           <div className="flex items-center justify-between mb-3">
             <span className="text-[#F7F7F7] font-semibold text-sm">Atividade recente</span>
-            <button className="text-xs font-semibold" style={{ color: '#FF9F3D' }}>Ver todas</button>
+            <button className="text-xs font-semibold" style={{ color: 'var(--color-accent)' }}>Ver todas</button>
           </div>
           {mockRecentActivity.length === 0 ? (
             <p className="text-[#6F6F6F] text-sm text-center py-4">Nenhuma atividade ainda.</p>
@@ -152,7 +152,7 @@ export function Home() {
                 >
                   <div
                     className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0"
-                    style={{ background: `${item.color}22` }}
+                    style={{ background: `color-mix(in srgb, ${item.color} 13%, transparent)` }}
                   >
                     {item.icon === 'briefcase' && <Briefcase size={16} color={item.color} />}
                     {item.icon === 'dollar-sign' && <span style={{ color: item.color, fontSize: 15, fontWeight: 'bold' }}>$</span>}

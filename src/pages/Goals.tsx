@@ -31,9 +31,9 @@ interface GoalAnalysis {
 }
 
 const actionConfig: Record<ActionTag, { label: string; color: string; icon: React.ReactNode }> = {
-  focar_agora: { label: 'Foco agora',     color: '#FF6B5F', icon: <Zap size={12} /> },
+  focar_agora: { label: 'Foco agora',     color: 'var(--color-danger)', icon: <Zap size={12} /> },
   no_caminho:  { label: 'No caminho',     color: '#22c55e', icon: <CheckCircle2 size={12} /> },
-  pode_adiar:  { label: 'Pode adiar',     color: '#FF9F3D', icon: <Clock size={12} /> },
+  pode_adiar:  { label: 'Pode adiar',     color: 'var(--color-accent)', icon: <Clock size={12} /> },
   pesquisar:   { label: 'Pesquisar',      color: '#A8A8A8', icon: <Search size={12} /> },
 };
 
@@ -128,7 +128,7 @@ function PlanningTab({ goals, onAdd }: { goals: Goal[]; onAdd: () => void }) {
   if (goals.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-16 gap-4">
-        <Sparkles size={32} color="#FF9F3D" />
+        <Sparkles size={32} color="var(--color-accent)" />
         <p className="text-[#F7F7F7] font-semibold text-base">Nenhuma meta cadastrada</p>
         <p className="text-[#6F6F6F] text-sm text-center px-6">
           Adicione metas para a IA gerar seu planejamento personalizado.
@@ -137,10 +137,10 @@ function PlanningTab({ goals, onAdd }: { goals: Goal[]; onAdd: () => void }) {
           whileTap={{ scale: 0.95 }}
           onClick={onAdd}
           className="flex items-center gap-2 px-5 py-3 rounded-2xl"
-          style={{ background: 'rgba(255,159,61,0.12)', border: '1px dashed rgba(255,159,61,0.35)' }}
+          style={{ background: 'rgba(var(--color-accent-rgb),0.12)', border: '1px dashed rgba(var(--color-accent-rgb),0.35)' }}
         >
-          <Plus size={16} color="#FF9F3D" />
-          <span className="text-[#FF9F3D] text-sm font-semibold">Criar primeira meta</span>
+          <Plus size={16} color="var(--color-accent)" />
+          <span className="text-[var(--color-accent)] text-sm font-semibold">Criar primeira meta</span>
         </motion.button>
       </div>
     );
@@ -159,11 +159,11 @@ function PlanningTab({ goals, onAdd }: { goals: Goal[]; onAdd: () => void }) {
       {/* Header card */}
       <div
         className="rounded-2xl p-4"
-        style={{ background: 'linear-gradient(135deg, rgba(255,159,61,0.12), rgba(255,47,125,0.08))', border: '1px solid rgba(255,159,61,0.2)' }}
+        style={{ background: 'linear-gradient(135deg, rgba(var(--color-accent-rgb),0.12), rgba(var(--color-end-rgb),0.08))', border: '1px solid rgba(var(--color-accent-rgb),0.2)' }}
       >
         <div className="flex items-center gap-2 mb-3">
-          <Sparkles size={15} color="#FF9F3D" />
-          <span className="text-[#FF9F3D] text-xs font-bold uppercase tracking-wider">Análise de IA</span>
+          <Sparkles size={15} color="var(--color-accent)" />
+          <span className="text-[var(--color-accent)] text-xs font-bold uppercase tracking-wider">Análise de IA</span>
         </div>
         <p className="text-[#F7F7F7] font-bold text-base mb-3">Planejamento Inteligente</p>
         <div className="grid grid-cols-3 gap-2">
@@ -197,7 +197,7 @@ function PlanningTab({ goals, onAdd }: { goals: Goal[]; onAdd: () => void }) {
               <span className="text-[#F7F7F7] font-semibold text-sm">{cfg.label}</span>
               <span
                 className="ml-auto text-[10px] font-bold px-2 py-0.5 rounded-full"
-                style={{ background: `${cfg.color}22`, color: cfg.color }}
+                style={{ background: `color-mix(in srgb, ${cfg.color} 13%, transparent)`, color: cfg.color }}
               >
                 {items.length}
               </span>
@@ -259,10 +259,10 @@ function EmptyState({ label, onAdd }: { label: string; onAdd: () => void }) {
         whileTap={{ scale: 0.95 }}
         onClick={onAdd}
         className="flex items-center gap-2 px-5 py-3 rounded-2xl"
-        style={{ background: 'rgba(255,159,61,0.12)', border: '1px dashed rgba(255,159,61,0.35)' }}
+        style={{ background: 'rgba(var(--color-accent-rgb),0.12)', border: '1px dashed rgba(var(--color-accent-rgb),0.35)' }}
       >
-        <Plus size={16} color="#FF9F3D" />
-        <span className="text-[#FF9F3D] text-sm font-semibold">Nova meta</span>
+        <Plus size={16} color="var(--color-accent)" />
+        <span className="text-[var(--color-accent)] text-sm font-semibold">Nova meta</span>
       </motion.button>
     </div>
   );
@@ -305,7 +305,7 @@ export function Goals() {
           whileTap={{ scale: 0.96 }}
           onClick={() => navigate('/metas/nova')}
           className="w-full flex items-center justify-center gap-2 rounded-2xl py-4"
-          style={{ background: 'linear-gradient(90deg, #FFD84A, #FF9F3D 40%, #FF6B5F 70%, #FF2F7D)' }}
+          style={{ background: 'linear-gradient(90deg, var(--color-start), var(--color-accent) 40%, var(--color-mid) 70%, var(--color-end))' }}
         >
           <Plus size={20} color="#000" strokeWidth={2.5} />
           <span className="text-black font-bold text-base">Nova meta</span>
@@ -335,7 +335,7 @@ export function Goals() {
                   <motion.button
                     whileTap={{ scale: 0.95 }}
                     onClick={() => navigate('/foco')}
-                    className="text-[#FF9F3D] text-xs font-medium"
+                    className="text-[var(--color-accent)] text-xs font-medium"
                   >
                     Ver todos →
                   </motion.button>

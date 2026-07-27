@@ -21,7 +21,7 @@ function ValueModal({
   const [amount, setAmount] = useState('');
   const [note, setNote] = useState('');
   const isAdd = mode === 'add';
-  const accent = isAdd ? '#22c55e' : '#FF6B5F';
+  const accent = isAdd ? '#22c55e' : 'var(--color-danger)';
 
   return (
     <motion.div
@@ -155,17 +155,17 @@ export function GoalDetail() {
           whileTap={{ scale: 0.9 }}
           onClick={() => setModal('delete')}
           className="w-9 h-9 rounded-xl flex items-center justify-center"
-          style={{ background: 'rgba(255,107,95,0.12)' }}
+          style={{ background: 'rgba(var(--color-danger-rgb),0.12)' }}
         >
-          <Trash2 size={16} color="#FF6B5F" />
+          <Trash2 size={16} color="var(--color-danger)" />
         </motion.button>
         <motion.button
           whileTap={{ scale: 0.9 }}
           onClick={() => navigate(`/metas/${goal.id}/editar`)}
           className="w-9 h-9 rounded-xl flex items-center justify-center"
-          style={{ background: 'rgba(255,159,61,0.15)' }}
+          style={{ background: 'rgba(var(--color-accent-rgb),0.15)' }}
         >
-          <Edit2 size={16} color="#FF9F3D" />
+          <Edit2 size={16} color="var(--color-accent)" />
         </motion.button>
       </div>
 
@@ -175,12 +175,12 @@ export function GoalDetail() {
           <div className="flex items-center gap-5">
             <ProgressRing value={displayPct} size={90} strokeWidth={7} label={`${displayPct}%`} />
             <div className="flex-1">
-              <p className="text-[10px] text-[#FF9F3D] font-semibold uppercase tracking-wider mb-1">{goal.category}</p>
+              <p className="text-[10px] text-[var(--color-accent)] font-semibold uppercase tracking-wider mb-1">{goal.category}</p>
               <p className="text-[#F7F7F7] font-bold text-2xl">{formatCurrency(currentAmount)}</p>
               <p className="text-[#A8A8A8] text-sm">de {formatCurrency(goal.target_amount)}</p>
               {monthlySuggestion && (
                 <p className="text-[#6F6F6F] text-xs mt-2">
-                  Guardar <span className="text-[#FF9F3D] font-semibold">{formatCurrency(monthlySuggestion)}/mês</span>
+                  Guardar <span className="text-[var(--color-accent)] font-semibold">{formatCurrency(monthlySuggestion)}/mês</span>
                 </p>
               )}
             </div>
@@ -209,10 +209,10 @@ export function GoalDetail() {
             whileTap={{ scale: 0.95 }}
             onClick={() => setModal('remove')}
             className="flex items-center justify-center gap-2 rounded-2xl py-4"
-            style={{ background: 'rgba(255,107,95,0.1)', border: '0.5px solid rgba(255,107,95,0.2)' }}
+            style={{ background: 'rgba(var(--color-danger-rgb),0.1)', border: '0.5px solid rgba(var(--color-danger-rgb),0.2)' }}
           >
-            <Minus size={18} color="#FF6B5F" strokeWidth={2.5} />
-            <span className="font-bold text-sm" style={{ color: '#FF6B5F' }}>Remover</span>
+            <Minus size={18} color="var(--color-danger)" strokeWidth={2.5} />
+            <span className="font-bold text-sm" style={{ color: 'var(--color-danger)' }}>Remover</span>
           </motion.button>
         </div>
 
@@ -247,7 +247,7 @@ export function GoalDetail() {
                     <p className="text-[#F7F7F7] text-sm">{c.note ?? (isRemoval ? 'Retirada' : 'Aporte')}</p>
                     <p className="text-[#6F6F6F] text-xs mt-0.5">{formatDate(c.created_at)}</p>
                   </div>
-                  <p className="font-bold text-sm" style={{ color: isRemoval ? '#FF6B5F' : '#22c55e' }}>
+                  <p className="font-bold text-sm" style={{ color: isRemoval ? 'var(--color-danger)' : '#22c55e' }}>
                     {isRemoval ? '-' : '+'}{formatCurrency(Math.abs(c.amount))}
                   </p>
                 </div>
@@ -283,8 +283,8 @@ export function GoalDetail() {
               style={{ background: 'rgba(18,18,18,0.98)', border: '0.5px solid rgba(255,255,255,0.1)' }}
               onClick={e => e.stopPropagation()}
             >
-              <div className="flex items-center justify-center w-12 h-12 rounded-2xl mx-auto mb-4" style={{ background: 'rgba(255,107,95,0.15)' }}>
-                <Trash2 size={22} color="#FF6B5F" />
+              <div className="flex items-center justify-center w-12 h-12 rounded-2xl mx-auto mb-4" style={{ background: 'rgba(var(--color-danger-rgb),0.15)' }}>
+                <Trash2 size={22} color="var(--color-danger)" />
               </div>
               <h3 className="text-[#F7F7F7] font-bold text-lg text-center mb-1">Excluir meta?</h3>
               <p className="text-[#6F6F6F] text-sm text-center mb-6">
@@ -303,7 +303,7 @@ export function GoalDetail() {
                   whileTap={{ scale: 0.96 }}
                   onClick={() => { navigate('/metas', { replace: true }); deleteGoal(goal.id); }}
                   className="flex-1 py-4 rounded-2xl font-bold text-sm"
-                  style={{ background: 'linear-gradient(90deg, #FF6B5F99, #FF6B5F)', color: '#fff' }}
+                  style={{ background: 'linear-gradient(90deg, rgba(var(--color-danger-rgb), 0.6), var(--color-danger))', color: '#fff' }}
                 >
                   Excluir
                 </motion.button>

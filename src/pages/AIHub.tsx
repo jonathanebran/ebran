@@ -70,7 +70,7 @@ export function AIHub() {
           <ArrowLeft size={22} color="#F7F7F7" />
         </motion.button>
         <div className="flex items-center gap-2">
-          <Sparkles size={18} color="#FF9F3D" />
+          <Sparkles size={18} color="var(--color-accent)" />
           <h1 className="text-xl font-bold text-[#F7F7F7]">IA Ebran</h1>
         </div>
       </div>
@@ -99,18 +99,18 @@ export function AIHub() {
                               whileTap={{ scale: 0.97 }}
                               onClick={() => navigate(dest)}
                               className="flex items-center gap-2 rounded-xl px-3 py-2 text-left w-full"
-                              style={{ background: 'rgba(255,159,61,0.1)', border: '1px solid rgba(255,159,61,0.2)' }}
+                              style={{ background: 'rgba(var(--color-accent-rgb),0.1)', border: '1px solid rgba(var(--color-accent-rgb),0.2)' }}
                             >
-                              <div className="w-1 h-1 rounded-full flex-shrink-0" style={{ background: '#FF9F3D' }} />
-                              <p className="text-xs text-[#FF9F3D] font-medium">{action}</p>
+                              <div className="w-1 h-1 rounded-full flex-shrink-0" style={{ background: 'var(--color-accent)' }} />
+                              <p className="text-xs text-[var(--color-accent)] font-medium">{action}</p>
                             </motion.button>
                           ) : (
                             <div
                               key={i}
                               className="flex items-center gap-2 rounded-xl px-3 py-2"
-                              style={{ background: 'rgba(255,159,61,0.06)' }}
+                              style={{ background: 'rgba(var(--color-accent-rgb),0.06)' }}
                             >
-                              <div className="w-1 h-1 rounded-full flex-shrink-0" style={{ background: '#FF9F3D' }} />
+                              <div className="w-1 h-1 rounded-full flex-shrink-0" style={{ background: 'var(--color-accent)' }} />
                               <p className="text-xs text-[#A8A8A8]">{action}</p>
                             </div>
                           );
@@ -124,7 +124,7 @@ export function AIHub() {
                             }}
                             className="mt-1 py-2 rounded-xl text-xs font-semibold text-center"
                             style={{
-                              background: 'linear-gradient(135deg, var(--color-start,#FFD84A), var(--color-end,#FF2F7D))',
+                              background: 'linear-gradient(135deg, var(--color-start), var(--color-end))',
                               color: '#000',
                             }}
                           >
@@ -139,7 +139,7 @@ export function AIHub() {
               {msg.type === 'user' && (
                 <div
                   className="max-w-[75%] px-4 py-3 rounded-2xl rounded-br-sm"
-                  style={{ background: 'rgba(255,159,61,0.15)', border: '1px solid rgba(255,159,61,0.2)' }}
+                  style={{ background: 'rgba(var(--color-accent-rgb),0.15)', border: '1px solid rgba(var(--color-accent-rgb),0.2)' }}
                 >
                   <p className="text-[#F7F7F7] text-sm">{msg.content}</p>
                 </div>
@@ -196,7 +196,7 @@ export function AIHub() {
           className="w-10 h-10 rounded-xl flex items-center justify-center"
           style={{
             background: input.trim()
-              ? 'linear-gradient(135deg, #FFD84A, #FF2F7D)'
+              ? 'linear-gradient(135deg, var(--color-start), var(--color-end))'
               : 'rgba(255,255,255,0.06)',
           }}
         >

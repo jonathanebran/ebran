@@ -19,7 +19,7 @@ export function ToggleSwitch({ value, onChange, size = 'md' }: ToggleSwitchProps
         height: h,
         borderRadius: h,
         background: value
-          ? 'linear-gradient(135deg, #FFD84A 0%, #FF9F3D 35%, #FF6B5F 65%, #FF2F7D 100%)'
+          ? 'linear-gradient(135deg, var(--color-start) 0%, var(--color-accent) 35%, var(--color-mid) 65%, var(--color-end) 100%)'
           : 'rgba(255,255,255,0.12)',
         border: 'none',
         cursor: 'pointer',

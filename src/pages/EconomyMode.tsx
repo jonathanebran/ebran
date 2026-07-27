@@ -14,9 +14,9 @@ const recommendationLabel: Record<string, string> = {
 
 const recommendationColor: Record<string, string> = {
   buy_now: '#22c55e',
-  buy_later: '#FF9F3D',
+  buy_later: 'var(--color-accent)',
   research: '#A8A8A8',
-  save_as_goal: '#FF2F7D',
+  save_as_goal: 'var(--color-end)',
 };
 
 const criteriaList = [
@@ -40,7 +40,7 @@ export function EconomyMode() {
           <ArrowLeft size={22} color="#F7F7F7" />
         </motion.button>
         <div className="flex items-center gap-2">
-          <Zap size={20} color="#FFD84A" />
+          <Zap size={20} color="var(--color-start)" />
           <h1 className="text-xl font-bold text-[#F7F7F7]">Modo Economia</h1>
         </div>
       </div>
@@ -78,7 +78,7 @@ export function EconomyMode() {
                 <div
                   className="w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5 text-xs font-bold"
                   style={{
-                    background: i === 0 ? 'linear-gradient(135deg, #FFD84A, #FF2F7D)' : 'rgba(255,255,255,0.06)',
+                    background: i === 0 ? 'linear-gradient(135deg, var(--color-start), var(--color-end))' : 'rgba(255,255,255,0.06)',
                     color: i === 0 ? '#000' : '#6F6F6F',
                   }}
                 >

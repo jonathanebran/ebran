@@ -51,7 +51,7 @@ function NavItem({ to, icon: Icon, label, exact }: NavItemProps) {
             className="relative z-10 font-semibold mt-0.5"
             style={{
               fontSize: 9,
-              color: isActive ? 'var(--color-accent,#FF9F3D)' : 'rgba(255,255,255,0.38)',
+              color: isActive ? 'var(--color-accent)' : 'rgba(255,255,255,0.38)',
               letterSpacing: '0.01em',
             }}
           >
@@ -85,9 +85,9 @@ function AIFloatingButton() {
             <svg width="56" height="56" className="absolute inset-0" style={{ overflow: 'visible' }}>
               <defs>
                 <linearGradient id="ai-fab-ring" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%"   style={{ stopColor: 'var(--color-start,#FFD84A)' }} />
-                  <stop offset="50%"  style={{ stopColor: 'var(--color-mid,#FF6B5F)' }} />
-                  <stop offset="100%" style={{ stopColor: 'var(--color-end,#FF2F7D)' }} />
+                  <stop offset="0%"   style={{ stopColor: 'var(--color-start)' }} />
+                  <stop offset="50%"  style={{ stopColor: 'var(--color-mid)' }} />
+                  <stop offset="100%" style={{ stopColor: 'var(--color-end)' }} />
                 </linearGradient>
               </defs>
               {isActive && (
@@ -105,7 +105,7 @@ function AIFloatingButton() {
               className="relative z-10 flex items-center justify-center rounded-full"
               style={{
                 width: 48, height: 48,
-                background: isActive ? 'rgba(255,100,60,0.18)' : 'rgba(12,12,12,0.82)',
+                background: isActive ? 'rgba(var(--color-accent-rgb),0.18)' : 'rgba(12,12,12,0.82)',
                 backdropFilter: 'blur(24px)',
                 WebkitBackdropFilter: 'blur(24px)',
                 border: '0.5px solid rgba(255,255,255,0.1)',
@@ -155,9 +155,9 @@ export function BottomNav() {
           <svg width="0" height="0" className="absolute">
             <defs>
               <linearGradient id="nav-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%"   style={{ stopColor: 'var(--color-start,#FFD84A)' }} />
-                <stop offset="35%"  style={{ stopColor: 'var(--color-mid,#FF9F3D)' }} />
-                <stop offset="100%" style={{ stopColor: 'var(--color-end,#FF2F7D)' }} />
+                <stop offset="0%"   style={{ stopColor: 'var(--color-start)' }} />
+                <stop offset="35%"  style={{ stopColor: 'var(--color-mid)' }} />
+                <stop offset="100%" style={{ stopColor: 'var(--color-end)' }} />
               </linearGradient>
             </defs>
           </svg>

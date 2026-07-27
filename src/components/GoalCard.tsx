@@ -16,11 +16,11 @@ const categoryEmoji: Record<string, string> = {
 };
 
 const categoryGradient: Record<string, [string, string]> = {
-  Viagem: ['#FF9F3D', '#FF2F7D'],
-  Transporte: ['#FFD84A', '#FF6B5F'],
-  Moradia: ['#FF6B5F', '#FF2F7D'],
-  Finanças: ['#22c55e', '#FF9F3D'],
-  default: ['#FFD84A', '#FF2F7D'],
+  Viagem: ['var(--color-accent)', 'var(--color-end)'],
+  Transporte: ['var(--color-start)', 'var(--color-danger)'],
+  Moradia: ['var(--color-danger)', 'var(--color-end)'],
+  Finanças: ['#22c55e', 'var(--color-accent)'],
+  default: ['var(--color-start)', 'var(--color-end)'],
 };
 
 function LuminousBar({ value, gradA, gradB }: { value: number; gradA: string; gradB: string }) {

@@ -66,13 +66,13 @@ function RoutineTab() {
       <GlassCard>
         <div className="flex items-center justify-between mb-2">
           <div className="flex items-center gap-2">
-            <Droplets size={16} color="#FF9F3D" />
+            <Droplets size={16} color="var(--color-accent)" />
             <span className="text-[#F7F7F7] font-semibold text-sm">Água</span>
           </div>
-          <span className="text-[#FF9F3D] font-bold text-sm">{mockHealthToday.water.current}L / {mockHealthToday.water.target}L</span>
+          <span className="text-[var(--color-accent)] font-bold text-sm">{mockHealthToday.water.current}L / {mockHealthToday.water.target}L</span>
         </div>
         <ProgressBar value={waterPct} height={6} />
-        <DotProgress value={Math.round(mockHealthToday.water.current * 4)} max={Math.round(mockHealthToday.water.target * 4)} color="#FF9F3D" />
+        <DotProgress value={Math.round(mockHealthToday.water.current * 4)} max={Math.round(mockHealthToday.water.target * 4)} color="var(--color-accent)" />
       </GlassCard>
 
       {/* Sono */}
@@ -93,10 +93,10 @@ function RoutineTab() {
           <motion.button
             whileTap={{ scale: 0.95 }}
             className="flex items-center gap-2 px-4 py-2 rounded-2xl"
-            style={{ background: 'rgba(255,159,61,0.10)', border: '1px dashed rgba(255,159,61,0.35)' }}
+            style={{ background: 'rgba(var(--color-accent-rgb),0.10)', border: '1px dashed rgba(var(--color-accent-rgb),0.35)' }}
           >
-            <Plus size={14} color="#FF9F3D" />
-            <span className="text-[#FF9F3D] text-xs font-semibold">Adicionar hábito</span>
+            <Plus size={14} color="var(--color-accent)" />
+            <span className="text-[var(--color-accent)] text-xs font-semibold">Adicionar hábito</span>
           </motion.button>
         </div>
       </GlassCard>
@@ -134,7 +134,7 @@ function MacrosTab() {
       <GlassCard>
         <p className="text-[#F7F7F7] font-semibold text-sm mb-3">Macros do dia</p>
         {[
-          { label: 'Proteína', value: 0, target: 180, unit: 'g', color: '#FF9F3D' },
+          { label: 'Proteína', value: 0, target: 180, unit: 'g', color: 'var(--color-accent)' },
           { label: 'Água', value: mockHealthToday.water.current, target: mockHealthToday.water.target, unit: 'L', color: '#4285F4' },
           { label: 'Calorias', value: 0, target: 2400, unit: 'kcal', color: '#22c55e' },
         ].map(m => (
@@ -168,10 +168,10 @@ function EsteticaTab() {
             <motion.button
               whileTap={{ scale: 0.95 }}
               className="flex items-center gap-2 px-4 py-2 rounded-2xl"
-              style={{ background: 'rgba(255,159,61,0.10)', border: '1px dashed rgba(255,159,61,0.35)' }}
+              style={{ background: 'rgba(var(--color-accent-rgb),0.10)', border: '1px dashed rgba(var(--color-accent-rgb),0.35)' }}
             >
-              <Plus size={14} color="#FF9F3D" />
-              <span className="text-[#FF9F3D] text-xs font-semibold">Adicionar produto</span>
+              <Plus size={14} color="var(--color-accent)" />
+              <span className="text-[var(--color-accent)] text-xs font-semibold">Adicionar produto</span>
             </motion.button>
           </div>
         ) : (
@@ -201,7 +201,7 @@ function MenteTab() {
     <div className="flex flex-col gap-3">
       <GlassCard>
         <div className="flex items-center gap-2 mb-3">
-          <Heart size={16} color="#FF2F7D" />
+          <Heart size={16} color="var(--color-end)" />
           <span className="text-[#F7F7F7] font-semibold text-sm">Saúde Mental</span>
         </div>
         <div className="flex gap-3 mb-3">
@@ -237,10 +237,10 @@ function ConsultasTab() {
             <motion.button
               whileTap={{ scale: 0.95 }}
               className="flex items-center gap-2 px-4 py-2 rounded-2xl"
-              style={{ background: 'rgba(255,159,61,0.10)', border: '1px dashed rgba(255,159,61,0.35)' }}
+              style={{ background: 'rgba(var(--color-accent-rgb),0.10)', border: '1px dashed rgba(var(--color-accent-rgb),0.35)' }}
             >
-              <Plus size={14} color="#FF9F3D" />
-              <span className="text-[#FF9F3D] text-xs font-semibold">Agendar consulta</span>
+              <Plus size={14} color="var(--color-accent)" />
+              <span className="text-[var(--color-accent)] text-xs font-semibold">Agendar consulta</span>
             </motion.button>
           </div>
         </GlassCard>
@@ -248,15 +248,15 @@ function ConsultasTab() {
         mockAppointments.map(ap => (
           <GlassCard key={ap.id} padding="p-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: 'rgba(255,111,95,0.12)' }}>
-                <Calendar size={18} color="#FF9F3D" />
+              <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: 'rgba(var(--color-mid-rgb),0.12)' }}>
+                <Calendar size={18} color="var(--color-accent)" />
               </div>
               <div className="flex-1">
                 <p className="text-[#F7F7F7] font-semibold text-sm">{ap.title}</p>
                 {ap.professional && <p className="text-[#A8A8A8] text-xs">{ap.professional}</p>}
                 <p className="text-[#6F6F6F] text-xs">{ap.date} · {ap.time}</p>
               </div>
-              <span className="text-xs px-2 py-1 rounded-xl text-[#FF9F3D]" style={{ background: 'rgba(255,159,61,0.12)' }}>Agendada</span>
+              <span className="text-xs px-2 py-1 rounded-xl text-[var(--color-accent)]" style={{ background: 'rgba(var(--color-accent-rgb),0.12)' }}>Agendada</span>
             </div>
           </GlassCard>
         ))
@@ -276,10 +276,10 @@ function MedicamentosTab() {
             <motion.button
               whileTap={{ scale: 0.95 }}
               className="flex items-center gap-2 px-4 py-2 rounded-2xl"
-              style={{ background: 'rgba(255,159,61,0.10)', border: '1px dashed rgba(255,159,61,0.35)' }}
+              style={{ background: 'rgba(var(--color-accent-rgb),0.10)', border: '1px dashed rgba(var(--color-accent-rgb),0.35)' }}
             >
-              <Plus size={14} color="#FF9F3D" />
-              <span className="text-[#FF9F3D] text-xs font-semibold">Adicionar medicamento</span>
+              <Plus size={14} color="var(--color-accent)" />
+              <span className="text-[var(--color-accent)] text-xs font-semibold">Adicionar medicamento</span>
             </motion.button>
           </div>
         </GlassCard>
@@ -287,8 +287,8 @@ function MedicamentosTab() {
         mockMedications.map(med => (
           <GlassCard key={med.id} padding="p-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: 'rgba(255,111,95,0.12)' }}>
-                <Pill size={18} color="#FF9F3D" />
+              <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: 'rgba(var(--color-mid-rgb),0.12)' }}>
+                <Pill size={18} color="var(--color-accent)" />
               </div>
               <div className="flex-1">
                 <p className="text-[#F7F7F7] font-semibold text-sm">{med.name}</p>

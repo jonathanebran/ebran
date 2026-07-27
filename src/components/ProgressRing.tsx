@@ -20,10 +20,10 @@ export function ProgressRing({ value, max = 100, size = 80, strokeWidth = 6, lab
       <svg width={size} height={size}>
         <defs>
           <linearGradient id="ring-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#FFD84A" />
-            <stop offset="35%" stopColor="#FF9F3D" />
-            <stop offset="65%" stopColor="#FF6B5F" />
-            <stop offset="100%" stopColor="#FF2F7D" />
+            <stop offset="0%" stopColor="var(--color-start)" />
+            <stop offset="35%" stopColor="var(--color-accent)" />
+            <stop offset="65%" stopColor="var(--color-danger)" />
+            <stop offset="100%" stopColor="var(--color-end)" />
           </linearGradient>
         </defs>
         {/* Track */}

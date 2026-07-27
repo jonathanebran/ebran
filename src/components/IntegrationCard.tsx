@@ -26,7 +26,7 @@ export function IntegrationCard({ integration, onConnect, onManage }: Integratio
       className="rounded-2xl p-4 flex items-center gap-4"
       style={{
         background: 'rgba(18,18,18,0.72)',
-        border: `1px solid ${isConnected ? 'rgba(255,111,95,0.3)' : 'rgba(255,255,255,0.1)'}`,
+        border: `1px solid ${isConnected ? 'rgba(var(--color-mid-rgb),0.3)' : 'rgba(255,255,255,0.1)'}`,
       }}
     >
       <div
@@ -63,8 +63,8 @@ export function IntegrationCard({ integration, onConnect, onManage }: Integratio
           onClick={onManage}
           className="flex items-center gap-1 px-3 py-1.5 rounded-xl text-xs font-semibold"
           style={{
-            border: '1px solid rgba(255,111,95,0.5)',
-            color: '#FF6B5F',
+            border: '1px solid rgba(var(--color-mid-rgb),0.5)',
+            color: 'var(--color-danger)',
           }}
         >
           Gerenciar
@@ -76,8 +76,8 @@ export function IntegrationCard({ integration, onConnect, onManage }: Integratio
           onClick={onConnect}
           className="px-3 py-1.5 rounded-xl text-xs font-semibold"
           style={{
-            border: '1px solid rgba(255,111,95,0.5)',
-            color: '#FF6B5F',
+            border: '1px solid rgba(var(--color-mid-rgb),0.5)',
+            color: 'var(--color-danger)',
           }}
         >
           Conectar

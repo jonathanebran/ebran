@@ -65,8 +65,8 @@ export function MeuPerfil() {
               className="w-24 h-24 rounded-[26px] flex items-center justify-center overflow-hidden"
               style={{
                 background: 'rgba(28,28,30,0.85)',
-                border: '2px solid rgba(255,111,95,0.5)',
-                boxShadow: '0 0 24px rgba(255,111,95,0.15)',
+                border: '2px solid rgba(var(--color-mid-rgb),0.5)',
+                boxShadow: '0 0 24px rgba(var(--color-mid-rgb),0.15)',
               }}
             >
               {avatar ? (
@@ -79,7 +79,7 @@ export function MeuPerfil() {
               whileTap={{ scale: 0.9 }}
               onClick={handlePhotoClick}
               className="absolute -bottom-1.5 -right-1.5 w-8 h-8 rounded-full flex items-center justify-center"
-              style={{ background: 'linear-gradient(135deg, #FFD84A, #FF2F7D)' }}
+              style={{ background: 'linear-gradient(135deg, var(--color-start), var(--color-end))' }}
             >
               <Camera size={14} color="#000" />
             </motion.button>

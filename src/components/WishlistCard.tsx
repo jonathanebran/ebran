@@ -4,7 +4,7 @@ import { GlassCard } from './GlassCard';
 import type { WishlistItem } from '../lib/types';
 import { formatCurrency } from '../lib/utils';
 
-const priorityColor = { low: '#6F6F6F', medium: '#FF9F3D', high: '#FF6B5F', urgent: '#FF2F7D' };
+const priorityColor = { low: '#6F6F6F', medium: 'var(--color-accent)', high: 'var(--color-danger)', urgent: 'var(--color-end)' };
 
 interface WishlistCardProps {
   item: WishlistItem;
@@ -26,7 +26,7 @@ export function WishlistCard({ item }: WishlistCardProps) {
         </div>
         <div className="flex flex-col items-end gap-1">
           {item.estimated_price && (
-            <p className="text-[#FF9F3D] font-bold text-sm">{formatCurrency(item.estimated_price)}</p>
+            <p className="text-[var(--color-accent)] font-bold text-sm">{formatCurrency(item.estimated_price)}</p>
           )}
           <motion.button whileTap={{ scale: 0.9 }}>
             <MoreHorizontal size={16} color="#6F6F6F" />

@@ -60,7 +60,7 @@ export function PinLock() {
         <p
           className="font-bold text-2xl tracking-tight"
           style={{
-            background: 'linear-gradient(90deg, #FFD84A, #FF9F3D 40%, #FF6B5F 70%, #FF2F7D)',
+            background: 'linear-gradient(90deg, var(--color-start), var(--color-accent) 40%, var(--color-mid) 70%, var(--color-end))',
             WebkitBackgroundClip: 'text',
             WebkitTextFillColor: 'transparent',
           }}
@@ -82,9 +82,9 @@ export function PinLock() {
             className="w-4 h-4 rounded-full transition-all duration-150"
             style={{
               background: pin.length > i
-                ? 'linear-gradient(135deg, #FFD84A, #FF2F7D)'
+                ? 'linear-gradient(135deg, var(--color-start), var(--color-end))'
                 : 'rgba(255,255,255,0.15)',
-              boxShadow: pin.length > i ? '0 0 12px rgba(255,159,61,0.7)' : 'none',
+              boxShadow: pin.length > i ? '0 0 12px rgba(var(--color-accent-rgb),0.7)' : 'none',
               transform: pin.length > i ? 'scale(1.15)' : 'scale(1)',
             }}
           />
@@ -95,13 +95,13 @@ export function PinLock() {
       {isLockedOut ? (
         <div
           className="mb-6 px-6 py-3 rounded-2xl text-center"
-          style={{ background: 'rgba(255,47,125,0.1)', border: '1px solid rgba(255,47,125,0.25)' }}
+          style={{ background: 'rgba(var(--color-end-rgb),0.1)', border: '1px solid rgba(var(--color-end-rgb),0.25)' }}
         >
-          <p className="text-[#FF2F7D] text-sm font-medium">Muitas tentativas incorretas</p>
-          <p className="text-[#FF2F7D] text-xs mt-0.5">Aguarde {timeLeft}s para tentar novamente</p>
+          <p className="text-[var(--color-end)] text-sm font-medium">Muitas tentativas incorretas</p>
+          <p className="text-[var(--color-end)] text-xs mt-0.5">Aguarde {timeLeft}s para tentar novamente</p>
         </div>
       ) : failCount > 0 ? (
-        <p className="text-[#FF6B5F] text-xs mb-6">
+        <p className="text-[var(--color-danger)] text-xs mb-6">
           PIN incorreto — {5 - failCount} tentativa{5 - failCount !== 1 ? 's' : ''} restante{5 - failCount !== 1 ? 's' : ''}
         </p>
       ) : (
@@ -126,7 +126,7 @@ export function PinLock() {
           return (
             <motion.button
               key={k}
-              whileTap={{ scale: 0.85, backgroundColor: 'rgba(255,159,61,0.15)' }}
+              whileTap={{ scale: 0.85, backgroundColor: 'rgba(var(--color-accent-rgb),0.15)' }}
               onClick={() => handleDigit(k)}
               disabled={isLockedOut}
               className="h-16 rounded-2xl flex items-center justify-center"
@@ -146,7 +146,7 @@ export function PinLock() {
         {showConfirm ? (
           <div className="text-center px-6">
             <p className="text-[#A8A8A8] text-sm mb-4">
-              Isso apagará <span className="text-[#FF2F7D] font-semibold">todos os dados</span> do app. Tem certeza?
+              Isso apagará <span className="text-[var(--color-end)] font-semibold">todos os dados</span> do app. Tem certeza?
             </p>
             <div className="flex gap-3 justify-center">
               <motion.button
@@ -161,7 +161,7 @@ export function PinLock() {
                 whileTap={{ scale: 0.95 }}
                 onClick={handleForgot}
                 className="px-6 py-2.5 rounded-xl text-sm font-semibold"
-                style={{ background: 'rgba(255,47,125,0.15)', color: '#FF2F7D', border: '1px solid rgba(255,47,125,0.3)' }}
+                style={{ background: 'rgba(var(--color-end-rgb),0.15)', color: 'var(--color-end)', border: '1px solid rgba(var(--color-end-rgb),0.3)' }}
               >
                 Apagar tudo
               </motion.button>

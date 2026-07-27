@@ -19,9 +19,9 @@ export function CareGoalCard({ goal, onClick }: CareGoalCardProps) {
         <div className="flex items-center gap-2">
           <div
             className="w-8 h-8 rounded-xl flex items-center justify-center"
-            style={{ background: 'rgba(255,111,95,0.1)' }}
+            style={{ background: 'rgba(var(--color-mid-rgb),0.1)' }}
           >
-            <Sparkles size={16} color="#FF9F3D" />
+            <Sparkles size={16} color="var(--color-accent)" />
           </div>
           <div>
             <p className="text-[#F7F7F7] font-semibold text-sm">{goal.title}</p>
@@ -34,7 +34,7 @@ export function CareGoalCard({ goal, onClick }: CareGoalCardProps) {
 
       <div className="flex justify-between text-xs mb-1.5">
         <span className="text-[#A8A8A8]">{formatCurrency(goal.current_amount)} / {formatCurrency(goal.target_amount)}</span>
-        <span className="text-[#FF9F3D] font-bold">{pct}%</span>
+        <span className="text-[var(--color-accent)] font-bold">{pct}%</span>
       </div>
       <ProgressBar value={pct} height={4} />
     </GlassCard>

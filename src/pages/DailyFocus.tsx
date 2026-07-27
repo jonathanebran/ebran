@@ -72,7 +72,7 @@ function SwipeToDelete({ children, onDelete }: {
     <div className="relative overflow-hidden">
       <motion.div
         className="absolute inset-0 flex items-center justify-end pr-5"
-        style={{ background: '#FF6B5F', opacity: deleteOpacity }}
+        style={{ background: 'var(--color-danger)', opacity: deleteOpacity }}
       >
         <Trash2 size={15} color="#fff" />
       </motion.div>
@@ -164,9 +164,9 @@ function AddItemSheet({ onClose, onSave }: {
               onClick={() => setCategory(opt.value)}
               className="px-3 py-1.5 rounded-xl text-sm font-medium"
               style={{
-                background: category === opt.value ? 'rgba(255,159,61,0.2)' : 'rgba(255,255,255,0.06)',
-                color: category === opt.value ? '#FF9F3D' : '#A8A8A8',
-                border: category === opt.value ? '0.5px solid rgba(255,159,61,0.4)' : '0.5px solid transparent',
+                background: category === opt.value ? 'rgba(var(--color-accent-rgb),0.2)' : 'rgba(255,255,255,0.06)',
+                color: category === opt.value ? 'var(--color-accent)' : '#A8A8A8',
+                border: category === opt.value ? '0.5px solid rgba(var(--color-accent-rgb),0.4)' : '0.5px solid transparent',
               }}
             >
               {opt.label}
@@ -183,9 +183,9 @@ function AddItemSheet({ onClose, onSave }: {
               onClick={() => setRecurrence(opt.value)}
               className="px-3 py-1.5 rounded-xl text-sm font-medium"
               style={{
-                background: recurrence === opt.value ? 'rgba(255,159,61,0.2)' : 'rgba(255,255,255,0.06)',
-                color: recurrence === opt.value ? '#FF9F3D' : '#A8A8A8',
-                border: recurrence === opt.value ? '0.5px solid rgba(255,159,61,0.4)' : '0.5px solid transparent',
+                background: recurrence === opt.value ? 'rgba(var(--color-accent-rgb),0.2)' : 'rgba(255,255,255,0.06)',
+                color: recurrence === opt.value ? 'var(--color-accent)' : '#A8A8A8',
+                border: recurrence === opt.value ? '0.5px solid rgba(var(--color-accent-rgb),0.4)' : '0.5px solid transparent',
               }}
             >
               {opt.label}
@@ -209,7 +209,7 @@ function AddItemSheet({ onClose, onSave }: {
           className="w-full py-4 rounded-2xl font-bold text-base"
           style={{
             background: name.trim()
-              ? 'linear-gradient(90deg, #FFD84A, #FF9F3D 40%, #FF6B5F 70%, #FF2F7D)'
+              ? 'linear-gradient(90deg, var(--color-start), var(--color-accent) 40%, var(--color-mid) 70%, var(--color-end))'
               : 'rgba(255,255,255,0.08)',
             color: name.trim() ? '#000' : '#6F6F6F',
           }}
@@ -257,15 +257,15 @@ function RestockPrompt({ item, onConfirm, onDismiss }: {
         onClick={e => e.stopPropagation()}
       >
         <div className="text-center mb-5">
-          <div className="w-12 h-12 rounded-2xl mx-auto mb-3 flex items-center justify-center" style={{ background: 'rgba(255,159,61,0.15)' }}>
-            <RefreshCw size={20} color="#FF9F3D" />
+          <div className="w-12 h-12 rounded-2xl mx-auto mb-3 flex items-center justify-center" style={{ background: 'rgba(var(--color-accent-rgb),0.15)' }}>
+            <RefreshCw size={20} color="var(--color-accent)" />
           </div>
           <h3 className="text-[#F7F7F7] font-bold text-base">{item.name} concluído!</h3>
           <p className="text-[#A8A8A8] text-sm mt-1">
             Quer ser lembrado de repor {recLabel}?
           </p>
           {recLabel && (
-            <p className="text-[#FF9F3D] text-xs mt-1 font-medium">
+            <p className="text-[var(--color-accent)] text-xs mt-1 font-medium">
               Próximo lembrete: {nextRestockDate(item.recurrence ?? '')}
             </p>
           )}
@@ -283,7 +283,7 @@ function RestockPrompt({ item, onConfirm, onDismiss }: {
             whileTap={{ scale: 0.97 }}
             onClick={onConfirm}
             className="flex-1 py-3.5 rounded-2xl font-bold text-sm"
-            style={{ background: 'linear-gradient(90deg, #FF9F3D, #FF6B5F)', color: '#000' }}
+            style={{ background: 'linear-gradient(90deg, var(--color-accent), var(--color-mid))', color: '#000' }}
           >
             Sim, lembrar
           </motion.button>
@@ -425,7 +425,7 @@ export function DailyFocus() {
         {restockQueue.length > 0 && (activeTab === 'Hoje' || activeTab === 'Mercado' || activeTab === 'Cuidado') && (
           <GlassCard>
             <div className="flex items-center gap-2 mb-3">
-              <RefreshCw size={15} color="#FF9F3D" />
+              <RefreshCw size={15} color="var(--color-accent)" />
               <span className="text-[#F7F7F7] font-semibold text-sm">Reposição sugerida</span>
             </div>
             <div className="flex flex-col gap-0">
@@ -451,7 +451,7 @@ export function DailyFocus() {
                       whileTap={{ scale: 0.94 }}
                       onClick={() => handleAddFromRestock(item)}
                       className="text-xs font-medium px-3 py-1.5 rounded-xl"
-                      style={{ background: 'rgba(255,159,61,0.15)', color: '#FF9F3D' }}
+                      style={{ background: 'rgba(var(--color-accent-rgb),0.15)', color: 'var(--color-accent)' }}
                     >
                       Adicionar
                     </motion.button>
@@ -459,9 +459,9 @@ export function DailyFocus() {
                       whileTap={{ scale: 0.9 }}
                       onClick={() => setRestockQueue(prev => prev.filter(r => r.id !== item.id))}
                       className="w-7 h-7 rounded-xl flex items-center justify-center flex-shrink-0"
-                      style={{ background: 'rgba(255,107,95,0.12)' }}
+                      style={{ background: 'rgba(var(--color-danger-rgb),0.12)' }}
                     >
-                      <Trash2 size={13} color="#FF6B5F" />
+                      <Trash2 size={13} color="var(--color-danger)" />
                     </motion.button>
                   </div>
                 </div>

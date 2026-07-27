@@ -66,46 +66,46 @@ export function GooglePermissions() {
         {/* Permissions */}
         <GlassCard>
           <div className="flex items-center gap-2 mb-1">
-            <span style={{ color: '#FF9F3D', fontSize: 14 }}>✦</span>
+            <span style={{ color: 'var(--color-accent)', fontSize: 14 }}>✦</span>
             <p className="text-[#F7F7F7] font-semibold text-sm">Permissões e sincronização</p>
           </div>
           <PermissionRow
-            icon={<Calendar size={16} color="#FF9F3D" />}
+            icon={<Calendar size={16} color="var(--color-accent)" />}
             label="Ler agenda do Calendar"
             description="Visualize seus eventos"
             value={permissions.readCalendar}
             onChange={() => toggle('readCalendar')}
           />
           <PermissionRow
-            icon={<Plus size={16} color="#FF9F3D" />}
+            icon={<Plus size={16} color="var(--color-accent)" />}
             label="Criar eventos"
             description="Permitir que o Ebran crie eventos"
             value={permissions.createEvents}
             onChange={() => toggle('createEvents')}
           />
           <PermissionRow
-            icon={<Lightbulb size={16} color="#FF9F3D" />}
+            icon={<Lightbulb size={16} color="var(--color-accent)" />}
             label="Importar listas do Keep"
             description="Sincronize suas notas e listas"
             value={permissions.importKeep}
             onChange={() => toggle('importKeep')}
           />
           <PermissionRow
-            icon={<CheckCircle2 size={16} color="#FF9F3D" />}
+            icon={<CheckCircle2 size={16} color="var(--color-accent)" />}
             label="Sincronizar tarefas"
             description="Sincronize tarefas e lembretes"
             value={permissions.syncTasks}
             onChange={() => toggle('syncTasks')}
           />
           <PermissionRow
-            icon={<Folder size={16} color="#FF9F3D" />}
+            icon={<Folder size={16} color="var(--color-accent)" />}
             label="Upload no Drive"
             description="Armazene anexos e documentos"
             value={permissions.driveUpload}
             onChange={() => toggle('driveUpload')}
           />
           <PermissionRow
-            icon={<Mail size={16} color="#FF9F3D" />}
+            icon={<Mail size={16} color="var(--color-accent)" />}
             label="Ler recibos do Gmail"
             description="Busque e organize seus recibos"
             value={permissions.readGmail}
@@ -120,7 +120,7 @@ export function GooglePermissions() {
             <p className="text-[#A8A8A8] text-sm font-medium">Pasta padrão do Drive</p>
           </div>
           <div className="flex items-center gap-3 rounded-xl px-3 py-3" style={{ background: 'rgba(255,255,255,0.05)' }}>
-            <Folder size={16} color="#FF9F3D" />
+            <Folder size={16} color="var(--color-accent)" />
             <p className="text-[#F7F7F7] text-sm flex-1">Ebran / Anexos</p>
             <ChevronRight size={16} color="#6F6F6F" />
           </div>
@@ -141,10 +141,10 @@ export function GooglePermissions() {
                 className="rounded-2xl py-3 px-2 text-center"
                 style={{
                   background: syncFreq === opt.value
-                    ? 'rgba(255,111,95,0.12)'
+                    ? 'rgba(var(--color-mid-rgb),0.12)'
                     : 'rgba(255,255,255,0.04)',
                   border: syncFreq === opt.value
-                    ? '1.5px solid rgba(255,111,95,0.65)'
+                    ? '1.5px solid rgba(var(--color-mid-rgb),0.65)'
                     : '1px solid rgba(255,255,255,0.08)',
                 }}
               >

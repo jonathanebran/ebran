@@ -22,7 +22,7 @@ export function ChecklistItem({ item, onToggle }: ChecklistItemProps) {
         className="flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center"
         style={{
           background: done
-            ? 'linear-gradient(135deg, #FFD84A, #FF2F7D)'
+            ? 'linear-gradient(135deg, var(--color-start), var(--color-end))'
             : 'transparent',
           border: done ? 'none' : '1.5px solid rgba(255,255,255,0.25)',
         }}
@@ -52,7 +52,7 @@ export function ChecklistItem({ item, onToggle }: ChecklistItemProps) {
       {item.priority === 'high' && !done && (
         <div
           className="w-1.5 h-1.5 rounded-full flex-shrink-0"
-          style={{ background: '#FF6B5F' }}
+          style={{ background: 'var(--color-danger)' }}
         />
       )}
     </motion.div>

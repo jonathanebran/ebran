@@ -50,7 +50,7 @@ export class ErrorBoundary extends React.Component<Props, State> {
           onClick={() => { window.location.href = '/'; }}
           className="mt-2 px-6 py-3 rounded-2xl font-semibold text-sm"
           style={{
-            background: 'linear-gradient(135deg, var(--color-start,#FFD84A), var(--color-end,#FF2F7D))',
+            background: 'linear-gradient(135deg, var(--color-start), var(--color-end))',
             color: '#000',
           }}
         >

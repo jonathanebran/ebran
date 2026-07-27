@@ -52,7 +52,7 @@ export function Signup() {
         <AppLogo size={56} className="mb-6" />
         <h2 className="text-2xl font-bold text-[#F7F7F7] mb-3">Verifique seu e-mail</h2>
         <p className="text-[#A8A8A8] text-sm text-center mb-8">
-          Enviamos um link de confirmação para <span style={{ color: '#FF9F3D' }}>{email}</span>.
+          Enviamos um link de confirmação para <span style={{ color: 'var(--color-accent)' }}>{email}</span>.
           Clique no link e depois faça login.
         </p>
         <PrimaryButton onClick={() => navigate('/entrar')}>Ir para o login</PrimaryButton>
@@ -75,7 +75,7 @@ export function Signup() {
         <TextField label="Senha" value={password} onChange={setPassword} type="password" placeholder="••••••••" />
 
         {error && (
-          <p className="text-xs text-center" style={{ color: '#FF6B5F' }}>{error}</p>
+          <p className="text-xs text-center" style={{ color: 'var(--color-danger)' }}>{error}</p>
         )}
 
         <PrimaryButton
@@ -118,7 +118,7 @@ export function Signup() {
           className="text-sm text-center mt-2"
           style={{ color: '#A8A8A8' }}
         >
-          Já tem conta? <span style={{ color: '#FF9F3D' }}>Entrar</span>
+          Já tem conta? <span style={{ color: 'var(--color-accent)' }}>Entrar</span>
         </motion.button>
       </div>
     </div>

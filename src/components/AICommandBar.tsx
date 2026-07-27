@@ -37,8 +37,8 @@ export function AICommandBar({ placeholder = 'O que você quer organizar agora? 
         <svg width="0" height="0" className="absolute">
           <defs>
             <linearGradient id="ai-grad" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="#FFD84A" />
-              <stop offset="100%" stopColor="#FF2F7D" />
+              <stop offset="0%" stopColor="var(--color-start)" />
+              <stop offset="100%" stopColor="var(--color-end)" />
             </linearGradient>
           </defs>
         </svg>
@@ -60,7 +60,7 @@ export function AICommandBar({ placeholder = 'O que você quer organizar agora? 
               whileTap={{ scale: 0.9 }}
               className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0"
               style={{
-                background: 'linear-gradient(135deg, #FFD84A 0%, #FF2F7D 100%)',
+                background: 'linear-gradient(135deg, var(--color-start) 0%, var(--color-end) 100%)',
               }}
             >
               <Send size={14} color="#000" />
@@ -90,7 +90,7 @@ export function AICommandBar({ placeholder = 'O que você quer organizar agora? 
                 >
                   <div
                     className="w-1.5 h-1.5 rounded-full flex-shrink-0"
-                    style={{ background: 'linear-gradient(135deg, #FF9F3D, #FF2F7D)' }}
+                    style={{ background: 'linear-gradient(135deg, var(--color-accent), var(--color-end))' }}
                   />
                   <p className="text-sm text-[#F7F7F7]">{action}</p>
                 </div>

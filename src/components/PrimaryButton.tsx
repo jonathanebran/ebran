@@ -34,7 +34,7 @@ export function PrimaryButton({
       style={{
         background: disabled || loading
           ? 'rgba(255,255,255,0.08)'
-          : 'linear-gradient(135deg, var(--color-start,#FFD84A) 0%, var(--color-mid,#FF9F3D) 50%, var(--color-end,#FF2F7D) 100%)',
+          : 'linear-gradient(135deg, var(--color-start) 0%, var(--color-mid) 50%, var(--color-end) 100%)',
         color: disabled || loading ? '#6F6F6F' : '#000',
         letterSpacing: '-0.01em',
         transition: 'opacity 0.2s',

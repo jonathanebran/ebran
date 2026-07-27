@@ -48,9 +48,9 @@ function PinSetupOverlay({ onDone, onCancel }: { onDone: () => void; onCancel: (
       <div className="mb-8 text-center">
         <div
           className="w-12 h-12 rounded-2xl flex items-center justify-center mx-auto mb-3"
-          style={{ background: 'rgba(255,159,61,0.15)' }}
+          style={{ background: 'rgba(var(--color-accent-rgb),0.15)' }}
         >
-          <Shield size={22} color="#FF9F3D" />
+          <Shield size={22} color="var(--color-accent)" />
         </div>
         <p className="text-[#F7F7F7] font-bold text-lg">
           {step === 'enter' ? 'Crie um PIN de 4 dígitos' : 'Confirme seu PIN'}
@@ -73,9 +73,9 @@ function PinSetupOverlay({ onDone, onCancel }: { onDone: () => void; onCancel: (
             className="w-4 h-4 rounded-full transition-all duration-150"
             style={{
               background: current.length > i
-                ? 'linear-gradient(135deg, #FFD84A, #FF2F7D)'
+                ? 'linear-gradient(135deg, var(--color-start), var(--color-end))'
                 : 'rgba(255,255,255,0.15)',
-              boxShadow: current.length > i ? '0 0 12px rgba(255,159,61,0.7)' : 'none',
+              boxShadow: current.length > i ? '0 0 12px rgba(var(--color-accent-rgb),0.7)' : 'none',
               transform: current.length > i ? 'scale(1.15)' : 'scale(1)',
             }}
           />
@@ -83,7 +83,7 @@ function PinSetupOverlay({ onDone, onCancel }: { onDone: () => void; onCancel: (
       </motion.div>
 
       {shake && (
-        <p className="text-[#FF6B5F] text-sm mb-4">PINs não coincidem. Tente novamente.</p>
+        <p className="text-[var(--color-danger)] text-sm mb-4">PINs não coincidem. Tente novamente.</p>
       )}
       {!shake && <div className="mb-4 h-5" />}
 
@@ -104,7 +104,7 @@ function PinSetupOverlay({ onDone, onCancel }: { onDone: () => void; onCancel: (
           return (
             <motion.button
               key={k}
-              whileTap={{ scale: 0.85, backgroundColor: 'rgba(255,159,61,0.15)' }}
+              whileTap={{ scale: 0.85, backgroundColor: 'rgba(var(--color-accent-rgb),0.15)' }}
               onClick={() => handleDigit(k)}
               className="h-16 rounded-2xl flex items-center justify-center"
               style={{ background: 'rgba(255,255,255,0.06)' }}
@@ -213,7 +213,7 @@ export function Configuracoes() {
         {/* Segurança */}
         <GlassCard>
           <div className="flex items-center gap-2 mb-4">
-            <Shield size={14} color="#FF9F3D" />
+            <Shield size={14} color="var(--color-accent)" />
             <p className="text-[#A8A8A8] text-xs font-semibold uppercase tracking-wider">Segurança</p>
           </div>
 
@@ -228,13 +228,13 @@ export function Configuracoes() {
           {hasPinSet && (
             <div className="flex flex-col gap-3 pt-4">
               <motion.button
-                whileTap={{ backgroundColor: 'rgba(255,159,61,0.08)' }}
+                whileTap={{ backgroundColor: 'rgba(var(--color-accent-rgb),0.08)' }}
                 onClick={() => setSetupMode('change')}
                 className="flex items-center justify-between w-full pb-4"
                 style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}
               >
                 <span className="text-[#F7F7F7] text-sm">Alterar PIN</span>
-                <span className="text-[#FF9F3D] text-sm font-medium">Alterar</span>
+                <span className="text-[var(--color-accent)] text-sm font-medium">Alterar</span>
               </motion.button>
 
               <div>
@@ -248,11 +248,11 @@ export function Configuracoes() {
                       className="px-3 py-1.5 rounded-xl text-xs font-medium"
                       style={{
                         background: autoLockMinutes === opt.value
-                          ? 'rgba(255,159,61,0.18)'
+                          ? 'rgba(var(--color-accent-rgb),0.18)'
                           : 'rgba(255,255,255,0.05)',
-                        color: autoLockMinutes === opt.value ? '#FF9F3D' : '#6F6F6F',
+                        color: autoLockMinutes === opt.value ? 'var(--color-accent)' : '#6F6F6F',
                         border: autoLockMinutes === opt.value
-                          ? '0.5px solid rgba(255,159,61,0.35)'
+                          ? '0.5px solid rgba(var(--color-accent-rgb),0.35)'
                           : '0.5px solid rgba(255,255,255,0.08)',
                       }}
                     >
@@ -268,7 +268,7 @@ export function Configuracoes() {
         {/* Aparência */}
         <GlassCard>
           <div className="flex items-center gap-2 mb-4">
-            <Palette size={14} color="var(--color-accent,#FF9F3D)" />
+            <Palette size={14} color="var(--color-accent)" />
             <p className="text-[#A8A8A8] text-xs font-semibold uppercase tracking-wider">Aparência</p>
           </div>
 
@@ -318,7 +318,7 @@ export function Configuracoes() {
               onChange={e => setGlassOpacity(parseFloat(e.target.value))}
               className="w-full h-1.5 rounded-full appearance-none cursor-pointer"
               style={{
-                background: `linear-gradient(to right, var(--color-accent,#FF9F3D) 0%, var(--color-accent,#FF9F3D) ${((glassOpacity - 0.15) / 0.8) * 100}%, rgba(255,255,255,0.1) ${((glassOpacity - 0.15) / 0.8) * 100}%, rgba(255,255,255,0.1) 100%)`,
+                background: `linear-gradient(to right, var(--color-accent) 0%, var(--color-accent) ${((glassOpacity - 0.15) / 0.8) * 100}%, rgba(255,255,255,0.1) ${((glassOpacity - 0.15) / 0.8) * 100}%, rgba(255,255,255,0.1) 100%)`,
               }}
             />
             <div className="flex justify-between mt-1">

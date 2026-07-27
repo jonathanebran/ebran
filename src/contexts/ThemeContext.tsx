@@ -36,13 +36,28 @@ function loadThemeData(): ThemeData {
   return { themeId: 'fogo', glassOpacity: 0.72 };
 }
 
+// "#FF9F3D" -> "255,159,61", para poder usar em rgba(var(--x-rgb), 0.15)
+function hexToRgb(hex: string): string {
+  const h = hex.replace('#', '');
+  const n = parseInt(h.length === 3 ? h.split('').map(c => c + c).join('') : h, 16);
+  return `${(n >> 16) & 255},${(n >> 8) & 255},${n & 255}`;
+}
+
 export function applyThemeToDom(themeId: string, glassOpacity: number) {
   const preset = THEMES.find(t => t.id === themeId) ?? THEMES[0];
   const root = document.documentElement;
+
   root.style.setProperty('--color-start', preset.start);
   root.style.setProperty('--color-mid', preset.mid);
   root.style.setProperty('--color-end', preset.end);
   root.style.setProperty('--color-accent', preset.accent);
+
+  // Versões em RGB: usadas nos fundos e bordas translúcidos do app inteiro.
+  root.style.setProperty('--color-start-rgb', hexToRgb(preset.start));
+  root.style.setProperty('--color-mid-rgb', hexToRgb(preset.mid));
+  root.style.setProperty('--color-end-rgb', hexToRgb(preset.end));
+  root.style.setProperty('--color-accent-rgb', hexToRgb(preset.accent));
+
   root.style.setProperty('--glass-opacity', String(glassOpacity));
 }
 

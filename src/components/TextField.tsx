@@ -46,7 +46,7 @@ export function TextField({
             rows={rows}
             disabled={disabled}
             style={{ ...inputStyle, resize: 'none' }}
-            onFocus={e => (e.target.style.borderColor = 'rgba(255,111,95,0.65)')}
+            onFocus={e => (e.target.style.borderColor = 'rgba(var(--color-mid-rgb),0.65)')}
             onBlur={e => (e.target.style.borderColor = 'rgba(255,255,255,0.12)')}
           />
         ) : (
@@ -57,7 +57,7 @@ export function TextField({
             placeholder={placeholder}
             disabled={disabled}
             style={inputStyle}
-            onFocus={e => (e.target.style.borderColor = 'rgba(255,111,95,0.65)')}
+            onFocus={e => (e.target.style.borderColor = 'rgba(var(--color-mid-rgb),0.65)')}
             onBlur={e => (e.target.style.borderColor = 'rgba(255,255,255,0.12)')}
           />
         )}
