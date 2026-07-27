@@ -18,7 +18,7 @@ export function Chip({ label, active = false, onClick, size = 'md' }: ChipProps)
         background: active
           ? 'linear-gradient(135deg, var(--color-start) 0%, var(--color-accent) 35%, var(--color-mid) 65%, var(--color-end) 100%)'
           : 'rgba(255,255,255,0.08)',
-        color: active ? '#000' : '#A8A8A8',
+        color: active ? 'var(--color-on-gradient)' : '#A8A8A8',
         border: active ? 'none' : '1px solid rgba(255,255,255,0.1)',
       }}
     >

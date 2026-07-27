@@ -307,8 +307,8 @@ export function Goals() {
           className="w-full flex items-center justify-center gap-2 rounded-2xl py-4"
           style={{ background: 'linear-gradient(90deg, var(--color-start), var(--color-accent) 40%, var(--color-mid) 70%, var(--color-end))' }}
         >
-          <Plus size={20} color="#000" strokeWidth={2.5} />
-          <span className="text-black font-bold text-base">Nova meta</span>
+          <Plus size={20} color="var(--color-on-gradient)" strokeWidth={2.5} />
+          <span className="font-bold text-base" style={{ color: 'var(--color-on-gradient)' }}>Nova meta</span>
         </motion.button>
       </div>
 

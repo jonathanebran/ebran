@@ -273,35 +273,42 @@ export function Configuracoes() {
           </div>
 
           <p className="text-[#F7F7F7] text-sm mb-3">Tema de cor</p>
-          <div className="flex flex-wrap gap-2 mb-5">
-            {THEMES.map(t => (
-              <motion.button
-                key={t.id}
-                whileTap={{ scale: 0.88 }}
-                onClick={() => setTheme(t.id)}
-                className="flex flex-col items-center gap-1"
-                style={{ minWidth: 52 }}
-              >
-                <div
-                  className="w-10 h-10 rounded-2xl flex items-center justify-center"
-                  style={{
-                    background: `linear-gradient(135deg, ${t.start}, ${t.end})`,
-                    border: themeId === t.id
-                      ? '2px solid rgba(255,255,255,0.85)'
-                      : '2px solid rgba(255,255,255,0.08)',
-                    boxShadow: themeId === t.id ? '0 0 14px rgba(255,255,255,0.25)' : 'none',
-                  }}
+          <div className="grid grid-cols-4 gap-x-2 gap-y-3 mb-5">
+            {THEMES.map(t => {
+              const selected = themeId === t.id;
+              return (
+                <motion.button
+                  key={t.id}
+                  whileTap={{ scale: 0.92 }}
+                  onClick={() => setTheme(t.id)}
+                  className="flex flex-col items-center gap-1"
                 >
-                  <span style={{ fontSize: 18 }}>{t.emoji}</span>
-                </div>
-                <span
-                  className="text-[9px] font-medium"
-                  style={{ color: themeId === t.id ? '#F7F7F7' : '#6F6F6F' }}
-                >
-                  {t.label}
-                </span>
-              </motion.button>
-            ))}
+                  <span style={{ fontSize: 13, lineHeight: 1 }}>{t.emoji}</span>
+                  <div
+                    className="w-full rounded-lg"
+                    style={{
+                      // A amostra mostra o gradiente exato da paleta, que pode
+                      // ter mais paradas do que as usadas na interface.
+                      background: t.swatch,
+                      aspectRatio: '13 / 9',
+                      border: selected
+                        ? '1.5px solid rgba(255,255,255,0.92)'
+                        : '1.5px solid rgba(255,255,255,0.08)',
+                      boxShadow: selected ? '0 0 12px rgba(255,255,255,0.35)' : 'none',
+                    }}
+                  />
+                  <span
+                    className="font-medium text-center leading-tight"
+                    style={{
+                      fontSize: 8,
+                      color: selected ? t.accent : '#6F6F6F',
+                    }}
+                  >
+                    {t.label}
+                  </span>
+                </motion.button>
+              );
+            })}
           </div>
 
           <div>
@@ -318,6 +325,7 @@ export function Configuracoes() {
               onChange={e => setGlassOpacity(parseFloat(e.target.value))}
               className="w-full h-1.5 rounded-full appearance-none cursor-pointer"
               style={{
+                accentColor: 'var(--color-accent)',
                 background: `linear-gradient(to right, var(--color-accent) 0%, var(--color-accent) ${((glassOpacity - 0.15) / 0.8) * 100}%, rgba(255,255,255,0.1) ${((glassOpacity - 0.15) / 0.8) * 100}%, rgba(255,255,255,0.1) 100%)`,
               }}
             />

@@ -202,7 +202,7 @@ export function Finance() {
           className="w-9 h-9 rounded-xl flex items-center justify-center"
           style={{ background: 'linear-gradient(135deg, var(--color-start), var(--color-end))' }}
         >
-          <Plus size={18} color="#000" />
+          <Plus size={18} color="var(--color-on-gradient)" />
         </motion.button>
       </div>
 

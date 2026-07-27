@@ -125,7 +125,7 @@ export function AIHub() {
                             className="mt-1 py-2 rounded-xl text-xs font-semibold text-center"
                             style={{
                               background: 'linear-gradient(135deg, var(--color-start), var(--color-end))',
-                              color: '#000',
+                              color: 'var(--color-on-gradient)',
                             }}
                           >
                             Confirmar e salvar

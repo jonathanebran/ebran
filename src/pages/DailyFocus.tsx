@@ -283,7 +283,7 @@ function RestockPrompt({ item, onConfirm, onDismiss }: {
             whileTap={{ scale: 0.97 }}
             onClick={onConfirm}
             className="flex-1 py-3.5 rounded-2xl font-bold text-sm"
-            style={{ background: 'linear-gradient(90deg, var(--color-accent), var(--color-mid))', color: '#000' }}
+            style={{ background: 'linear-gradient(90deg, var(--color-accent), var(--color-mid))', color: 'var(--color-on-gradient)' }}
           >
             Sim, lembrar
           </motion.button>

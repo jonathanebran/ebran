@@ -6,21 +6,72 @@ export interface ThemePreset {
   id: string;
   label: string;
   emoji: string;
+  /** Paradas usadas nos gradientes da interface. */
   start: string;
   mid: string;
   end: string;
+  /** Cor de destaque — textos, ícones e estados ativos sobre o fundo preto.
+   *  É sempre a mais clara da paleta, senão some no preto do app. */
   accent: string;
+  /** Cor do texto que fica em cima do gradiente (botão primário, por exemplo).
+   *  Paletas escuras pedem branco; as claras, preto. */
+  onGradient: string;
+  /** Gradiente exato da paleta, mostrado no seletor de temas. Pode ter mais
+   *  paradas que start/mid/end — é só uma amostra, não é usado na interface. */
+  swatch: string;
 }
 
 export const THEMES: ThemePreset[] = [
-  { id: 'fogo',      label: 'Fogo',      emoji: '🔥', start: '#FFD84A', mid: '#FF9F3D', end: '#FF2F7D', accent: '#FF9F3D' },
-  { id: 'oceano',    label: 'Oceano',    emoji: '🌊', start: '#00D2FF', mid: '#4285F4', end: '#3B5BDB', accent: '#4285F4' },
-  { id: 'floresta',  label: 'Floresta',  emoji: '🌿', start: '#A8FF78', mid: '#2ECC71', end: '#1ABC9C', accent: '#2ECC71' },
-  { id: 'violeta',   label: 'Violeta',   emoji: '💜', start: '#E9A8FF', mid: '#9B51E0', end: '#5B2DD1', accent: '#9B51E0' },
-  { id: 'aurora',    label: 'Aurora',    emoji: '🌸', start: '#FF8FAB', mid: '#FF5C8D', end: '#C0288C', accent: '#FF5C8D' },
-  { id: 'gelo',      label: 'Gelo',      emoji: '❄️', start: '#A8DFFF', mid: '#00B4D8', end: '#0077B6', accent: '#00B4D8' },
-  { id: 'por-do-sol',label: 'Pôr do Sol',emoji: '🌅', start: '#FFB347', mid: '#FF6B35', end: '#E84545', accent: '#FF6B35' },
-  { id: 'cosmos',    label: 'Cosmos',    emoji: '🪐', start: '#C2A4FF', mid: '#7A5AF8', end: '#3A1FA8', accent: '#7A5AF8' },
+  {
+    id: 'fogo', label: 'Fogo', emoji: '🔥',
+    start: '#C82D00', mid: '#E25800', end: '#F1A100',
+    accent: '#F1A100', onGradient: '#000000',
+    swatch: 'linear-gradient(135deg, #C82D00 0%, #E25800 50%, #F1A100 100%)',
+  },
+  {
+    id: 'oceano', label: 'Oceano', emoji: '🌊',
+    start: '#03396C', mid: '#005B96', end: '#0190EA',
+    accent: '#0190EA', onGradient: '#FFFFFF',
+    swatch: 'linear-gradient(135deg, #03396C 0%, #005B96 50%, #0190EA 100%)',
+  },
+  {
+    id: 'gelo', label: 'Gelo', emoji: '❄️',
+    start: '#EBF8FF', mid: '#C2E9FB', end: '#A1C4FD',
+    accent: '#A1C4FD', onGradient: '#000000',
+    swatch: 'linear-gradient(135deg, #EBF8FF 0%, #C2E9FB 50%, #A1C4FD 100%)',
+  },
+  {
+    id: 'floresta', label: 'Floresta', emoji: '🌿',
+    start: '#0B3C12', mid: '#1B7A2B', end: '#5BD149',
+    accent: '#5BD149', onGradient: '#FFFFFF',
+    swatch: 'linear-gradient(135deg, #0B3C12 0%, #1B7A2B 50%, #5BD149 100%)',
+  },
+  {
+    id: 'aurora', label: 'Aurora', emoji: '🌸',
+    start: '#00E676', mid: '#4A148C', end: '#C2185B',
+    accent: '#00E676', onGradient: '#FFFFFF',
+    swatch: 'linear-gradient(135deg, #00E676 0%, #4A148C 50%, #C2185B 100%)',
+  },
+  {
+    // O #0A081D da paleta é quase preto e sumiria no fundo do app, então os
+    // gradientes da interface começam no violeta. A amostra mantém as 4 cores.
+    id: 'cosmos', label: 'Cosmos', emoji: '🪐',
+    start: '#3B1C5A', mid: '#126388', end: '#E5B350',
+    accent: '#E5B350', onGradient: '#FFFFFF',
+    swatch: 'linear-gradient(135deg, #0A081D 0%, #3B1C5A 40%, #126388 80%, #E5B350 100%)',
+  },
+  {
+    id: 'pradaria', label: 'Pradaria de Lufa', emoji: '🌵',
+    start: '#F5E6CA', mid: '#E0C097', end: '#D2A8B7',
+    accent: '#E0C097', onGradient: '#000000',
+    swatch: 'linear-gradient(135deg, #F5E6CA 0%, #E0C097 50%, #D2A8B7 100%)',
+  },
+  {
+    id: 'por-do-sol', label: 'Pôr do Sol', emoji: '🌅',
+    start: '#B85042', mid: '#D9822B', end: '#E7A1B0',
+    accent: '#D9822B', onGradient: '#000000',
+    swatch: 'linear-gradient(135deg, #B85042 0%, #D9822B 50%, #E7A1B0 100%)',
+  },
 ];
 
 interface ThemeData {
@@ -57,6 +108,10 @@ export function applyThemeToDom(themeId: string, glassOpacity: number) {
   root.style.setProperty('--color-mid-rgb', hexToRgb(preset.mid));
   root.style.setProperty('--color-end-rgb', hexToRgb(preset.end));
   root.style.setProperty('--color-accent-rgb', hexToRgb(preset.accent));
+
+  // Texto/ícone que fica por cima do gradiente — muda com a luminosidade da
+  // paleta, senão temas escuros ficariam com texto preto ilegível.
+  root.style.setProperty('--color-on-gradient', preset.onGradient);
 
   root.style.setProperty('--glass-opacity', String(glassOpacity));
 }

@@ -51,7 +51,7 @@ export class ErrorBoundary extends React.Component<Props, State> {
           className="mt-2 px-6 py-3 rounded-2xl font-semibold text-sm"
           style={{
             background: 'linear-gradient(135deg, var(--color-start), var(--color-end))',
-            color: '#000',
+            color: 'var(--color-on-gradient)',
           }}
         >
           Voltar ao início

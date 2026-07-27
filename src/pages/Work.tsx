@@ -169,8 +169,8 @@ function AtendimentosTab() {
           background: 'linear-gradient(90deg, var(--color-start), var(--color-accent) 40%, var(--color-mid) 70%, var(--color-end))',
         }}
       >
-        <Plus size={18} color="#000" strokeWidth={2.5} />
-        <span className="text-black font-bold">Registrar atendimento</span>
+        <Plus size={18} color="var(--color-on-gradient)" strokeWidth={2.5} />
+        <span className="font-bold" style={{ color: 'var(--color-on-gradient)' }}>Registrar atendimento</span>
       </motion.button>
     </div>
   );
@@ -461,7 +461,7 @@ export function Work() {
           className="w-9 h-9 rounded-xl flex items-center justify-center"
           style={{ background: 'linear-gradient(135deg, var(--color-start), var(--color-end))' }}
         >
-          <Plus size={18} color="#000" />
+          <Plus size={18} color="var(--color-on-gradient)" />
         </motion.button>
       </div>
 

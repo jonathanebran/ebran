@@ -81,7 +81,7 @@ export function MeuPerfil() {
               className="absolute -bottom-1.5 -right-1.5 w-8 h-8 rounded-full flex items-center justify-center"
               style={{ background: 'linear-gradient(135deg, var(--color-start), var(--color-end))' }}
             >
-              <Camera size={14} color="#000" />
+              <Camera size={14} color="var(--color-on-gradient)" />
             </motion.button>
           </div>
           <p className="text-[#6F6F6F] text-xs mt-3">Toque na foto para alterar</p>
@@ -131,7 +131,7 @@ export function MeuPerfil() {
                 animate={{ opacity: 1 }}
                 className="flex items-center gap-2"
               >
-                <Check size={16} color="#000" />
+                <Check size={16} color="var(--color-on-gradient)" />
                 Salvo!
               </motion.span>
             ) : (

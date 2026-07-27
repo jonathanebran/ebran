@@ -27,7 +27,7 @@ export function ChecklistItem({ item, onToggle }: ChecklistItemProps) {
           border: done ? 'none' : '1.5px solid rgba(255,255,255,0.25)',
         }}
       >
-        {done && <Check size={12} color="#000" strokeWidth={3} />}
+        {done && <Check size={12} color="var(--color-on-gradient)" strokeWidth={3} />}
         {!done && <Circle size={12} color="transparent" />}
       </motion.button>
 

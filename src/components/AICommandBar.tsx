@@ -63,7 +63,7 @@ export function AICommandBar({ placeholder = 'O que você quer organizar agora? 
                 background: 'linear-gradient(135deg, var(--color-start) 0%, var(--color-end) 100%)',
               }}
             >
-              <Send size={14} color="#000" />
+              <Send size={14} color="var(--color-on-gradient)" />
             </motion.button>
           )}
         </AnimatePresence>
