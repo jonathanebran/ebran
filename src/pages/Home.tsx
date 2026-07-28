@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ChevronRight, Droplets, Dumbbell, Moon, Plus } from 'lucide-react';
@@ -6,7 +7,8 @@ import { GlassCard } from '../components/GlassCard';
 import { AICommandBar } from '../components/AICommandBar';
 import { ProgressBar } from '../components/ProgressBar';
 import { ProgressRing } from '../components/ProgressRing';
-import { mockWorkSummary, mockHealthToday, mockRecentActivity } from '../data/mockData';
+import { mockWorkSummary, mockRecentActivity } from '../data/mockData';
+import { loadHealth } from '../lib/healthStore';
 import { useGoals } from '../contexts/GoalsContext';
 import { formatCurrency, getPercentage } from '../lib/utils';
 import { Briefcase } from 'lucide-react';
@@ -19,6 +21,8 @@ const stagger = {
 export function Home() {
   const navigate = useNavigate();
   const { goals } = useGoals();
+  const [health] = useState(() => loadHealth());
+  const workoutToday = health.workoutDays.includes(new Date().getDay());
 
   const workPct = getPercentage(mockWorkSummary.monthly_revenue, mockWorkSummary.monthly_goal);
   const primaryGoal = goals.find(g => g.status === 'active') ?? goals[0] ?? null;
@@ -115,19 +119,19 @@ export function Home() {
             <div className="grid grid-cols-3 gap-2">
               <div className="flex flex-col items-center gap-1 rounded-2xl py-3" style={{ background: 'rgba(255,255,255,0.04)' }}>
                 <Droplets size={18} color="var(--color-accent)" />
-                <p className="text-[#F7F7F7] text-xs font-bold">{mockHealthToday.water.current}L</p>
-                <p className="text-[#6F6F6F] text-[10px]">{mockHealthToday.water.target}L meta</p>
+                <p className="text-[#F7F7F7] text-xs font-bold">{health.water.toFixed(1)}L</p>
+                <p className="text-[#6F6F6F] text-[10px]">{health.waterTarget}L meta</p>
               </div>
               <div className="flex flex-col items-center gap-1 rounded-2xl py-3" style={{ background: 'rgba(255,255,255,0.04)' }}>
-                <Dumbbell size={18} color={mockHealthToday.workout.done ? '#22c55e' : '#6F6F6F'} />
+                <Dumbbell size={18} color={workoutToday ? '#22c55e' : '#6F6F6F'} />
                 <p className="text-[#F7F7F7] text-xs font-bold">Treino</p>
-                <p className="text-[10px]" style={{ color: mockHealthToday.workout.done ? '#22c55e' : '#6F6F6F' }}>
-                  {mockHealthToday.workout.done ? 'Concluído' : 'Pendente'}
+                <p className="text-[10px]" style={{ color: workoutToday ? '#22c55e' : '#6F6F6F' }}>
+                  {workoutToday ? 'Concluído' : 'Pendente'}
                 </p>
               </div>
               <div className="flex flex-col items-center gap-1 rounded-2xl py-3" style={{ background: 'rgba(255,255,255,0.04)' }}>
                 <Moon size={18} color="#a78bfa" />
-                <p className="text-[#F7F7F7] text-xs font-bold">{mockHealthToday.sleep.hours}h {mockHealthToday.sleep.minutes}min</p>
+                <p className="text-[#F7F7F7] text-xs font-bold">{health.sleepHours}h {health.sleepMinutes}min</p>
                 <p className="text-[#6F6F6F] text-[10px]">Sono</p>
               </div>
             </div>

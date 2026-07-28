@@ -1,5 +1,5 @@
 import { NavLink } from 'react-router-dom';
-import { Home, Target, Briefcase, PieChart, ListChecks } from 'lucide-react';
+import { Home, Target, Briefcase, PieChart, ListChecks, HeartPulse } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { AppLogo } from './AppLogo';
 import { motion } from 'framer-motion';
@@ -7,6 +7,7 @@ import { motion } from 'framer-motion';
 const navItems = [
   { to: '/',         icon: Home,       label: 'Home',   exact: true  },
   { to: '/foco',     icon: ListChecks, label: 'Foco',   exact: false },
+  { to: '/saude',    icon: HeartPulse, label: 'Saúde',  exact: false },
   { to: '/metas',    icon: Target,     label: 'Metas',  exact: false },
   { to: '/trabalho', icon: Briefcase,  label: 'Trab.',  exact: false },
   { to: '/financas', icon: PieChart,   label: 'Finan.', exact: false },
@@ -25,7 +26,7 @@ function NavItem({ to, icon: Icon, label, exact }: NavItemProps) {
       to={to}
       end={exact}
       className="relative flex flex-col items-center tap-scale"
-      style={{ padding: '6px 12px 4px', minWidth: 54 }}
+      style={{ padding: '6px 8px 4px', minWidth: 48 }}
     >
       {({ isActive }) => (
         <>
