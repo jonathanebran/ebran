@@ -49,20 +49,22 @@ export const THEMES: ThemePreset[] = [
     swatch: 'linear-gradient(135deg, #0B3C12 0%, #1B7A2B 50%, #5BD149 100%)',
   },
   {
-    // Preto rende 5,0:1 no violeta e 8,3:1 no esmeralda — a faixa onde o texto
-    // dos botões cai. O verde petróleo do fim é escuro, mas fica nas bordas.
+    // O verde petróleo #065F46 da paleta original escurecia metade do botão;
+    // no lugar dele entra o lilás #A78BFA no início, deixando o gradiente
+    // luminoso de ponta a ponta.
     id: 'neon-nebula', label: 'Neon Nebula', emoji: '🌌',
-    start: '#8B5CF6', mid: '#10B981', end: '#065F46',
-    accent: '#8B5CF6', onGradient: '#000000',
-    swatch: 'linear-gradient(135deg, #8B5CF6 0%, #10B981 50%, #065F46 100%)',
+    start: '#A78BFA', mid: '#8B5CF6', end: '#10B981',
+    accent: '#A78BFA', onGradient: '#000000',
+    swatch: 'linear-gradient(135deg, #A78BFA 0%, #8B5CF6 50%, #10B981 100%)',
   },
   {
-    // Paleta escura: preto sobre ela fica entre 1,7:1 e 3,6:1, ou seja,
-    // ilegível. O texto dos botões é branco, que rende de 5,8:1 a 12,5:1.
+    // Sai o vinho #61192B, que puxava tudo para o escuro, e entra o rosa
+    // #E0527A no fim. Mesmo assim a paleta é fechada: o texto sobre o
+    // gradiente é branco.
     id: 'borgonha', label: 'Borgonha Imperial', emoji: '🍷',
-    start: '#61192B', mid: '#8C233B', end: '#B8324F',
-    accent: '#B8324F', onGradient: '#FFFFFF',
-    swatch: 'linear-gradient(135deg, #61192B 0%, #8C233B 50%, #B8324F 100%)',
+    start: '#8C233B', mid: '#B8324F', end: '#E0527A',
+    accent: '#E0527A', onGradient: '#FFFFFF',
+    swatch: 'linear-gradient(135deg, #8C233B 0%, #B8324F 50%, #E0527A 100%)',
   },
   {
     id: 'pradaria', label: 'Pradaria de Lufa', emoji: '🌵',
@@ -71,11 +73,12 @@ export const THEMES: ThemePreset[] = [
     swatch: 'linear-gradient(135deg, #F5E6CA 0%, #E0C097 50%, #D2A8B7 100%)',
   },
   {
-    // Paleta clara: preto rende de 4,2:1 a 12,6:1 sobre ela.
+    // Sai o ocre #B45309 e entra o ouro #F0A81B no meio: o gradiente fica
+    // dourado por inteiro em vez de começar apagado.
     id: 'sirio', label: 'Sírio do Sul', emoji: '🌟',
-    start: '#B45309', mid: '#D97706', end: '#FBBF24',
+    start: '#D97706', mid: '#F0A81B', end: '#FBBF24',
     accent: '#FBBF24', onGradient: '#000000',
-    swatch: 'linear-gradient(135deg, #B45309 0%, #D97706 50%, #FBBF24 100%)',
+    swatch: 'linear-gradient(135deg, #D97706 0%, #F0A81B 50%, #FBBF24 100%)',
   },
 ];
 
