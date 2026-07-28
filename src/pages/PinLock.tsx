@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Delete } from 'lucide-react';
 import { usePinLock } from '../contexts/PinLockContext';
+import { AppLogo } from '../components/AppLogo';
 
 export function PinLock() {
   const { unlock, failCount, lockoutUntil } = usePinLock();
@@ -56,18 +57,9 @@ export function PinLock() {
       className="fixed inset-0 flex flex-col items-center justify-center z-50"
       style={{ background: '#000', maxWidth: 430, margin: '0 auto' }}
     >
-      <div className="mb-10 text-center">
-        <p
-          className="font-bold text-2xl tracking-tight"
-          style={{
-            background: 'linear-gradient(90deg, var(--color-start), var(--color-accent) 40%, var(--color-mid) 70%, var(--color-end))',
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
-          }}
-        >
-          ebran
-        </p>
-        <p className="text-[#6F6F6F] text-sm mt-2">Digite seu PIN para entrar</p>
+      <div className="mb-10 flex flex-col items-center text-center">
+        <AppLogo size={64} />
+        <p className="text-[#6F6F6F] text-sm mt-4">Digite seu PIN para entrar</p>
       </div>
 
       {/* Dots */}
