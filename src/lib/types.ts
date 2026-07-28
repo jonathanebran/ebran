@@ -122,6 +122,8 @@ export interface DailyFocusItem {
   status: 'pending' | 'done' | 'skipped';
   priority: Priority;
   recurrence?: Recurrence;
+  /** Dia âncora do item (YYYY-MM-DD): quando ele acontece / começa. */
+  date?: string;
   next_restock_date?: string;
   estimated_price?: number;
   note?: string;

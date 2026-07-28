@@ -274,7 +274,8 @@ export function Goals() {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const { goals } = useGoals();
-  const { items: focusItems, toggleItem: toggleFocusItem } = useDailyFocus();
+  const { itemsForDate, isDone, toggleForDate } = useDailyFocus();
+  const todayIso = new Date().toISOString().slice(0, 10);
 
   const paramTab = searchParams.get('tab');
   const [activeTab, setActiveTab] = useState<Tab>(
@@ -289,7 +290,7 @@ export function Goals() {
   const focusGoals = goals.filter(g => g.type === 'small');
   const careGoals  = goals.filter(g => g.type === 'care' || g.type === 'health');
   const wishGoals  = goals.filter(g => g.type === 'wish');
-  const pendingFocusItems = focusItems.filter(i => i.status === 'pending');
+  const pendingFocusItems = itemsForDate(todayIso).filter(i => !isDone(i.id, todayIso));
 
   return (
     <div className="flex flex-col min-h-screen pb-28" style={{ background: '#000' }}>
@@ -342,7 +343,7 @@ export function Goals() {
                 </div>
                 <GlassCard padding="px-4 py-1">
                   {pendingFocusItems.slice(0, 6).map(item => (
-                    <ChecklistItem key={item.id} item={item} onToggle={toggleFocusItem} />
+                    <ChecklistItem key={item.id} item={item} done={false} onToggle={() => toggleForDate(item.id, todayIso)} />
                   ))}
                 </GlassCard>
               </div>

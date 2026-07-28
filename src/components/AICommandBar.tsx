@@ -80,6 +80,7 @@ export function AICommandBar({ placeholder = 'O que você quer organizar agora? 
         status: 'pending',
         priority: 'medium',
         recurrence: 'once',
+        date: new Date().toISOString().slice(0, 10),
         created_at: new Date().toISOString(),
       }));
       setDone(`${focusItems.length} item(ns) adicionado(s) ao Foco diário`);

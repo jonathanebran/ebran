@@ -4,12 +4,11 @@ import type { DailyFocusItem } from '../lib/types';
 
 interface ChecklistItemProps {
   item: DailyFocusItem;
-  onToggle: (id: string) => void;
+  done: boolean;
+  onToggle: () => void;
 }
 
-export function ChecklistItem({ item, onToggle }: ChecklistItemProps) {
-  const done = item.status === 'done';
-
+export function ChecklistItem({ item, done, onToggle }: ChecklistItemProps) {
   return (
     <motion.div
       className="flex items-center gap-3 py-3 border-b"
@@ -17,7 +16,7 @@ export function ChecklistItem({ item, onToggle }: ChecklistItemProps) {
       whileTap={{ scale: 0.99 }}
     >
       <motion.button
-        onClick={() => onToggle(item.id)}
+        onClick={onToggle}
         whileTap={{ scale: 0.85 }}
         className="flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center"
         style={{
