@@ -1,196 +1,199 @@
-import { useState } from 'react';
-import { Droplets, Dumbbell, Moon, Pill, Calendar, Plus, Minus, X, Check, Trash2 } from 'lucide-react';
+import { useState, useRef } from 'react';
+import { Droplets, Dumbbell, Pill, Calendar, Plus, Minus, X, Check, Trash2, Pencil } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Header } from '../components/Header';
-import { Chip } from '../components/Chip';
 import { GlassCard } from '../components/GlassCard';
 import { ProgressBar } from '../components/ProgressBar';
 import { loadHealth, saveHealth, type HealthData } from '../lib/healthStore';
 import type { Appointment, Medication } from '../lib/types';
 
-const tabs = ['Rotina', 'Consultas', 'Medicamentos'] as const;
-type Tab = typeof tabs[number];
+const WEEKDAYS = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
 
-const WEEKDAYS = ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom'];
-// índice do array acima → getDay() (0=Dom..6=Sáb)
-const WEEKDAY_TO_DOW = [1, 2, 3, 4, 5, 6, 0];
+// Tamanhos rápidos de água (em litros).
+const WATER_SIZES = [
+  { label: 'Copo', ml: '250 ml', v: 0.25 },
+  { label: 'Caneca', ml: '350 ml', v: 0.35 },
+  { label: 'Garrafa', ml: '500 ml', v: 0.5 },
+  { label: 'Garrafão', ml: '1 L', v: 1 },
+];
 
-// ─── Rotina ─────────────────────────────────────────────────────────────────
+// ─── Água ─────────────────────────────────────────────────────────────────────
 
-function RoutineTab({ data, update }: { data: HealthData; update: (patch: Partial<HealthData>) => void }) {
-  const [habitName, setHabitName] = useState('');
-  const waterPct = Math.min(100, (data.water / data.waterTarget) * 100);
-  const todayDow = new Date().getDay();
+function WaterCard({ data, update }: { data: HealthData; update: (patch: Partial<HealthData>) => void }) {
+  const [editing, setEditing] = useState(false);
+  const [targetInput, setTargetInput] = useState(String(data.waterTarget));
+  const reachedRef = useRef(data.water >= data.waterTarget);
+  const [celebrate, setCelebrate] = useState(false);
+  const pct = Math.min(100, (data.water / data.waterTarget) * 100);
+  const reached = data.water >= data.waterTarget;
 
-  const addHabit = () => {
-    if (!habitName.trim()) return;
-    update({ habits: [...data.habits, { id: `h-${Date.now()}`, name: habitName.trim(), done: false }] });
-    setHabitName('');
+  const add = (v: number) => {
+    const next = Math.max(0, +(data.water + v).toFixed(2));
+    update({ water: next });
+    // Cruzou a meta agora → comemora.
+    if (!reachedRef.current && next >= data.waterTarget) {
+      setCelebrate(true);
+      setTimeout(() => setCelebrate(false), 1600);
+    }
+    reachedRef.current = next >= data.waterTarget;
+  };
+
+  const saveTarget = () => {
+    const t = parseFloat(targetInput.replace(',', '.'));
+    if (!isNaN(t) && t > 0) update({ waterTarget: +t.toFixed(2) });
+    setEditing(false);
   };
 
   return (
-    <div className="flex flex-col gap-3">
-      {/* Água */}
-      <GlassCard>
-        <div className="flex items-center justify-between mb-3">
-          <div className="flex items-center gap-2">
-            <Droplets size={16} color="var(--color-accent)" />
-            <span className="text-[#F7F7F7] font-semibold text-sm">Água</span>
-          </div>
-          <span className="text-[var(--color-accent)] font-bold text-sm">
-            {data.water.toFixed(1)}L / {data.waterTarget}L
-          </span>
-        </div>
-        <ProgressBar value={waterPct} height={6} />
-        <div className="flex items-center justify-center gap-3 mt-4">
-          <motion.button
-            whileTap={{ scale: 0.9 }}
-            onClick={() => update({ water: Math.max(0, +(data.water - 0.25).toFixed(2)) })}
-            className="w-10 h-10 rounded-2xl flex items-center justify-center"
-            style={{ background: 'rgba(255,255,255,0.06)' }}
-          >
-            <Minus size={18} color="#A8A8A8" />
-          </motion.button>
-          <span className="text-[#6F6F6F] text-xs w-24 text-center">Copo de 250ml</span>
-          <motion.button
-            whileTap={{ scale: 0.9 }}
-            onClick={() => update({ water: +(data.water + 0.25).toFixed(2) })}
-            className="w-10 h-10 rounded-2xl flex items-center justify-center"
-            style={{ background: 'rgba(var(--color-accent-rgb),0.15)' }}
-          >
-            <Plus size={18} color="var(--color-accent)" />
-          </motion.button>
-        </div>
-      </GlassCard>
-
-      {/* Sono */}
-      <GlassCard>
-        <div className="flex items-center gap-2 mb-3">
-          <Moon size={16} color="#a78bfa" />
-          <span className="text-[#F7F7F7] font-semibold text-sm">Sono</span>
-          <span className="text-[#a78bfa] font-bold text-sm ml-auto">{data.sleepHours}h {data.sleepMinutes}min</span>
-        </div>
-        <div className="grid grid-cols-2 gap-3">
-          <div>
-            <p className="text-[#6F6F6F] text-xs mb-1">Horas</p>
-            <div className="flex items-center gap-2">
-              <motion.button whileTap={{ scale: 0.9 }} onClick={() => update({ sleepHours: Math.max(0, data.sleepHours - 1) })}
-                className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ background: 'rgba(255,255,255,0.06)' }}>
-                <Minus size={14} color="#A8A8A8" />
-              </motion.button>
-              <span className="text-[#F7F7F7] font-bold text-base flex-1 text-center">{data.sleepHours}</span>
-              <motion.button whileTap={{ scale: 0.9 }} onClick={() => update({ sleepHours: Math.min(14, data.sleepHours + 1) })}
-                className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ background: 'rgba(167,139,250,0.15)' }}>
-                <Plus size={14} color="#a78bfa" />
-              </motion.button>
-            </div>
-          </div>
-          <div>
-            <p className="text-[#6F6F6F] text-xs mb-1">Minutos</p>
-            <div className="flex items-center gap-2">
-              <motion.button whileTap={{ scale: 0.9 }} onClick={() => update({ sleepMinutes: (data.sleepMinutes + 45) % 60 })}
-                className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ background: 'rgba(255,255,255,0.06)' }}>
-                <Minus size={14} color="#A8A8A8" />
-              </motion.button>
-              <span className="text-[#F7F7F7] font-bold text-base flex-1 text-center">{data.sleepMinutes}</span>
-              <motion.button whileTap={{ scale: 0.9 }} onClick={() => update({ sleepMinutes: (data.sleepMinutes + 15) % 60 })}
-                className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ background: 'rgba(167,139,250,0.15)' }}>
-                <Plus size={14} color="#a78bfa" />
-              </motion.button>
-            </div>
-          </div>
-        </div>
-      </GlassCard>
-
-      {/* Treino da semana */}
-      <GlassCard>
-        <div className="flex items-center gap-2 mb-3">
-          <Dumbbell size={16} color="#22c55e" />
-          <span className="text-[#F7F7F7] font-semibold text-sm">Treino da semana</span>
-          <span className="text-[#22c55e] text-xs ml-auto font-medium">{data.workoutDays.length}/7</span>
-        </div>
-        <div className="flex justify-between gap-1.5">
-          {WEEKDAYS.map((label, i) => {
-            const dow = WEEKDAY_TO_DOW[i];
-            const done = data.workoutDays.includes(dow);
-            const isToday = dow === todayDow;
-            return (
-              <button
-                key={label}
-                onClick={() => update({
-                  workoutDays: done ? data.workoutDays.filter(d => d !== dow) : [...data.workoutDays, dow],
-                })}
-                className="flex flex-col items-center gap-1 flex-1 tap-scale"
-              >
-                <span className="text-[10px]" style={{ color: isToday ? '#22c55e' : '#6F6F6F' }}>{label}</span>
-                <div
-                  className="w-full rounded-xl flex items-center justify-center"
-                  style={{
-                    height: 34,
-                    background: done ? 'rgba(34,197,94,0.9)' : 'rgba(255,255,255,0.05)',
-                    border: isToday && !done ? '1px solid rgba(34,197,94,0.5)' : '1px solid rgba(255,255,255,0.06)',
-                  }}
-                >
-                  {done && <Check size={16} color="#fff" strokeWidth={3} />}
-                </div>
-              </button>
-            );
-          })}
-        </div>
-        <p className="text-[#3F3F3F] text-[10px] mt-2 text-center">Marque os dias em que treinou</p>
-      </GlassCard>
-
-      {/* Hábitos */}
-      <GlassCard>
-        <p className="text-[#F7F7F7] font-semibold text-sm mb-3">Hábitos do dia</p>
-        {data.habits.length > 0 && (
-          <div className="flex flex-col gap-2 mb-3">
-            {data.habits.map(h => (
-              <div key={h.id} className="flex items-center gap-3">
-                <button
-                  onClick={() => update({ habits: data.habits.map(x => x.id === h.id ? { ...x, done: !x.done } : x) })}
-                  className="w-6 h-6 rounded-lg flex items-center justify-center flex-shrink-0"
-                  style={{
-                    background: h.done ? 'linear-gradient(135deg, var(--color-start), var(--color-end))' : 'transparent',
-                    border: h.done ? 'none' : '1.5px solid rgba(255,255,255,0.2)',
-                  }}
-                >
-                  {h.done && <Check size={13} color="var(--color-on-gradient)" strokeWidth={3} />}
-                </button>
-                <span className="flex-1 text-sm" style={{ color: h.done ? '#6F6F6F' : '#F7F7F7', textDecoration: h.done ? 'line-through' : 'none' }}>
-                  {h.name}
-                </span>
-                <button
-                  onClick={() => update({ habits: data.habits.filter(x => x.id !== h.id) })}
-                  className="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0"
-                  style={{ background: 'rgba(var(--color-danger-rgb),0.1)' }}
-                >
-                  <Trash2 size={12} color="var(--color-danger)" />
-                </button>
-              </div>
-            ))}
-          </div>
-        )}
+    <GlassCard>
+      <div className="flex items-center justify-between mb-2">
         <div className="flex items-center gap-2">
-          <input
-            value={habitName}
-            onChange={e => setHabitName(e.target.value)}
-            onKeyDown={e => e.key === 'Enter' && addHabit()}
-            placeholder="Novo hábito (ex.: tomar vitamina)"
-            className="flex-1 rounded-xl px-3 py-2.5 text-sm text-[#F7F7F7] outline-none"
-            style={{ background: 'rgba(255,255,255,0.05)', border: '0.5px solid rgba(255,255,255,0.1)' }}
-          />
-          <motion.button
-            whileTap={{ scale: 0.9 }}
-            onClick={addHabit}
-            className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
-            style={{ background: 'rgba(var(--color-accent-rgb),0.15)' }}
-          >
-            <Plus size={18} color="var(--color-accent)" />
-          </motion.button>
+          <Droplets size={16} color="var(--color-accent)" />
+          <span className="text-[#F7F7F7] font-semibold text-sm">Água</span>
         </div>
-      </GlassCard>
-    </div>
+        <div className="flex items-center gap-2">
+          <span className="font-bold text-sm" style={{ color: reached ? '#22c55e' : 'var(--color-accent)' }}>
+            {data.water.toFixed(2).replace(/\.?0+$/, '')}L / {data.waterTarget}L
+          </span>
+          <button onClick={() => { setTargetInput(String(data.waterTarget)); setEditing(true); }} className="tap-scale">
+            <Pencil size={13} color="#6F6F6F" />
+          </button>
+        </div>
+      </div>
+
+      <div className="relative">
+        <ProgressBar value={pct} height={8} />
+        <AnimatePresence>
+          {celebrate && (
+            <motion.div
+              className="absolute inset-0 flex items-center justify-center pointer-events-none"
+              initial={{ opacity: 0, scale: 0.6, y: 0 }}
+              animate={{ opacity: 1, scale: 1, y: -22 }}
+              exit={{ opacity: 0, y: -34 }}
+            >
+              <span className="text-xs font-bold px-2 py-0.5 rounded-full" style={{ background: '#22c55e', color: '#000' }}>
+                Meta batida! 🎉
+              </span>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
+
+      {reached && !celebrate && (
+        <p className="text-[#22c55e] text-xs mt-2 flex items-center gap-1">
+          <Check size={12} strokeWidth={3} /> Meta do dia concluída
+        </p>
+      )}
+
+      <div className="grid grid-cols-4 gap-2 mt-3">
+        {WATER_SIZES.map(s => (
+          <motion.button
+            key={s.label} whileTap={{ scale: 0.93 }} onClick={() => add(s.v)}
+            className="flex flex-col items-center gap-0.5 rounded-2xl py-2.5"
+            style={{ background: 'rgba(var(--color-accent-rgb),0.1)', border: '0.5px solid rgba(var(--color-accent-rgb),0.2)' }}
+          >
+            <Plus size={13} color="var(--color-accent)" />
+            <span className="text-[#F7F7F7] text-[11px] font-semibold">{s.label}</span>
+            <span className="text-[#6F6F6F] text-[9px]">{s.ml}</span>
+          </motion.button>
+        ))}
+      </div>
+
+      {data.water > 0 && (
+        <button
+          onClick={() => { update({ water: Math.max(0, +(data.water - 0.25).toFixed(2)) }); reachedRef.current = (data.water - 0.25) >= data.waterTarget; }}
+          className="flex items-center justify-center gap-1 mt-2 w-full py-1.5 text-[#6F6F6F] text-xs"
+        >
+          <Minus size={12} /> Tirar um copo
+        </button>
+      )}
+
+      <AnimatePresence>
+        {editing && (
+          <FormSheet title="Meta de água por dia" onClose={() => setEditing(false)} onSave={saveTarget} canSave={!!targetInput}>
+            <div>
+              <label className="text-[#6F6F6F] text-xs mb-1.5 block">Litros por dia</label>
+              <input
+                autoFocus type="number" inputMode="decimal" step="0.25"
+                value={targetInput} onChange={e => setTargetInput(e.target.value)}
+                className="w-full rounded-xl px-3 py-3 text-[#F7F7F7] text-base font-bold outline-none"
+                style={{ background: 'rgba(255,255,255,0.06)', border: '0.5px solid rgba(255,255,255,0.1)', colorScheme: 'dark' }}
+              />
+            </div>
+          </FormSheet>
+        )}
+      </AnimatePresence>
+    </GlassCard>
+  );
+}
+
+// ─── Treino da semana ─────────────────────────────────────────────────────────
+
+function WorkoutCard({ data, update }: { data: HealthData; update: (patch: Partial<HealthData>) => void }) {
+  const [editGoal, setEditGoal] = useState(false);
+  const todayDow = new Date().getDay();
+  const count = data.workoutDays.length;
+  const reached = count >= data.workoutGoal;
+
+  const toggle = (dow: number) => {
+    const done = data.workoutDays.includes(dow);
+    update({ workoutDays: done ? data.workoutDays.filter(d => d !== dow) : [...data.workoutDays, dow] });
+  };
+
+  return (
+    <GlassCard>
+      <div className="flex items-center gap-2 mb-3">
+        <Dumbbell size={16} color="#22c55e" />
+        <span className="text-[#F7F7F7] font-semibold text-sm">Treino da semana</span>
+        <button onClick={() => setEditGoal(true)} className="ml-auto flex items-center gap-1 tap-scale">
+          <span className="text-xs font-medium" style={{ color: reached ? '#22c55e' : '#6F6F6F' }}>{count}/{data.workoutGoal}</span>
+          <Pencil size={11} color="#6F6F6F" />
+        </button>
+      </div>
+      <div className="flex justify-between gap-1.5">
+        {WEEKDAYS.map((label, dow) => {
+          const done = data.workoutDays.includes(dow);
+          const isToday = dow === todayDow;
+          return (
+            <button key={label} onClick={() => toggle(dow)} className="flex flex-col items-center gap-1 flex-1 tap-scale">
+              <span className="text-[10px]" style={{ color: isToday ? '#22c55e' : '#6F6F6F' }}>{label}</span>
+              <div className="w-full rounded-xl flex items-center justify-center"
+                style={{
+                  height: 34,
+                  background: done ? 'rgba(34,197,94,0.9)' : 'rgba(255,255,255,0.05)',
+                  border: isToday && !done ? '1px solid rgba(34,197,94,0.5)' : '1px solid transparent',
+                }}>
+                {done && <Check size={16} color="#fff" strokeWidth={3} />}
+              </div>
+            </button>
+          );
+        })}
+      </div>
+      {reached ? (
+        <p className="text-[#22c55e] text-xs mt-2 text-center font-medium">Meta da semana batida! 💪</p>
+      ) : (
+        <p className="text-[#3F3F3F] text-[10px] mt-2 text-center">Marque os dias em que treinou</p>
+      )}
+
+      <AnimatePresence>
+        {editGoal && (
+          <FormSheet title="Meta de treinos na semana" onClose={() => setEditGoal(false)} onSave={() => setEditGoal(false)} canSave>
+            <div className="flex items-center justify-center gap-4">
+              <motion.button whileTap={{ scale: 0.9 }} onClick={() => update({ workoutGoal: Math.max(1, data.workoutGoal - 1) })}
+                className="w-11 h-11 rounded-2xl flex items-center justify-center" style={{ background: 'rgba(255,255,255,0.06)' }}>
+                <Minus size={18} color="#A8A8A8" />
+              </motion.button>
+              <span className="text-[#F7F7F7] font-bold text-3xl w-16 text-center">{data.workoutGoal}</span>
+              <motion.button whileTap={{ scale: 0.9 }} onClick={() => update({ workoutGoal: Math.min(7, data.workoutGoal + 1) })}
+                className="w-11 h-11 rounded-2xl flex items-center justify-center" style={{ background: 'rgba(34,197,94,0.15)' }}>
+                <Plus size={18} color="#22c55e" />
+              </motion.button>
+            </div>
+            <p className="text-[#6F6F6F] text-xs text-center">dias por semana</p>
+          </FormSheet>
+        )}
+      </AnimatePresence>
+    </GlassCard>
   );
 }
 
@@ -217,36 +220,49 @@ function AppointmentSheet({ onClose, onSave }: { onClose: () => void; onSave: (a
     <SheetInput label="Consulta / especialidade" value={title} onChange={setTitle} placeholder="Ex.: Dermatologista" autoFocus />
     <SheetInput label="Profissional (opcional)" value={professional} onChange={setProfessional} placeholder="Ex.: Dra. Ana" />
     <div className="grid grid-cols-2 gap-3">
-      <SheetInput label="Data" value={date} onChange={setDate} placeholder="Ex.: 12 dez" />
-      <SheetInput label="Horário" value={time} onChange={setTime} placeholder="Ex.: 15:00" />
+      <SheetInput label="Data" value={date} onChange={setDate} type="date" />
+      <SheetInput label="Horário" value={time} onChange={setTime} type="time" />
     </div>
   </FormSheet>;
 }
 
-function ConsultasTab({ data, update }: { data: HealthData; update: (patch: Partial<HealthData>) => void }) {
+function fmtDate(iso: string): string {
+  if (!iso || iso === 'A definir') return 'A definir';
+  const m = iso.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (!m) return iso;
+  const months = ['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
+  return `${parseInt(m[3])} ${months[parseInt(m[2]) - 1]}`;
+}
+
+function ConsultasCard({ data, update }: { data: HealthData; update: (patch: Partial<HealthData>) => void }) {
   const [sheet, setSheet] = useState(false);
   return (
-    <div className="flex flex-col gap-3">
-      <p className="text-[#6F6F6F] text-xs px-1">Consultas que você precisa fazer ou já agendou.</p>
-      {data.appointments.map(ap => (
-        <GlassCard key={ap.id} padding="p-4">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: 'rgba(var(--color-mid-rgb),0.12)' }}>
-              <Calendar size={18} color="var(--color-accent)" />
+    <div>
+      <div className="flex items-center gap-2 mb-2 px-1">
+        <Calendar size={14} color="var(--color-accent)" />
+        <span className="text-[#A8A8A8] text-xs font-semibold uppercase tracking-wider">Consultas</span>
+      </div>
+      <div className="flex flex-col gap-2">
+        {data.appointments.map(ap => (
+          <GlassCard key={ap.id} padding="p-4">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: 'rgba(var(--color-mid-rgb),0.12)' }}>
+                <Calendar size={18} color="var(--color-accent)" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-[#F7F7F7] font-semibold text-sm">{ap.title}</p>
+                {ap.professional && <p className="text-[#A8A8A8] text-xs">{ap.professional}</p>}
+                <p className="text-[#6F6F6F] text-xs">{fmtDate(ap.date)}{ap.time ? ` · ${ap.time}` : ''}</p>
+              </div>
+              <button onClick={() => update({ appointments: data.appointments.filter(x => x.id !== ap.id) })}
+                className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0" style={{ background: 'rgba(var(--color-danger-rgb),0.1)' }}>
+                <Trash2 size={13} color="var(--color-danger)" />
+              </button>
             </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-[#F7F7F7] font-semibold text-sm">{ap.title}</p>
-              {ap.professional && <p className="text-[#A8A8A8] text-xs">{ap.professional}</p>}
-              <p className="text-[#6F6F6F] text-xs">{ap.date}{ap.time ? ` · ${ap.time}` : ''}</p>
-            </div>
-            <button onClick={() => update({ appointments: data.appointments.filter(x => x.id !== ap.id) })}
-              className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0" style={{ background: 'rgba(var(--color-danger-rgb),0.1)' }}>
-              <Trash2 size={13} color="var(--color-danger)" />
-            </button>
-          </div>
-        </GlassCard>
-      ))}
-      <AddButton label="Adicionar consulta" onClick={() => setSheet(true)} />
+          </GlassCard>
+        ))}
+        <AddButton label="Adicionar consulta" onClick={() => setSheet(true)} />
+      </div>
       <AnimatePresence>
         {sheet && <AppointmentSheet onClose={() => setSheet(false)} onSave={a => update({ appointments: [...data.appointments, a] })} />}
       </AnimatePresence>
@@ -274,33 +290,39 @@ function MedicationSheet({ onClose, onSave }: { onClose: () => void; onSave: (m:
   return <FormSheet title="Novo medicamento" onClose={onClose} onSave={save} canSave={!!name.trim()}>
     <SheetInput label="Nome" value={name} onChange={setName} placeholder="Ex.: Vitamina D" autoFocus />
     <SheetInput label="Dose (opcional)" value={dose} onChange={setDose} placeholder="Ex.: 2000 UI" />
-    <SheetInput label="Horário do lembrete (opcional)" value={time} onChange={setTime} placeholder="Ex.: 08:00" />
+    <SheetInput label="Horário do lembrete (opcional)" value={time} onChange={setTime} type="time" />
   </FormSheet>;
 }
 
-function MedicamentosTab({ data, update }: { data: HealthData; update: (patch: Partial<HealthData>) => void }) {
+function MedicamentosCard({ data, update }: { data: HealthData; update: (patch: Partial<HealthData>) => void }) {
   const [sheet, setSheet] = useState(false);
   return (
-    <div className="flex flex-col gap-3">
-      {data.medications.map(med => (
-        <GlassCard key={med.id} padding="p-4">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: 'rgba(var(--color-mid-rgb),0.12)' }}>
-              <Pill size={18} color="var(--color-accent)" />
+    <div>
+      <div className="flex items-center gap-2 mb-2 px-1">
+        <Pill size={14} color="var(--color-accent)" />
+        <span className="text-[#A8A8A8] text-xs font-semibold uppercase tracking-wider">Medicamentos</span>
+      </div>
+      <div className="flex flex-col gap-2">
+        {data.medications.map(med => (
+          <GlassCard key={med.id} padding="p-4">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: 'rgba(var(--color-mid-rgb),0.12)' }}>
+                <Pill size={18} color="var(--color-accent)" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-[#F7F7F7] font-semibold text-sm">{med.name}</p>
+                <p className="text-[#A8A8A8] text-xs">{med.dose} · Diário</p>
+                {med.reminder_time && <p className="text-[#6F6F6F] text-xs">Lembrete: {med.reminder_time}</p>}
+              </div>
+              <button onClick={() => update({ medications: data.medications.filter(x => x.id !== med.id) })}
+                className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0" style={{ background: 'rgba(var(--color-danger-rgb),0.1)' }}>
+                <Trash2 size={13} color="var(--color-danger)" />
+              </button>
             </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-[#F7F7F7] font-semibold text-sm">{med.name}</p>
-              <p className="text-[#A8A8A8] text-xs">{med.dose} · Diário</p>
-              {med.reminder_time && <p className="text-[#6F6F6F] text-xs">Lembrete: {med.reminder_time}</p>}
-            </div>
-            <button onClick={() => update({ medications: data.medications.filter(x => x.id !== med.id) })}
-              className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0" style={{ background: 'rgba(var(--color-danger-rgb),0.1)' }}>
-              <Trash2 size={13} color="var(--color-danger)" />
-            </button>
-          </div>
-        </GlassCard>
-      ))}
-      <AddButton label="Adicionar medicamento" onClick={() => setSheet(true)} />
+          </GlassCard>
+        ))}
+        <AddButton label="Adicionar medicamento" onClick={() => setSheet(true)} />
+      </div>
       <AnimatePresence>
         {sheet && <MedicationSheet onClose={() => setSheet(false)} onSave={m => update({ medications: [...data.medications, m] })} />}
       </AnimatePresence>
@@ -312,31 +334,25 @@ function MedicamentosTab({ data, update }: { data: HealthData; update: (patch: P
 
 function AddButton({ label, onClick }: { label: string; onClick: () => void }) {
   return (
-    <motion.button
-      whileTap={{ scale: 0.97 }}
-      onClick={onClick}
-      className="flex items-center justify-center gap-2 rounded-2xl py-3.5"
-      style={{ border: '1.5px dashed rgba(var(--color-accent-rgb),0.35)' }}
-    >
-      <Plus size={16} color="var(--color-accent)" />
+    <motion.button whileTap={{ scale: 0.97 }} onClick={onClick}
+      className="flex items-center justify-center gap-2 rounded-2xl py-3"
+      style={{ border: '1.5px dashed rgba(var(--color-accent-rgb),0.35)' }}>
+      <Plus size={15} color="var(--color-accent)" />
       <span className="text-[var(--color-accent)] text-sm font-semibold">{label}</span>
     </motion.button>
   );
 }
 
-function SheetInput({ label, value, onChange, placeholder, autoFocus }: {
-  label: string; value: string; onChange: (v: string) => void; placeholder?: string; autoFocus?: boolean;
+function SheetInput({ label, value, onChange, placeholder, autoFocus, type = 'text' }: {
+  label: string; value: string; onChange: (v: string) => void; placeholder?: string; autoFocus?: boolean; type?: string;
 }) {
   return (
     <div>
       <label className="text-[#6F6F6F] text-xs mb-1.5 block">{label}</label>
       <input
-        autoFocus={autoFocus}
-        value={value}
-        onChange={e => onChange(e.target.value)}
-        placeholder={placeholder}
+        autoFocus={autoFocus} type={type} value={value} onChange={e => onChange(e.target.value)} placeholder={placeholder}
         className="w-full rounded-xl px-3 py-3 text-[#F7F7F7] text-sm outline-none"
-        style={{ background: 'rgba(255,255,255,0.06)', border: '0.5px solid rgba(255,255,255,0.1)' }}
+        style={{ background: 'rgba(255,255,255,0.06)', border: '0.5px solid rgba(255,255,255,0.1)', colorScheme: 'dark' }}
       />
     </div>
   );
@@ -365,15 +381,12 @@ function FormSheet({ title, onClose, onSave, canSave, children }: {
         </div>
         {children}
         <motion.button
-          whileTap={{ scale: 0.97 }}
-          onClick={onSave}
-          disabled={!canSave}
+          whileTap={{ scale: 0.97 }} onClick={onSave} disabled={!canSave}
           className="w-full py-3.5 rounded-2xl font-bold text-sm mt-1"
           style={{
             background: canSave ? 'linear-gradient(135deg, var(--color-start), var(--color-end))' : 'rgba(255,255,255,0.08)',
             color: canSave ? 'var(--color-on-gradient)' : '#6F6F6F',
-          }}
-        >
+          }}>
           Salvar
         </motion.button>
       </motion.div>
@@ -384,7 +397,6 @@ function FormSheet({ title, onClose, onSave, canSave, children }: {
 // ─── Página ─────────────────────────────────────────────────────────────────
 
 export function Health() {
-  const [activeTab, setActiveTab] = useState<Tab>('Rotina');
   const [data, setData] = useState<HealthData>(() => loadHealth());
 
   const update = (patch: Partial<HealthData>) => {
@@ -401,19 +413,14 @@ export function Health() {
 
       <div className="px-5 pt-3">
         <h1 className="text-2xl font-bold text-[#F7F7F7]">Saúde</h1>
-        <p className="text-[#6F6F6F] text-sm mt-1">Rotina, consultas e medicamentos</p>
+        <p className="text-[#6F6F6F] text-sm mt-1">Água, treino, consultas e medicamentos</p>
       </div>
 
-      <div className="flex gap-2 px-5 mt-4 overflow-x-auto pb-1">
-        {tabs.map(tab => (
-          <Chip key={tab} label={tab} active={activeTab === tab} onClick={() => setActiveTab(tab)} />
-        ))}
-      </div>
-
-      <div className="px-5 mt-4">
-        {activeTab === 'Rotina' && <RoutineTab data={data} update={update} />}
-        {activeTab === 'Consultas' && <ConsultasTab data={data} update={update} />}
-        {activeTab === 'Medicamentos' && <MedicamentosTab data={data} update={update} />}
+      <div className="px-5 mt-4 flex flex-col gap-4">
+        <WaterCard data={data} update={update} />
+        <WorkoutCard data={data} update={update} />
+        <ConsultasCard data={data} update={update} />
+        <MedicamentosCard data={data} update={update} />
       </div>
     </div>
   );

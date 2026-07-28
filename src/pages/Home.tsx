@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ChevronRight, Droplets, Dumbbell, Moon, Plus } from 'lucide-react';
+import { ChevronRight, Droplets, Dumbbell, Calendar, Plus } from 'lucide-react';
 import { Header } from '../components/Header';
 import { GlassCard } from '../components/GlassCard';
 import { AICommandBar } from '../components/AICommandBar';
@@ -124,15 +124,13 @@ export function Home() {
               </div>
               <div className="flex flex-col items-center gap-1 rounded-2xl py-3" style={{ background: 'rgba(255,255,255,0.04)' }}>
                 <Dumbbell size={18} color={workoutToday ? '#22c55e' : '#6F6F6F'} />
-                <p className="text-[#F7F7F7] text-xs font-bold">Treino</p>
-                <p className="text-[10px]" style={{ color: workoutToday ? '#22c55e' : '#6F6F6F' }}>
-                  {workoutToday ? 'Concluído' : 'Pendente'}
-                </p>
+                <p className="text-[#F7F7F7] text-xs font-bold">{health.workoutDays.length}/{health.workoutGoal}</p>
+                <p className="text-[10px]" style={{ color: workoutToday ? '#22c55e' : '#6F6F6F' }}>Treino</p>
               </div>
               <div className="flex flex-col items-center gap-1 rounded-2xl py-3" style={{ background: 'rgba(255,255,255,0.04)' }}>
-                <Moon size={18} color="#a78bfa" />
-                <p className="text-[#F7F7F7] text-xs font-bold">{health.sleepHours}h {health.sleepMinutes}min</p>
-                <p className="text-[#6F6F6F] text-[10px]">Sono</p>
+                <Calendar size={18} color="var(--color-accent)" />
+                <p className="text-[#F7F7F7] text-xs font-bold">{health.appointments.length}</p>
+                <p className="text-[#6F6F6F] text-[10px]">Consultas</p>
               </div>
             </div>
           </GlassCard>

@@ -4,39 +4,33 @@ import type { Appointment, Medication } from './types';
 
 const KEY = 'ebran:health:v1';
 
-export interface Habit { id: string; name: string; done: boolean }
-
 export interface HealthData {
   water: number;          // litros de hoje
   waterTarget: number;    // meta em litros
-  sleepHours: number;
-  sleepMinutes: number;
-  workoutWeekStart: string;   // segunda-feira da semana atual (YYYY-MM-DD)
+  workoutWeekStart: string;   // domingo da semana atual (YYYY-MM-DD)
   workoutDays: number[];      // dias da semana (0=Dom..6=Sáb) com treino feito
-  habits: Habit[];
+  workoutGoal: number;        // meta de treinos na semana
   appointments: Appointment[];
   medications: Medication[];
-  day: string;            // data (YYYY-MM-DD) a que água/sono se referem
+  day: string;            // data (YYYY-MM-DD) a que a água se refere
 }
 
 function todayKey(): string {
   return new Date().toISOString().slice(0, 10);
 }
 
-// Segunda-feira da semana atual, para saber quando zerar os treinos.
+// Domingo da semana atual (padrão BR), para saber quando zerar os treinos.
 function weekStart(): string {
   const d = new Date();
-  const dow = (d.getDay() + 6) % 7; // 0 = segunda
-  d.setDate(d.getDate() - dow);
+  d.setDate(d.getDate() - d.getDay()); // 0 = domingo
   return d.toISOString().slice(0, 10);
 }
 
 function fresh(): HealthData {
   return {
     water: 0, waterTarget: 3,
-    sleepHours: 0, sleepMinutes: 0,
-    workoutWeekStart: weekStart(), workoutDays: [],
-    habits: [], appointments: [], medications: [],
+    workoutWeekStart: weekStart(), workoutDays: [], workoutGoal: 5,
+    appointments: [], medications: [],
     day: todayKey(),
   };
 }
@@ -46,12 +40,10 @@ export function loadHealth(): HealthData {
     const raw = localStorage.getItem(KEY);
     if (!raw) return fresh();
     const data = { ...fresh(), ...JSON.parse(raw) } as HealthData;
-    // Vira o dia: zera água e sono.
+    // Vira o dia: zera a água.
     if (data.day !== todayKey()) {
       data.day = todayKey();
       data.water = 0;
-      data.sleepHours = 0;
-      data.sleepMinutes = 0;
     }
     // Vira a semana: zera os treinos marcados.
     if (data.workoutWeekStart !== weekStart()) {
