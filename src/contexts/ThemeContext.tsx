@@ -49,18 +49,20 @@ export const THEMES: ThemePreset[] = [
     swatch: 'linear-gradient(135deg, #0B3C12 0%, #1B7A2B 50%, #5BD149 100%)',
   },
   {
-    id: 'aurora', label: 'Aurora', emoji: '🌸',
-    start: '#00E676', mid: '#4A148C', end: '#C2185B',
-    accent: '#00E676', onGradient: '#FFFFFF',
-    swatch: 'linear-gradient(135deg, #00E676 0%, #4A148C 50%, #C2185B 100%)',
+    // Preto rende 5,0:1 no violeta e 8,3:1 no esmeralda — a faixa onde o texto
+    // dos botões cai. O verde petróleo do fim é escuro, mas fica nas bordas.
+    id: 'neon-nebula', label: 'Neon Nebula', emoji: '🌌',
+    start: '#8B5CF6', mid: '#10B981', end: '#065F46',
+    accent: '#8B5CF6', onGradient: '#000000',
+    swatch: 'linear-gradient(135deg, #8B5CF6 0%, #10B981 50%, #065F46 100%)',
   },
   {
-    // O #0A081D da paleta é quase preto e sumiria no fundo do app, então os
-    // gradientes da interface começam no violeta. A amostra mantém as 4 cores.
-    id: 'cosmos', label: 'Cosmos', emoji: '🪐',
-    start: '#3B1C5A', mid: '#126388', end: '#E5B350',
-    accent: '#E5B350', onGradient: '#FFFFFF',
-    swatch: 'linear-gradient(135deg, #0A081D 0%, #3B1C5A 40%, #126388 80%, #E5B350 100%)',
+    // Paleta escura: preto sobre ela fica entre 1,7:1 e 3,6:1, ou seja,
+    // ilegível. O texto dos botões é branco, que rende de 5,8:1 a 12,5:1.
+    id: 'borgonha', label: 'Borgonha Imperial', emoji: '🍷',
+    start: '#61192B', mid: '#8C233B', end: '#B8324F',
+    accent: '#B8324F', onGradient: '#FFFFFF',
+    swatch: 'linear-gradient(135deg, #61192B 0%, #8C233B 50%, #B8324F 100%)',
   },
   {
     id: 'pradaria', label: 'Pradaria de Lufa', emoji: '🌵',
@@ -69,10 +71,11 @@ export const THEMES: ThemePreset[] = [
     swatch: 'linear-gradient(135deg, #F5E6CA 0%, #E0C097 50%, #D2A8B7 100%)',
   },
   {
-    id: 'por-do-sol', label: 'Pôr do Sol', emoji: '🌅',
-    start: '#B85042', mid: '#D9822B', end: '#E7A1B0',
-    accent: '#D9822B', onGradient: '#000000',
-    swatch: 'linear-gradient(135deg, #B85042 0%, #D9822B 50%, #E7A1B0 100%)',
+    // Paleta clara: preto rende de 4,2:1 a 12,6:1 sobre ela.
+    id: 'sirio', label: 'Sírio do Sul', emoji: '🌟',
+    start: '#B45309', mid: '#D97706', end: '#FBBF24',
+    accent: '#FBBF24', onGradient: '#000000',
+    swatch: 'linear-gradient(135deg, #B45309 0%, #D97706 50%, #FBBF24 100%)',
   },
 ];
 
