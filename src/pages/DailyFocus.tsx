@@ -1,24 +1,26 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence, useMotionValue, useTransform, animate } from 'framer-motion';
 import type { PanInfo } from 'framer-motion';
 import { Plus, RefreshCw, ChevronDown, ChevronUp, X, Trash2 } from 'lucide-react';
 import { Header } from '../components/Header';
-import { Chip } from '../components/Chip';
 import { GlassCard } from '../components/GlassCard';
 import { ChecklistItem } from '../components/ChecklistItem';
 import { useDailyFocus } from '../contexts/DailyFocusContext';
 import type { DailyFocusItem } from '../lib/types';
 
-const tabs = ['Hoje', 'Mercado', 'Casa', 'Treino', 'Cuidado'] as const;
-type Tab = typeof tabs[number];
+// As tarefas do dia são separadas por categoria em blocos, em vez de abas.
+// 'recurring' cai em Tarefas junto com 'task'.
+const CATEGORY_BLOCKS = [
+  { key: 'market',  label: 'Mercado', emoji: '🛒', match: ['market'] },
+  { key: 'care',    label: 'Cuidado', emoji: '🧴', match: ['care'] },
+  { key: 'home',    label: 'Casa',    emoji: '🏠', match: ['home'] },
+  { key: 'workout', label: 'Treino',  emoji: '💪', match: ['workout'] },
+  { key: 'task',    label: 'Tarefas', emoji: '✅', match: ['task', 'recurring'] },
+] as const;
 
-const tabCategoryMap: Record<Tab, string[]> = {
-  Hoje: ['market', 'care', 'home', 'workout', 'task', 'recurring'],
-  Mercado: ['market'],
-  Casa: ['home'],
-  Treino: ['workout'],
-  Cuidado: ['care'],
-};
+const WEEKDAYS = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
+const MONTHS = ['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
+const WEEKDAYS_LONG = ['Domingo','Segunda-feira','Terça-feira','Quarta-feira','Quinta-feira','Sexta-feira','Sábado'];
 
 const categoryOptions = [
   { value: 'market', label: 'Mercado' },
@@ -298,7 +300,26 @@ function RestockPrompt({ item, onConfirm, onDismiss }: {
 export function DailyFocus() {
   const { items, addItem, toggleItem, updateItem, deleteItem } = useDailyFocus();
 
-  const [activeTab, setActiveTab] = useState<Tab>('Hoje');
+  const today = new Date();
+  const [selectedDay, setSelectedDay] = useState(today.getDate());
+  const isToday = selectedDay === today.getDate();
+  const dayStripRef = useRef<HTMLDivElement>(null);
+  const todayRef = useRef<HTMLButtonElement>(null);
+
+  // Dias do mês atual, na tira horizontal. O dia de hoje entra em foco.
+  const daysInMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0).getDate();
+  const monthDays = Array.from({ length: daysInMonth }, (_, i) => {
+    const d = new Date(today.getFullYear(), today.getMonth(), i + 1);
+    return { day: i + 1, weekday: WEEKDAYS[d.getDay()] };
+  });
+
+  useEffect(() => {
+    todayRef.current?.scrollIntoView({ inline: 'center', block: 'nearest' });
+  }, []);
+
+  const selectedDate = new Date(today.getFullYear(), today.getMonth(), selectedDay);
+  const dateLabel = `${WEEKDAYS_LONG[selectedDate.getDay()]}, ${selectedDay} de ${MONTHS[today.getMonth()]}`;
+
   const [restockQueue, setRestockQueue] = useState<DailyFocusItem[]>(() =>
     items.filter(i => i.recurrence && i.next_restock_date && i.status !== 'done')
   );
@@ -306,10 +327,11 @@ export function DailyFocus() {
   const [showAddSheet, setShowAddSheet] = useState(false);
   const [restockPrompt, setRestockPrompt] = useState<DailyFocusItem | null>(null);
 
-  const categories = tabCategoryMap[activeTab];
-
-  const pendingItems = items.filter(i => categories.includes(i.category) && i.status === 'pending');
-  const doneItems = items.filter(i => categories.includes(i.category) && i.status === 'done');
+  // Sem histórico por dia ainda: os itens pertencem a "hoje". Outros dias
+  // mostram um estado vazio.
+  const dayItems = isToday ? items : [];
+  const pendingItems = dayItems.filter(i => i.status === 'pending');
+  const doneItems = dayItems.filter(i => i.status === 'done');
 
   const toggle = (id: string) => {
     const item = items.find(i => i.id === id);
@@ -351,41 +373,84 @@ export function DailyFocus() {
 
       <div className="px-5 pt-3">
         <h1 className="text-2xl font-bold text-[#F7F7F7]">Foco Diário</h1>
-        <p className="text-[#6F6F6F] text-sm mt-1">
+        <p className="text-[#6F6F6F] text-sm mt-1">{dateLabel}</p>
+        <p className="text-[var(--color-accent)] text-xs mt-1 font-medium">
           {doneItems.length}/{pendingItems.length + doneItems.length} concluídos
         </p>
       </div>
 
-      <div className="flex gap-2 px-5 mt-4 overflow-x-auto pb-1">
-        {tabs.map(tab => (
-          <Chip key={tab} label={tab} active={activeTab === tab} onClick={() => setActiveTab(tab)} />
-        ))}
+      {/* Tira de dias do mês */}
+      <div ref={dayStripRef} className="flex gap-2 px-5 mt-4 overflow-x-auto pb-1" style={{ scrollbarWidth: 'none' }}>
+        {monthDays.map(({ day, weekday }) => {
+          const active = day === selectedDay;
+          const isTodayChip = day === today.getDate();
+          return (
+            <button
+              key={day}
+              ref={isTodayChip ? todayRef : undefined}
+              onClick={() => setSelectedDay(day)}
+              className="flex flex-col items-center justify-center rounded-2xl flex-shrink-0 tap-scale"
+              style={{
+                width: 46, height: 60,
+                background: active ? 'linear-gradient(135deg, var(--color-start), var(--color-end))' : 'rgba(255,255,255,0.05)',
+                border: isTodayChip && !active ? '1px solid rgba(var(--color-accent-rgb),0.5)' : '1px solid rgba(255,255,255,0.06)',
+              }}
+            >
+              <span className="text-[10px] font-medium" style={{ color: active ? 'var(--color-on-gradient)' : '#6F6F6F' }}>{weekday}</span>
+              <span className="text-lg font-bold" style={{ color: active ? 'var(--color-on-gradient)' : '#F7F7F7' }}>{day}</span>
+            </button>
+          );
+        })}
       </div>
 
       <div className="px-5 mt-4 flex flex-col gap-3">
-        {/* Active items list */}
-        {pendingItems.length > 0 ? (
-          <GlassCard padding="py-1">
-            {pendingItems.map(item => (
-              <SwipeToDelete key={item.id} onDelete={() => deleteItem(item.id)}>
-                <div className="px-4">
-                  <ChecklistItem item={item} onToggle={toggle} />
-                </div>
-              </SwipeToDelete>
-            ))}
-          </GlassCard>
-        ) : doneItems.length === 0 ? (
+        {/* Dias que não são hoje ainda não têm histórico */}
+        {!isToday ? (
           <div className="text-center py-12">
-            <p className="text-[#6F6F6F] text-sm">Nenhum item nesta categoria</p>
+            <p className="text-[#6F6F6F] text-sm">Sem itens registrados para este dia.</p>
+            <p className="text-[#3F3F3F] text-xs mt-1">O foco de hoje aparece ao selecionar o dia atual.</p>
+          </div>
+        ) : pendingItems.length === 0 && doneItems.length === 0 ? (
+          <div className="text-center py-12">
+            <p className="text-[#6F6F6F] text-sm">Nenhum item no foco de hoje.</p>
+            <p className="text-[#3F3F3F] text-xs mt-1">Toque em "Novo item" para começar.</p>
           </div>
         ) : (
-          <div className="text-center py-8">
-            <p className="text-[#22c55e] text-sm font-medium">Tudo concluído nesta categoria!</p>
-          </div>
+          <>
+            {/* Blocos por categoria — só os que têm itens pendentes */}
+            {CATEGORY_BLOCKS.map(block => {
+              const blockPending = pendingItems.filter(i => (block.match as readonly string[]).includes(i.category));
+              if (blockPending.length === 0) return null;
+              return (
+                <div key={block.key}>
+                  <div className="flex items-center gap-2 mb-2 px-1">
+                    <span style={{ fontSize: 14 }}>{block.emoji}</span>
+                    <span className="text-[#A8A8A8] text-xs font-semibold uppercase tracking-wider">{block.label}</span>
+                    <span className="text-[#3F3F3F] text-xs">{blockPending.length}</span>
+                  </div>
+                  <GlassCard padding="py-1">
+                    {blockPending.map(item => (
+                      <SwipeToDelete key={item.id} onDelete={() => deleteItem(item.id)}>
+                        <div className="px-4">
+                          <ChecklistItem item={item} onToggle={toggle} />
+                        </div>
+                      </SwipeToDelete>
+                    ))}
+                  </GlassCard>
+                </div>
+              );
+            })}
+
+            {pendingItems.length === 0 && doneItems.length > 0 && (
+              <div className="text-center py-6">
+                <p className="text-[#22c55e] text-sm font-medium">Tudo concluído hoje! 🎉</p>
+              </div>
+            )}
+          </>
         )}
 
         {/* Done items — collapsible */}
-        {doneItems.length > 0 && (
+        {isToday && doneItems.length > 0 && (
           <div>
             <motion.button
               whileTap={{ scale: 0.97 }}
@@ -422,7 +487,7 @@ export function DailyFocus() {
         )}
 
         {/* Reposição sugerida */}
-        {restockQueue.length > 0 && (activeTab === 'Hoje' || activeTab === 'Mercado' || activeTab === 'Cuidado') && (
+        {isToday && restockQueue.length > 0 && (
           <GlassCard>
             <div className="flex items-center gap-2 mb-3">
               <RefreshCw size={15} color="var(--color-accent)" />
@@ -471,15 +536,17 @@ export function DailyFocus() {
         )}
 
         {/* Add button */}
-        <motion.button
-          whileTap={{ scale: 0.97 }}
-          onClick={() => setShowAddSheet(true)}
-          className="flex items-center justify-center gap-2 rounded-2xl py-3.5"
-          style={{ border: '1.5px dashed rgba(255,255,255,0.13)', color: '#6F6F6F' }}
-        >
-          <Plus size={16} />
-          <span className="text-sm font-medium">Novo item</span>
-        </motion.button>
+        {isToday && (
+          <motion.button
+            whileTap={{ scale: 0.97 }}
+            onClick={() => setShowAddSheet(true)}
+            className="flex items-center justify-center gap-2 rounded-2xl py-3.5"
+            style={{ border: '1.5px dashed rgba(255,255,255,0.13)', color: '#6F6F6F' }}
+          >
+            <Plus size={16} />
+            <span className="text-sm font-medium">Novo item</span>
+          </motion.button>
+        )}
       </div>
 
       <AnimatePresence>
