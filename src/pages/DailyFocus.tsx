@@ -6,6 +6,7 @@ import { Header } from '../components/Header';
 import { GlassCard } from '../components/GlassCard';
 import { ChecklistItem } from '../components/ChecklistItem';
 import { useDailyFocus } from '../contexts/DailyFocusContext';
+import { logActivity } from '../lib/activityStore';
 import type { DailyFocusItem } from '../lib/types';
 
 const CATEGORY_BLOCKS = [
@@ -212,6 +213,11 @@ export function DailyFocus() {
     addItem({ ...data, id: `df-${Date.now()}`, user_id: 'user-1', created_at: new Date().toISOString() });
   };
 
+  const handleToggle = (item: DailyFocusItem) => {
+    if (!isDone(item.id, selectedIso)) logActivity('focus', `Concluído: ${item.name}`);
+    toggleForDate(item.id, selectedIso);
+  };
+
   return (
     <div className="flex flex-col min-h-screen pb-28" style={{ background: '#000' }}>
       <Header />
@@ -303,7 +309,7 @@ export function DailyFocus() {
                     {blockPending.map(item => (
                       <SwipeToDelete key={item.id} onDelete={() => deleteItem(item.id)}>
                         <div className="px-4">
-                          <ChecklistItem item={item} done={false} onToggle={() => toggleForDate(item.id, selectedIso)} />
+                          <ChecklistItem item={item} done={false} onToggle={() => handleToggle(item)} />
                         </div>
                       </SwipeToDelete>
                     ))}
@@ -330,7 +336,7 @@ export function DailyFocus() {
                       <GlassCard padding="py-1">
                         {done.map(item => (
                           <div key={item.id} className="px-4">
-                            <ChecklistItem item={item} done={true} onToggle={() => toggleForDate(item.id, selectedIso)} />
+                            <ChecklistItem item={item} done={true} onToggle={() => handleToggle(item)} />
                           </div>
                         ))}
                       </GlassCard>

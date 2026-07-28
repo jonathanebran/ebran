@@ -7,8 +7,10 @@ import { GlassCard } from '../components/GlassCard';
 import { AICommandBar } from '../components/AICommandBar';
 import { ProgressBar } from '../components/ProgressBar';
 import { ProgressRing } from '../components/ProgressRing';
-import { mockWorkSummary, mockRecentActivity } from '../data/mockData';
+import { mockWorkSummary } from '../data/mockData';
 import { loadHealth } from '../lib/healthStore';
+import { loadActivity, relativeTime, type ActivityIcon } from '../lib/activityStore';
+import { Target as TargetIcon, CheckCircle2, Calendar as CalIcon, Pill } from 'lucide-react';
 import { useGoals } from '../contexts/GoalsContext';
 import { formatCurrency, getPercentage } from '../lib/utils';
 import { Briefcase } from 'lucide-react';
@@ -18,10 +20,21 @@ const stagger = {
   item: { hidden: { opacity: 0, y: 16 }, show: { opacity: 1, y: 0, transition: { duration: 0.35 } } },
 };
 
+function activityIcon(icon: ActivityIcon) {
+  const c = 'var(--color-accent)';
+  if (icon === 'goal') return <TargetIcon size={16} color={c} />;
+  if (icon === 'focus') return <CheckCircle2 size={16} color="#22c55e" />;
+  if (icon === 'appointment') return <CalIcon size={16} color={c} />;
+  if (icon === 'medication') return <Pill size={16} color={c} />;
+  if (icon === 'income') return <span style={{ color: '#22c55e', fontSize: 15, fontWeight: 'bold' }}>$</span>;
+  return <span style={{ color: 'var(--color-danger)', fontSize: 15, fontWeight: 'bold' }}>$</span>;
+}
+
 export function Home() {
   const navigate = useNavigate();
   const { goals } = useGoals();
   const [health] = useState(() => loadHealth());
+  const [activity] = useState(() => loadActivity());
   const workoutToday = health.workoutDays.includes(new Date().getDay());
 
   const workPct = getPercentage(mockWorkSummary.monthly_revenue, mockWorkSummary.monthly_goal);
@@ -140,13 +153,12 @@ export function Home() {
         <motion.div variants={stagger.item}>
           <div className="flex items-center justify-between mb-3">
             <span className="text-[#F7F7F7] font-semibold text-sm">Atividade recente</span>
-            <button className="text-xs font-semibold" style={{ color: 'var(--color-accent)' }}>Ver todas</button>
           </div>
-          {mockRecentActivity.length === 0 ? (
-            <p className="text-[#6F6F6F] text-sm text-center py-4">Nenhuma atividade ainda.</p>
+          {activity.length === 0 ? (
+            <p className="text-[#6F6F6F] text-sm text-center py-4">Suas ações no app aparecem aqui.</p>
           ) : (
             <div className="flex flex-col gap-2">
-              {mockRecentActivity.map(item => (
+              {activity.slice(0, 6).map(item => (
                 <div
                   key={item.id}
                   className="flex items-center gap-3 rounded-xl p-3"
@@ -154,17 +166,15 @@ export function Home() {
                 >
                   <div
                     className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0"
-                    style={{ background: `color-mix(in srgb, ${item.color} 13%, transparent)` }}
+                    style={{ background: 'rgba(var(--color-accent-rgb),0.12)' }}
                   >
-                    {item.icon === 'briefcase' && <Briefcase size={16} color={item.color} />}
-                    {item.icon === 'dollar-sign' && <span style={{ color: item.color, fontSize: 15, fontWeight: 'bold' }}>$</span>}
-                    {item.icon === 'target' && <span style={{ color: item.color, fontSize: 15 }}>◎</span>}
+                    {activityIcon(item.icon)}
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-[#F7F7F7] text-xs font-medium truncate">{item.title}</p>
-                    <p className="text-[#6F6F6F] text-[10px]">{item.subtitle}</p>
+                    {item.subtitle && <p className="text-[#6F6F6F] text-[10px]">{item.subtitle}</p>}
                   </div>
-                  <span className="text-[#6F6F6F] text-[10px] flex-shrink-0">{item.time}</span>
+                  <span className="text-[#6F6F6F] text-[10px] flex-shrink-0">{relativeTime(item.at)}</span>
                 </div>
               ))}
             </div>

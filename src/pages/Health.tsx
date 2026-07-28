@@ -5,6 +5,7 @@ import { Header } from '../components/Header';
 import { GlassCard } from '../components/GlassCard';
 import { ProgressBar } from '../components/ProgressBar';
 import { loadHealth, saveHealth, type HealthData } from '../lib/healthStore';
+import { logActivity } from '../lib/activityStore';
 import type { Appointment, Medication } from '../lib/types';
 
 const WEEKDAYS = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
@@ -264,7 +265,7 @@ function ConsultasCard({ data, update }: { data: HealthData; update: (patch: Par
         <AddButton label="Adicionar consulta" onClick={() => setSheet(true)} />
       </div>
       <AnimatePresence>
-        {sheet && <AppointmentSheet onClose={() => setSheet(false)} onSave={a => update({ appointments: [...data.appointments, a] })} />}
+        {sheet && <AppointmentSheet onClose={() => setSheet(false)} onSave={a => { update({ appointments: [...data.appointments, a] }); logActivity('appointment', `Consulta agendada: ${a.title}`); }} />}
       </AnimatePresence>
     </div>
   );
@@ -324,7 +325,7 @@ function MedicamentosCard({ data, update }: { data: HealthData; update: (patch: 
         <AddButton label="Adicionar medicamento" onClick={() => setSheet(true)} />
       </div>
       <AnimatePresence>
-        {sheet && <MedicationSheet onClose={() => setSheet(false)} onSave={m => update({ medications: [...data.medications, m] })} />}
+        {sheet && <MedicationSheet onClose={() => setSheet(false)} onSave={m => { update({ medications: [...data.medications, m] }); logActivity('medication', `Medicamento: ${m.name}`); }} />}
       </AnimatePresence>
     </div>
   );
