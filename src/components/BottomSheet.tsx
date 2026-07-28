@@ -15,17 +15,21 @@ export function BottomSheet({ open, onClose, title, children }: BottomSheetProps
       {open && (
         <>
           <motion.div
-            className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm"
+            className="fixed inset-0 z-[100] bg-black/60 backdrop-blur-sm"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
           />
           <motion.div
-            className="fixed bottom-0 left-0 right-0 z-50 rounded-t-3xl p-5 pb-8 max-h-[90vh] overflow-y-auto"
+            className="fixed bottom-0 left-0 right-0 z-[100] rounded-t-3xl p-5 max-h-[90vh] overflow-y-auto"
             style={{
               background: 'rgba(18,18,20,0.98)',
               border: '1px solid rgba(255,255,255,0.1)',
+              // Espaço extra embaixo: a barra flutuante fica em z-50, o sheet
+              // em z-[100] cobre ela, mas o conteúdo não deve terminar colado
+              // na borda inferior do aparelho.
+              paddingBottom: 'max(32px, env(safe-area-inset-bottom, 0px))',
             }}
             initial={{ y: '100%' }}
             animate={{ y: 0 }}
