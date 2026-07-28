@@ -52,6 +52,7 @@ export function AICommandBar({ placeholder = 'O que você quer organizar agora? 
   const navigate = useNavigate();
   const { addItem } = useDailyFocus();
   const [input, setInput] = useState('');
+  const [lastText, setLastText] = useState('');
   const [result, setResult] = useState<Classified | null>(null);
   const [sheetOpen, setSheetOpen] = useState(false);
   const [done, setDone] = useState<string | null>(null);
@@ -59,6 +60,7 @@ export function AICommandBar({ placeholder = 'O que você quer organizar agora? 
   const handleSubmit = () => {
     if (!input.trim()) return;
     setResult(classifyAICommand(input));
+    setLastText(input.trim());
     setDone(null);
     setSheetOpen(true);
     setInput('');
@@ -66,11 +68,15 @@ export function AICommandBar({ placeholder = 'O que você quer organizar agora? 
 
   const dest = result ? (DESTINATION[result.suggestedDestination] ?? DESTINATION.ai_hub) : null;
   const focusItems = result ? extractFocusItems(result) : [];
+  const isGoal = result?.suggestedDestination === 'goals';
+  const isAssistant = result?.suggestedDestination === 'ai_hub';
 
-  // Ação principal: executa o que dá na hora, senão abre o módulo para concluir.
+  // Ação principal: executa o que dá na hora, senão abre a tela certa já
+  // preparada — nunca joga o usuário numa lista para recomeçar do zero.
   const confirm = () => {
     if (!result) return;
 
+    // 1) Itens de mercado/cuidado → adiciona direto ao Foco.
     if (focusItems.length > 0) {
       focusItems.forEach((it, i) => addItem({
         id: `df-${Date.now()}-${i}`,
@@ -89,11 +95,27 @@ export function AICommandBar({ placeholder = 'O que você quer organizar agora? 
     }
 
     setSheetOpen(false);
+
+    // 2) Meta → abre o formulário de nova meta já com título e tipo.
+    if (isGoal) {
+      const ed = result.extractedData as { title?: string; type?: string };
+      navigate('/metas/nova', { state: { prefillTitle: ed.title, prefillType: ed.type } });
+      return;
+    }
+
+    // 3) Não entendeu → abre o assistente já com a mensagem enviada.
+    if (isAssistant) {
+      navigate('/ai-hub', { state: { message: lastText } });
+      return;
+    }
+
+    // 4) Demais casos → abre o módulo correspondente.
     if (dest) navigate(dest.route);
   };
 
-  const primaryLabel = focusItems.length > 0
-    ? `Adicionar ao Foco diário`
+  const primaryLabel = focusItems.length > 0 ? 'Adicionar ao Foco diário'
+    : isGoal ? 'Criar meta'
+    : isAssistant ? 'Abrir assistente'
     : (dest?.label ?? 'Abrir');
 
   return (

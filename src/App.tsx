@@ -30,7 +30,9 @@ import { Configuracoes } from './pages/Configuracoes';
 import { Login } from './pages/Login';
 import { Signup } from './pages/Signup';
 
-const mainRoutes = ['/', '/metas', '/ai-hub', '/trabalho', '/financas', '/foco', '/saude', '/perfil'];
+// O assistente (/ai-hub) fica de fora: tem barra de mensagem própria embaixo,
+// e a barra flutuante ficaria por cima dela.
+const mainRoutes = ['/', '/metas', '/trabalho', '/financas', '/foco', '/saude', '/perfil'];
 
 function AppContent() {
   useGoogleAutoRefresh();

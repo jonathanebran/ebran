@@ -1,8 +1,11 @@
-import { NavLink } from 'react-router-dom';
+import { useRef, useState } from 'react';
+import { NavLink, useNavigate } from 'react-router-dom';
 import { Home, Target, Briefcase, PieChart, ListChecks, HeartPulse } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { AppLogo } from './AppLogo';
 import { motion } from 'framer-motion';
+
+const FAB_POS_KEY = 'ebran:aifab:v1';
 
 const navItems = [
   { to: '/',         icon: Home,       label: 'Home',   exact: true  },
@@ -64,61 +67,65 @@ function NavItem({ to, icon: Icon, label, exact }: NavItemProps) {
   );
 }
 
-// Floating AI button — sits above the nav bar on the right side
+// Botão flutuante do assistente — arrastável para qualquer canto da tela.
+// A posição fica salva; um toque (sem arrastar) abre o assistente.
 function AIFloatingButton() {
+  const navigate = useNavigate();
+  const [pos] = useState<{ x: number; y: number }>(() => {
+    try { return JSON.parse(localStorage.getItem(FAB_POS_KEY) || '') || { x: 0, y: 0 }; }
+    catch { return { x: 0, y: 0 }; }
+  });
+  const draggedRef = useRef(false);
+
+  // Mantém o botão dentro da tela (âncora no canto inferior direito).
+  const vw = typeof window !== 'undefined' ? window.innerWidth : 390;
+  const vh = typeof window !== 'undefined' ? window.innerHeight : 800;
+
   return (
-    <div
+    <motion.div
       className="fixed z-50"
-      style={{
-        right: 16,
-        bottom: 'calc(max(16px, env(safe-area-inset-bottom, 16px)) + 78px)',
+      style={{ right: 16, bottom: 'calc(max(16px, env(safe-area-inset-bottom, 16px)) + 78px)', touchAction: 'none' }}
+      drag
+      dragMomentum={false}
+      dragElastic={0.05}
+      dragConstraints={{ left: -(vw - 90), right: 8, top: -(vh - 180), bottom: 24 }}
+      initial={{ x: pos.x, y: pos.y }}
+      onDragStart={() => { draggedRef.current = true; }}
+      onDragEnd={(_, info) => {
+        const next = { x: pos.x + info.offset.x, y: pos.y + info.offset.y };
+        try { localStorage.setItem(FAB_POS_KEY, JSON.stringify(next)); } catch { /* ignora */ }
+        // pequena folga para o onClick não disparar logo após arrastar
+        setTimeout(() => { draggedRef.current = false; }, 0);
       }}
+      onClick={() => { if (!draggedRef.current) navigate('/ai-hub'); }}
+      whileTap={{ scale: 0.94 }}
     >
-      <NavLink to="/ai-hub" className="tap-scale block">
-        {({ isActive }) => (
-          <motion.div
-            initial={{ scale: 0, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{ type: 'spring', stiffness: 380, damping: 30, delay: 0.15 }}
-            className="relative flex items-center justify-center"
-            style={{ width: 56, height: 56 }}
-          >
-            <svg width="56" height="56" className="absolute inset-0" style={{ overflow: 'visible' }}>
-              <defs>
-                <linearGradient id="ai-fab-ring" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%"   style={{ stopColor: 'var(--color-start)' }} />
-                  <stop offset="50%"  style={{ stopColor: 'var(--color-mid)' }} />
-                  <stop offset="100%" style={{ stopColor: 'var(--color-end)' }} />
-                </linearGradient>
-              </defs>
-              {isActive && (
-                <circle cx="28" cy="28" r="27" fill="none" stroke="url(#ai-fab-ring)" strokeWidth={10} opacity={0.12} />
-              )}
-              <circle
-                cx="28" cy="28" r="26"
-                fill="none"
-                stroke="url(#ai-fab-ring)"
-                strokeWidth={isActive ? 2.2 : 1.6}
-                opacity={isActive ? 1 : 0.85}
-              />
-            </svg>
-            <div
-              className="relative z-10 flex items-center justify-center rounded-full"
-              style={{
-                width: 48, height: 48,
-                background: isActive ? 'rgba(var(--color-accent-rgb),0.18)' : 'rgba(12,12,12,0.82)',
-                backdropFilter: 'blur(24px)',
-                WebkitBackdropFilter: 'blur(24px)',
-                border: '0.5px solid rgba(255,255,255,0.1)',
-                boxShadow: '0 8px 28px rgba(0,0,0,0.55)',
-              }}
-            >
-              <AppLogo size={26} />
-            </div>
-          </motion.div>
-        )}
-      </NavLink>
-    </div>
+      <div className="relative flex items-center justify-center" style={{ width: 56, height: 56, cursor: 'grab' }}>
+        <svg width="56" height="56" className="absolute inset-0" style={{ overflow: 'visible' }}>
+          <defs>
+            <linearGradient id="ai-fab-ring" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%"   style={{ stopColor: 'var(--color-start)' }} />
+              <stop offset="50%"  style={{ stopColor: 'var(--color-mid)' }} />
+              <stop offset="100%" style={{ stopColor: 'var(--color-end)' }} />
+            </linearGradient>
+          </defs>
+          <circle cx="28" cy="28" r="26" fill="none" stroke="url(#ai-fab-ring)" strokeWidth={1.6} opacity={0.85} />
+        </svg>
+        <div
+          className="relative z-10 flex items-center justify-center rounded-full"
+          style={{
+            width: 48, height: 48,
+            background: 'rgba(12,12,12,0.82)',
+            backdropFilter: 'blur(24px)',
+            WebkitBackdropFilter: 'blur(24px)',
+            border: '0.5px solid rgba(255,255,255,0.1)',
+            boxShadow: '0 8px 28px rgba(0,0,0,0.55)',
+          }}
+        >
+          <AppLogo size={26} />
+        </div>
+      </div>
+    </motion.div>
   );
 }
 

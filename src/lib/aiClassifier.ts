@@ -23,13 +23,38 @@ export function classifyAICommand(input: string): AIClassifierResult {
     };
   }
 
-  // Goal annotation: "anotar nas metas", "adicionar meta", "criar meta"
-  if (lower.includes('meta') && (lower.includes('anotar') || lower.includes('adicionar') || lower.includes('criar') || lower.includes('quero') || lower.includes('nova'))) {
+  // Viagem: "viagem para X", "viajar para X", "conhecer X"
+  if (lower.includes('viagem') || lower.includes('viajar') || (lower.includes('conhecer') && (lower.includes('para') || lower.includes('pra')))) {
+    // Destino = o que vem depois de "para"/"pra"/"conhecer".
+    const m = input.match(/(?:para|pra|conhecer)\s+([A-Za-zÀ-ú][\wÀ-ú\s]*?)(?:$|[,.!?])/i);
+    const dest = m ? m[1].trim().replace(/\b\w/g, c => c.toUpperCase()) : '';
+    const title = dest ? `Viagem para ${dest}` : 'Viagem';
+    return {
+      intent: 'create_travel_goal',
+      module: 'goals',
+      action: 'create_goal',
+      extractedData: { type: 'travel', title },
+      suggestedDestination: 'goals',
+      confirmationRequired: true,
+      suggestedActions: [
+        `Criar meta de viagem: ${title}`,
+        'Definir valor e prazo',
+        'Guardar mensalmente',
+      ],
+    };
+  }
+
+  // Meta genérica: "anotar nas metas", "adicionar meta", "criar meta", "quero juntar/comprar"
+  if (
+    (lower.includes('meta') && (lower.includes('anotar') || lower.includes('adicionar') || lower.includes('criar') || lower.includes('quero') || lower.includes('nova'))) ||
+    lower.includes('quero juntar') || lower.includes('quero comprar') || lower.includes('juntar dinheiro') || lower.includes('economizar para')
+  ) {
+    const title = input.replace(/^(quero|criar meta de|meta de|anotar|adicionar)\s+/i, '').trim();
     return {
       intent: 'create_goal',
       module: 'goals',
       action: 'create_goal',
-      extractedData: { input },
+      extractedData: { title: title.replace(/\b\w/g, c => c.toUpperCase()) },
       suggestedDestination: 'goals',
       confirmationRequired: true,
       suggestedActions: [

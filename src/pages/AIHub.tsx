@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState, useEffect, useRef } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { ArrowLeft, Sparkles, Send, Mic } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { GlassCard } from '../components/GlassCard';
@@ -40,12 +40,13 @@ const ACTION_ROUTES: Record<string, string> = {
 
 export function AIHub() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [input, setInput] = useState('');
   const [messages, setMessages] = useState<Message[]>([
     {
       id: '0',
       type: 'ai',
-      content: 'Olá! Sou a IA do Ebran. Pode me dizer o que quer organizar, registrar ou planejar. Use texto livre — voz e imagem em breve. 🔮',
+      content: 'Olá! Sou o seu assistente pessoal do Ebran. Diga o que quer organizar, registrar ou planejar — em texto livre. Voz e imagem em breve. 🔮',
     },
   ]);
 
@@ -63,6 +64,18 @@ export function AIHub() {
     setInput('');
   };
 
+  // Se a Home mandou uma mensagem, processa automaticamente ao abrir.
+  const handledRef = useRef(false);
+  useEffect(() => {
+    const incoming = (location.state as { message?: string } | null)?.message;
+    if (incoming && !handledRef.current) {
+      handledRef.current = true;
+      send(incoming);
+      navigate(location.pathname, { replace: true, state: null });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   return (
     <div className="flex flex-col h-screen" style={{ background: '#000' }}>
       <div className="flex items-center gap-3 px-5 pt-12 pb-4 flex-shrink-0">
@@ -71,7 +84,7 @@ export function AIHub() {
         </motion.button>
         <div className="flex items-center gap-2">
           <Sparkles size={18} color="var(--color-accent)" />
-          <h1 className="text-xl font-bold text-[#F7F7F7]">IA Ebran</h1>
+          <h1 className="text-xl font-bold text-[#F7F7F7]">Assistente pessoal</h1>
         </div>
       </div>
 

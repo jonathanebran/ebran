@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ArrowLeft } from 'lucide-react';
 import { TextField } from '../components/TextField';
@@ -38,8 +38,11 @@ export function GoalCreate() {
   const navigate = useNavigate();
   const { addGoal } = useGoals();
 
-  const [selectedType, setSelectedType] = useState<GoalType | ''>('');
-  const [title, setTitle] = useState('');
+  // A IA pode abrir esta tela já com tipo e título sugeridos.
+  const prefill = (useLocation().state ?? {}) as { prefillTitle?: string; prefillType?: GoalType };
+
+  const [selectedType, setSelectedType] = useState<GoalType | ''>(prefill.prefillType ?? '');
+  const [title, setTitle] = useState(prefill.prefillTitle ?? '');
   const [description, setDescription] = useState('');
   const [targetAmount, setTargetAmount] = useState('');
   const [initialAmount, setInitialAmount] = useState('');
