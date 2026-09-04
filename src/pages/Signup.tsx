@@ -19,12 +19,24 @@ const googleFeatures = [
 
 export function Signup() {
   const navigate = useNavigate();
-  const { signUp } = useAuth();
+  const { signUp, signInWithGoogle } = useAuth();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  async function handleGoogle() {
+    setError(null);
+    const { error: err } = await signInWithGoogle();
+    if (err) {
+      setError(
+        err.includes('provider is not enabled') || err.includes('Unsupported provider')
+          ? 'Login com Google ainda não está ativado no servidor.'
+          : err,
+      );
+    }
+  }
   const [success, setSuccess] = useState(false);
 
   async function handleSignup() {
@@ -92,7 +104,7 @@ export function Signup() {
           <div className="flex-1 h-px" style={{ background: 'rgba(255,255,255,0.1)' }} />
         </div>
 
-        <SecondaryButton fullWidth onClick={() => navigate('/')}>
+        <SecondaryButton fullWidth onClick={handleGoogle}>
           <span>G</span> Continuar com Google
         </SecondaryButton>
 
