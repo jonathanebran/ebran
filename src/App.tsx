@@ -4,6 +4,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { isSupabaseConfigured } from './lib/supabase';
 import { AppLogo } from './components/AppLogo';
+import { ThemeSync } from './components/ThemeSync';
 import { GoalsProvider } from './contexts/GoalsContext';
 import { DailyFocusProvider } from './contexts/DailyFocusContext';
 import { PinLockProvider, usePinLock } from './contexts/PinLockContext';
@@ -124,6 +125,7 @@ export default function App() {
             <BrowserRouter>
               <AuthProvider>
                 <AuthGate>
+                  <ThemeSync />
                   <GoalsProvider>
                     <DailyFocusProvider>
                       <AppContent />

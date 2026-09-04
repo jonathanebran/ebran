@@ -16,6 +16,10 @@ create table if not exists public.profiles (
   updated_at timestamptz not null default now()
 );
 
+-- Preferências de tema, sincronizadas entre dispositivos.
+alter table public.profiles add column if not exists theme_id      text;
+alter table public.profiles add column if not exists glass_opacity numeric;
+
 -- Metas
 create table if not exists public.goals (
   id             text primary key,
