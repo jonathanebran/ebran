@@ -10,6 +10,8 @@ export interface Database {
           avatar_url: string | null;
           brand: string | null;
           monthly_income_goal: number | null;
+          theme_id: string | null;
+          glass_opacity: number | null;
           created_at: string;
           updated_at: string;
         };
@@ -19,6 +21,8 @@ export interface Database {
           avatar_url?: string | null;
           brand?: string | null;
           monthly_income_goal?: number | null;
+          theme_id?: string | null;
+          glass_opacity?: number | null;
           created_at?: string;
           updated_at?: string;
         };
@@ -27,6 +31,8 @@ export interface Database {
           avatar_url?: string | null;
           brand?: string | null;
           monthly_income_goal?: number | null;
+          theme_id?: string | null;
+          glass_opacity?: number | null;
           updated_at?: string;
         };
       };
