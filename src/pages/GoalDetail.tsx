@@ -7,7 +7,7 @@ import { ProgressRing } from '../components/ProgressRing';
 import { ProgressBar } from '../components/ProgressBar';
 import { SecondaryButton } from '../components/SecondaryButton';
 import { useGoals } from '../contexts/GoalsContext';
-import { logActivity } from '../lib/activityStore';
+import { useActivity } from '../contexts/ActivityContext';
 import { formatCurrency, getPercentage, getDaysRemaining, getMonthlySuggestion, formatDate } from '../lib/utils';
 
 function ValueModal({
@@ -90,6 +90,7 @@ export function GoalDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { goals, contributions: allContributions, updateGoal, deleteGoal, addContribution } = useGoals();
+  const { log } = useActivity();
   const goal = goals.find(g => g.id === id);
 
   // Todos os hooks ficam antes de qualquer return condicional: se a meta for
@@ -125,7 +126,7 @@ export function GoalDetail() {
         note: note || 'Aporte',
         created_at: new Date().toISOString(),
       });
-      logActivity('goal', `+${formatCurrency(value)} na meta ${goal.title}`);
+      log('goal', `+${formatCurrency(value)} na meta ${goal.title}`);
     }
     if (modal === 'remove') {
       newAmount = Math.max(0, currentAmount - value);

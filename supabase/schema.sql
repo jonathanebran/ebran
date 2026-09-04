@@ -122,6 +122,15 @@ create table if not exists public.medications (
   created_at    timestamptz not null default now()
 );
 
+-- Estado do app por área (blob JSON por usuário) — usado pela sincronização.
+create table if not exists public.app_state (
+  user_id    uuid not null default auth.uid() references auth.users(id) on delete cascade,
+  key        text not null,
+  value      jsonb,
+  updated_at timestamptz not null default now(),
+  primary key (user_id, key)
+);
+
 -- Feed de atividade
 create table if not exists public.activities (
   id       text primary key,
@@ -140,7 +149,7 @@ declare
   t text;
   tbls text[] := array[
     'profiles','goals','goal_contributions','focus_items','focus_completions',
-    'health_state','appointments','medications','activities'
+    'health_state','appointments','medications','activities','app_state'
   ];
   owner_col text;
 begin

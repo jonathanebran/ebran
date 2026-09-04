@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ChevronRight, Droplets, Dumbbell, Calendar, Plus } from 'lucide-react';
@@ -8,10 +7,11 @@ import { AICommandBar } from '../components/AICommandBar';
 import { ProgressBar } from '../components/ProgressBar';
 import { ProgressRing } from '../components/ProgressRing';
 import { mockWorkSummary } from '../data/mockData';
-import { loadHealth } from '../lib/healthStore';
-import { loadActivity, relativeTime, type ActivityIcon } from '../lib/activityStore';
+import { relativeTime, type ActivityIcon } from '../lib/activityStore';
 import { Target as TargetIcon, CheckCircle2, Calendar as CalIcon, Pill } from 'lucide-react';
 import { useGoals } from '../contexts/GoalsContext';
+import { useHealth } from '../contexts/HealthContext';
+import { useActivity } from '../contexts/ActivityContext';
 import { formatCurrency, getPercentage } from '../lib/utils';
 import { Briefcase } from 'lucide-react';
 
@@ -33,8 +33,8 @@ function activityIcon(icon: ActivityIcon) {
 export function Home() {
   const navigate = useNavigate();
   const { goals } = useGoals();
-  const [health] = useState(() => loadHealth());
-  const [activity] = useState(() => loadActivity());
+  const { data: health } = useHealth();
+  const { items: activity } = useActivity();
   const workoutToday = health.workoutDays.includes(new Date().getDay());
 
   const workPct = getPercentage(mockWorkSummary.monthly_revenue, mockWorkSummary.monthly_goal);

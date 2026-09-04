@@ -7,6 +7,8 @@ import { AppLogo } from './components/AppLogo';
 import { ThemeSync } from './components/ThemeSync';
 import { GoalsProvider } from './contexts/GoalsContext';
 import { DailyFocusProvider } from './contexts/DailyFocusContext';
+import { HealthProvider } from './contexts/HealthContext';
+import { ActivityProvider } from './contexts/ActivityContext';
 import { PinLockProvider, usePinLock } from './contexts/PinLockContext';
 import { ThemeProvider } from './contexts/ThemeContext';
 import { ErrorBoundary } from './components/ErrorBoundary';
@@ -126,11 +128,15 @@ export default function App() {
               <AuthProvider>
                 <AuthGate>
                   <ThemeSync />
-                  <GoalsProvider>
-                    <DailyFocusProvider>
-                      <AppContent />
-                    </DailyFocusProvider>
-                  </GoalsProvider>
+                  <ActivityProvider>
+                    <HealthProvider>
+                      <GoalsProvider>
+                        <DailyFocusProvider>
+                          <AppContent />
+                        </DailyFocusProvider>
+                      </GoalsProvider>
+                    </HealthProvider>
+                  </ActivityProvider>
                 </AuthGate>
               </AuthProvider>
             </BrowserRouter>

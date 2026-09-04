@@ -1,6 +1,7 @@
-import { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useContext, useState, useEffect, useMemo, useCallback } from 'react';
 import type { ReactNode } from 'react';
 import type { DailyFocusItem } from '../lib/types';
+import { useCloudBlob } from '../hooks/useCloudBlob';
 
 const FOCUS_KEY = 'ebran:dailyfocus:v2';
 const DONE_KEY = 'ebran:focusdone:v1';
@@ -65,6 +66,14 @@ export function DailyFocusProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => { saveToStorage(FOCUS_KEY, items); }, [items]);
   useEffect(() => { saveToStorage(DONE_KEY, done); }, [done]);
+
+  // Sincroniza itens + conclusões com a nuvem (mesmo bloco).
+  const blob = useMemo(() => ({ items, done }), [items, done]);
+  const applyRemote = useCallback((remote: { items?: DailyFocusItem[]; done?: Record<string, boolean> }) => {
+    setItems(remote.items ?? []);
+    setDone(remote.done ?? {});
+  }, []);
+  useCloudBlob('dailyfocus', blob, applyRemote);
 
   function addItem(item: DailyFocusItem) {
     setItems(prev => [item, ...prev]);

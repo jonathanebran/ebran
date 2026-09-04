@@ -35,22 +35,26 @@ function fresh(): HealthData {
   };
 }
 
+// Aplica as viradas de dia (zera água) e de semana (zera treinos) a um dado
+// já carregado — usado tanto no load local quanto ao receber da nuvem.
+export function normalizeHealth(input: Partial<HealthData>): HealthData {
+  const data = { ...fresh(), ...input } as HealthData;
+  if (data.day !== todayKey()) {
+    data.day = todayKey();
+    data.water = 0;
+  }
+  if (data.workoutWeekStart !== weekStart()) {
+    data.workoutWeekStart = weekStart();
+    data.workoutDays = [];
+  }
+  return data;
+}
+
 export function loadHealth(): HealthData {
   try {
     const raw = localStorage.getItem(KEY);
     if (!raw) return fresh();
-    const data = { ...fresh(), ...JSON.parse(raw) } as HealthData;
-    // Vira o dia: zera a água.
-    if (data.day !== todayKey()) {
-      data.day = todayKey();
-      data.water = 0;
-    }
-    // Vira a semana: zera os treinos marcados.
-    if (data.workoutWeekStart !== weekStart()) {
-      data.workoutWeekStart = weekStart();
-      data.workoutDays = [];
-    }
-    return data;
+    return normalizeHealth(JSON.parse(raw));
   } catch {
     return fresh();
   }
