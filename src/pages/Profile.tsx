@@ -4,6 +4,7 @@ import { ArrowLeft, User, Settings, Target, Link2, LogOut, ChevronRight } from '
 import { motion } from 'framer-motion';
 import { GlassCard } from '../components/GlassCard';
 import { mockUser } from '../data/mockData';
+import { useAuth } from '../contexts/AuthContext';
 
 const PROFILE_KEY = 'ebran:profile:v1';
 const AVATAR_KEY = 'ebran:avatar:v1';
@@ -17,6 +18,13 @@ const menuItems = [
 
 export function Profile() {
   const navigate = useNavigate();
+  const { signOut } = useAuth();
+
+  async function handleLogout() {
+    await signOut();
+    navigate('/');
+  }
+
   // Lidos no inicializador (e não num efeito) para foto e nome já aparecerem
   // no primeiro render, sem piscar os valores padrão antes.
   const [avatar] = useState<string | null>(() => {
@@ -99,7 +107,7 @@ export function Profile() {
         <GlassCard padding="p-0">
           <motion.button
             whileTap={{ backgroundColor: 'rgba(var(--color-end-rgb),0.05)' }}
-            onClick={() => navigate('/entrar')}
+            onClick={handleLogout}
             className="w-full flex items-center gap-3 px-4 py-4"
           >
             <div className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ background: 'rgba(var(--color-end-rgb), 0.09)' }}>
