@@ -1,7 +1,9 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
-import { AuthProvider } from './contexts/AuthContext';
+import { AuthProvider, useAuth } from './contexts/AuthContext';
+import { isSupabaseConfigured } from './lib/supabase';
+import { AppLogo } from './components/AppLogo';
 import { GoalsProvider } from './contexts/GoalsContext';
 import { DailyFocusProvider } from './contexts/DailyFocusContext';
 import { PinLockProvider, usePinLock } from './contexts/PinLockContext';
@@ -85,6 +87,34 @@ function PinGate({ children }: { children: React.ReactNode }) {
   return <>{children}</>;
 }
 
+function AuthSplash() {
+  return (
+    <div className="flex items-center justify-center min-h-screen" style={{ background: '#000' }}>
+      <AppLogo size={56} />
+    </div>
+  );
+}
+
+/**
+ * Portão de autenticação. Quando o Supabase está configurado, exige login:
+ * usuário deslogado só enxerga Login/Cadastro. Sem Supabase (dev local sem
+ * variáveis), deixa passar direto para não quebrar o modo local.
+ */
+function AuthGate({ children }: { children: React.ReactNode }) {
+  const { user, loading } = useAuth();
+  if (!isSupabaseConfigured) return <>{children}</>;
+  if (loading) return <AuthSplash />;
+  if (!user) {
+    return (
+      <Routes>
+        <Route path="/cadastro" element={<Signup />} />
+        <Route path="*" element={<Login />} />
+      </Routes>
+    );
+  }
+  return <>{children}</>;
+}
+
 export default function App() {
   return (
     <ErrorBoundary>
@@ -93,11 +123,13 @@ export default function App() {
           <PinGate>
             <BrowserRouter>
               <AuthProvider>
-                <GoalsProvider>
-                  <DailyFocusProvider>
-                    <AppContent />
-                  </DailyFocusProvider>
-                </GoalsProvider>
+                <AuthGate>
+                  <GoalsProvider>
+                    <DailyFocusProvider>
+                      <AppContent />
+                    </DailyFocusProvider>
+                  </GoalsProvider>
+                </AuthGate>
               </AuthProvider>
             </BrowserRouter>
           </PinGate>
