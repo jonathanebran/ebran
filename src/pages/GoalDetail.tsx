@@ -117,7 +117,9 @@ export function GoalDetail() {
   const handleConfirm = (value: number, note: string) => {
     let newAmount = currentAmount;
     if (modal === 'add') {
-      newAmount = Math.min(currentAmount + value, goal.target_amount);
+      // Não trava no alvo: metas sem alvo (0) somavam para 0. O progresso já é
+      // limitado a 100% na exibição.
+      newAmount = currentAmount + value;
       addContribution({
         id: `c-${Date.now()}`,
         goal_id: goal.id,
