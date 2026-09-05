@@ -1,13 +1,10 @@
-import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, User, Settings, Target, Link2, LogOut, ChevronRight } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { GlassCard } from '../components/GlassCard';
 import { mockUser } from '../data/mockData';
 import { useAuth } from '../contexts/AuthContext';
-
-const PROFILE_KEY = 'ebran:profile:v1';
-const AVATAR_KEY = 'ebran:avatar:v1';
+import { useProfile } from '../contexts/ProfileContext';
 
 const menuItems = [
   { icon: User, label: 'Meu perfil', to: '/meu-perfil', color: 'var(--color-accent)' },
@@ -25,21 +22,9 @@ export function Profile() {
     navigate('/');
   }
 
-  // Lidos no inicializador (e não num efeito) para foto e nome já aparecerem
-  // no primeiro render, sem piscar os valores padrão antes.
-  const [avatar] = useState<string | null>(() => {
-    try { return localStorage.getItem(AVATAR_KEY); } catch { return null; }
-  });
-  const [displayName] = useState(() => {
-    try {
-      const raw = localStorage.getItem(PROFILE_KEY);
-      if (raw) {
-        const data = JSON.parse(raw) as { name: string };
-        if (data.name) return data.name;
-      }
-    } catch { /* usa o padrão abaixo */ }
-    return mockUser.name;
-  });
+  const { profile } = useProfile();
+  const avatar = profile.avatar;
+  const displayName = profile.name;
 
   return (
     <div className="flex flex-col min-h-screen pb-10" style={{ background: '#000' }}>

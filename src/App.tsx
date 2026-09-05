@@ -10,6 +10,7 @@ import { HealthProvider } from './contexts/HealthContext';
 import { ActivityProvider } from './contexts/ActivityContext';
 import { FinanceProvider } from './contexts/FinanceContext';
 import { WorkProvider } from './contexts/WorkContext';
+import { ProfileProvider } from './contexts/ProfileContext';
 import { PinLockProvider, usePinLock } from './contexts/PinLockContext';
 import { ThemeProvider } from './contexts/ThemeContext';
 import { ErrorBoundary } from './components/ErrorBoundary';
@@ -128,6 +129,7 @@ export default function App() {
             <AuthProvider>
               <AuthGate>
                 <ThemeProvider>
+                  <ProfileProvider>
                   <ActivityProvider>
                     <FinanceProvider>
                       <WorkProvider>
@@ -141,6 +143,7 @@ export default function App() {
                       </WorkProvider>
                     </FinanceProvider>
                   </ActivityProvider>
+                  </ProfileProvider>
                 </ThemeProvider>
               </AuthGate>
             </AuthProvider>

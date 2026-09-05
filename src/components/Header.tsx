@@ -1,12 +1,9 @@
-import { useState } from 'react';
 import { User } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { AppLogo } from './AppLogo';
 import { mockUser } from '../data/mockData';
-
-const AVATAR_KEY = 'ebran:avatar:v1';
-const PROFILE_KEY = 'ebran:profile:v1';
+import { useProfile } from '../contexts/ProfileContext';
 
 interface HeaderProps {
   showGreeting?: boolean;
@@ -14,21 +11,9 @@ interface HeaderProps {
 
 export function Header({ showGreeting = false }: HeaderProps) {
   const navigate = useNavigate();
-  // Lidos no inicializador (e não num efeito) para a foto já aparecer no
-  // primeiro render, sem piscar o ícone padrão antes.
-  const [avatar] = useState<string | null>(() => {
-    try { return localStorage.getItem(AVATAR_KEY); } catch { return null; }
-  });
-  const [firstName] = useState(() => {
-    try {
-      const raw = localStorage.getItem(PROFILE_KEY);
-      if (raw) {
-        const data = JSON.parse(raw) as { name: string };
-        if (data.name) return data.name.split(' ')[0];
-      }
-    } catch { /* usa o padrão abaixo */ }
-    return mockUser.name.split(' ')[0];
-  });
+  const { profile } = useProfile();
+  const avatar = profile.avatar;
+  const firstName = (profile.name || mockUser.name).split(' ')[0];
 
   return (
     <div className="px-5 pt-4 pb-2">
