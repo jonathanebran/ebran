@@ -336,9 +336,11 @@ export function DailyFocus() {
                     <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }} transition={{ duration: 0.22 }} style={{ overflow: 'hidden' }}>
                       <GlassCard padding="py-1">
                         {done.map(item => (
-                          <div key={item.id} className="px-4">
-                            <ChecklistItem item={item} done={true} onToggle={() => handleToggle(item)} />
-                          </div>
+                          <SwipeToDelete key={item.id} onDelete={() => deleteItem(item.id)}>
+                            <div className="px-4">
+                              <ChecklistItem item={item} done={true} onToggle={() => handleToggle(item)} />
+                            </div>
+                          </SwipeToDelete>
                         ))}
                       </GlassCard>
                     </motion.div>
