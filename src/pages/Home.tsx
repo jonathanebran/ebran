@@ -4,9 +4,8 @@ import { ChevronRight, Droplets, Dumbbell, Calendar, Plus } from 'lucide-react';
 import { Header } from '../components/Header';
 import { GlassCard } from '../components/GlassCard';
 import { AICommandBar } from '../components/AICommandBar';
-import { ProgressBar } from '../components/ProgressBar';
 import { ProgressRing } from '../components/ProgressRing';
-import { mockWorkSummary } from '../data/mockData';
+import { useWork } from '../contexts/WorkContext';
 import { relativeTime, type ActivityIcon } from '../lib/activityStore';
 import { Target as TargetIcon, CheckCircle2, Calendar as CalIcon, Pill } from 'lucide-react';
 import { useGoals } from '../contexts/GoalsContext';
@@ -37,7 +36,12 @@ export function Home() {
   const { items: activity } = useActivity();
   const workoutToday = health.workoutDays.includes(new Date().getDay());
 
-  const workPct = getPercentage(mockWorkSummary.monthly_revenue, mockWorkSummary.monthly_goal);
+  const { sessions } = useWork();
+  const since30 = Date.now() - 30 * 86_400_000;
+  const recentWork = sessions.filter(s => new Date(s.date).getTime() >= since30);
+  const workRevenue = recentWork.reduce((a, s) => a + (s.amount ?? 0), 0);
+  const workCount = recentWork.length;
+  const workTicket = workCount ? workRevenue / workCount : 0;
   const primaryGoal = goals.find(g => g.status === 'active') ?? goals[0] ?? null;
   const goalPct = primaryGoal ? getPercentage(primaryGoal.current_amount, primaryGoal.target_amount) : 0;
   const activeCount = goals.filter(g => g.status === 'active').length;
@@ -67,19 +71,16 @@ export function Home() {
                 <span className="text-[#F7F7F7] font-semibold text-xs">Trabalho</span>
               </div>
             </div>
-            <p className="text-[#6F6F6F] text-[10px] uppercase tracking-wide mb-0.5">Faturamento</p>
-            <p className="text-[#F7F7F7] font-bold text-base leading-tight">{formatCurrency(mockWorkSummary.monthly_revenue)}</p>
-            <p className="text-[#6F6F6F] text-[10px] mb-2">Meta {formatCurrency(mockWorkSummary.monthly_goal)}</p>
-            <ProgressBar value={workPct} height={4} />
-            <p className="text-[var(--color-accent)] text-[10px] font-bold mt-1.5">{workPct}%</p>
-            <div className="flex justify-between mt-2 pt-2" style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+            <p className="text-[#6F6F6F] text-[10px] uppercase tracking-wide mb-0.5">Faturamento · 30d</p>
+            <p className="text-[#F7F7F7] font-bold text-base leading-tight">{formatCurrency(workRevenue)}</p>
+            <div className="flex justify-between mt-3 pt-2" style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
               <div>
                 <p className="text-[#6F6F6F] text-[9px]">Atendimentos</p>
-                <p className="text-[#F7F7F7] text-xs font-bold">{mockWorkSummary.services_count}</p>
+                <p className="text-[#F7F7F7] text-xs font-bold">{workCount}</p>
               </div>
               <div className="text-right">
                 <p className="text-[#6F6F6F] text-[9px]">Ticket médio</p>
-                <p className="text-[#F7F7F7] text-xs font-bold">{formatCurrency(mockWorkSummary.average_ticket)}</p>
+                <p className="text-[#F7F7F7] text-xs font-bold">{formatCurrency(workTicket)}</p>
               </div>
             </div>
           </GlassCard>
