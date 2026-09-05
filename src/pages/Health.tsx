@@ -4,8 +4,9 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Header } from '../components/Header';
 import { GlassCard } from '../components/GlassCard';
 import { ProgressBar } from '../components/ProgressBar';
-import { loadHealth, saveHealth, type HealthData } from '../lib/healthStore';
-import { logActivity } from '../lib/activityStore';
+import { type HealthData } from '../lib/healthStore';
+import { useHealth } from '../contexts/HealthContext';
+import { useActivity } from '../contexts/ActivityContext';
 import type { Appointment, Medication } from '../lib/types';
 
 const WEEKDAYS = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
@@ -236,6 +237,7 @@ function fmtDate(iso: string): string {
 }
 
 function ConsultasCard({ data, update }: { data: HealthData; update: (patch: Partial<HealthData>) => void }) {
+  const { log } = useActivity();
   const [sheet, setSheet] = useState(false);
   return (
     <div>
@@ -265,7 +267,7 @@ function ConsultasCard({ data, update }: { data: HealthData; update: (patch: Par
         <AddButton label="Adicionar consulta" onClick={() => setSheet(true)} />
       </div>
       <AnimatePresence>
-        {sheet && <AppointmentSheet onClose={() => setSheet(false)} onSave={a => { update({ appointments: [...data.appointments, a] }); logActivity('appointment', `Consulta agendada: ${a.title}`); }} />}
+        {sheet && <AppointmentSheet onClose={() => setSheet(false)} onSave={a => { update({ appointments: [...data.appointments, a] }); log('appointment', `Consulta agendada: ${a.title}`); }} />}
       </AnimatePresence>
     </div>
   );
@@ -296,6 +298,7 @@ function MedicationSheet({ onClose, onSave }: { onClose: () => void; onSave: (m:
 }
 
 function MedicamentosCard({ data, update }: { data: HealthData; update: (patch: Partial<HealthData>) => void }) {
+  const { log } = useActivity();
   const [sheet, setSheet] = useState(false);
   return (
     <div>
@@ -325,7 +328,7 @@ function MedicamentosCard({ data, update }: { data: HealthData; update: (patch: 
         <AddButton label="Adicionar medicamento" onClick={() => setSheet(true)} />
       </div>
       <AnimatePresence>
-        {sheet && <MedicationSheet onClose={() => setSheet(false)} onSave={m => { update({ medications: [...data.medications, m] }); logActivity('medication', `Medicamento: ${m.name}`); }} />}
+        {sheet && <MedicationSheet onClose={() => setSheet(false)} onSave={m => { update({ medications: [...data.medications, m] }); log('medication', `Medicamento: ${m.name}`); }} />}
       </AnimatePresence>
     </div>
   );
@@ -398,15 +401,7 @@ function FormSheet({ title, onClose, onSave, canSave, children }: {
 // ─── Página ─────────────────────────────────────────────────────────────────
 
 export function Health() {
-  const [data, setData] = useState<HealthData>(() => loadHealth());
-
-  const update = (patch: Partial<HealthData>) => {
-    setData(prev => {
-      const next = { ...prev, ...patch };
-      saveHealth(next);
-      return next;
-    });
-  };
+  const { data, update } = useHealth();
 
   return (
     <div className="flex flex-col min-h-screen pb-28" style={{ background: '#000' }}>

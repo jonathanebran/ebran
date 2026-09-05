@@ -6,7 +6,7 @@ import { Header } from '../components/Header';
 import { GlassCard } from '../components/GlassCard';
 import { ChecklistItem } from '../components/ChecklistItem';
 import { useDailyFocus } from '../contexts/DailyFocusContext';
-import { logActivity } from '../lib/activityStore';
+import { useActivity } from '../contexts/ActivityContext';
 import type { DailyFocusItem } from '../lib/types';
 
 const CATEGORY_BLOCKS = [
@@ -182,6 +182,7 @@ type ViewMode = 'semana' | 'mes';
 
 export function DailyFocus() {
   const { addItem, deleteItem, itemsForDate, isDone, toggleForDate } = useDailyFocus();
+  const { log } = useActivity();
 
   const today = new Date();
   const [selected, setSelected] = useState<Date>(today);
@@ -214,7 +215,7 @@ export function DailyFocus() {
   };
 
   const handleToggle = (item: DailyFocusItem) => {
-    if (!isDone(item.id, selectedIso)) logActivity('focus', `Concluído: ${item.name}`);
+    if (!isDone(item.id, selectedIso)) log('focus', `Concluído: ${item.name}`);
     toggleForDate(item.id, selectedIso);
   };
 

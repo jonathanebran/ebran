@@ -1,6 +1,7 @@
-import { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useContext, useState, useEffect, useMemo, useCallback } from 'react';
 import type { ReactNode } from 'react';
 import type { Goal, GoalContribution } from '../lib/types';
+import { useCloudBlob } from '../hooks/useCloudBlob';
 
 const GOALS_KEY = 'ebran:goals:v2';
 const CONTRIBUTIONS_KEY = 'ebran:contributions:v2';
@@ -41,6 +42,14 @@ export function GoalsProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => { saveToStorage(GOALS_KEY, goals); }, [goals]);
   useEffect(() => { saveToStorage(CONTRIBUTIONS_KEY, contributions); }, [contributions]);
+
+  // Sincroniza metas + aportes com a nuvem (mesmo bloco).
+  const blob = useMemo(() => ({ goals, contributions }), [goals, contributions]);
+  const applyRemote = useCallback((remote: { goals?: Goal[]; contributions?: GoalContribution[] }) => {
+    setGoals(remote.goals ?? []);
+    setContributions(remote.contributions ?? []);
+  }, []);
+  useCloudBlob('goals', blob, applyRemote);
 
   function addGoal(goal: Goal) {
     setGoals(prev => [goal, ...prev]);
