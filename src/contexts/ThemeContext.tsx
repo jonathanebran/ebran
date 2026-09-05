@@ -1,4 +1,5 @@
-import { createContext, useContext, useState, type ReactNode } from 'react';
+import { createContext, useContext, useState, useMemo, useCallback, type ReactNode } from 'react';
+import { useCloudBlob } from '../hooks/useCloudBlob';
 
 const THEME_KEY = 'ebran:theme:v1';
 
@@ -150,6 +151,21 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     applyThemeToDom(next.themeId, next.glassOpacity);
     try { localStorage.setItem(THEME_KEY, JSON.stringify(next)); } catch { /* armazenamento cheio ou indisponível */ }
   };
+
+  // Sincroniza o tema com a conta (mesmo mecanismo das demais áreas).
+  const blob = useMemo(() => ({ themeId: data.themeId, glassOpacity: data.glassOpacity }), [data]);
+  const applyRemote = useCallback((remote: { themeId?: string; glassOpacity?: number }) => {
+    setData(prev => {
+      const next: ThemeData = {
+        themeId: remote.themeId ?? prev.themeId,
+        glassOpacity: typeof remote.glassOpacity === 'number' ? remote.glassOpacity : prev.glassOpacity,
+      };
+      applyThemeToDom(next.themeId, next.glassOpacity);
+      try { localStorage.setItem(THEME_KEY, JSON.stringify(next)); } catch { /* indisponível */ }
+      return next;
+    });
+  }, []);
+  useCloudBlob('theme', blob, applyRemote);
 
   return (
     <ThemeContext.Provider value={{

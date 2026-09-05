@@ -4,7 +4,6 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { isSupabaseConfigured } from './lib/supabase';
 import { AppLogo } from './components/AppLogo';
-import { ThemeSync } from './components/ThemeSync';
 import { GoalsProvider } from './contexts/GoalsContext';
 import { DailyFocusProvider } from './contexts/DailyFocusContext';
 import { HealthProvider } from './contexts/HealthContext';
@@ -121,13 +120,12 @@ function AuthGate({ children }: { children: React.ReactNode }) {
 export default function App() {
   return (
     <ErrorBoundary>
-      <ThemeProvider>
-        <PinLockProvider>
-          <PinGate>
-            <BrowserRouter>
-              <AuthProvider>
-                <AuthGate>
-                  <ThemeSync />
+      <PinLockProvider>
+        <PinGate>
+          <BrowserRouter>
+            <AuthProvider>
+              <AuthGate>
+                <ThemeProvider>
                   <ActivityProvider>
                     <HealthProvider>
                       <GoalsProvider>
@@ -137,12 +135,12 @@ export default function App() {
                       </GoalsProvider>
                     </HealthProvider>
                   </ActivityProvider>
-                </AuthGate>
-              </AuthProvider>
-            </BrowserRouter>
-          </PinGate>
-        </PinLockProvider>
-      </ThemeProvider>
+                </ThemeProvider>
+              </AuthGate>
+            </AuthProvider>
+          </BrowserRouter>
+        </PinGate>
+      </PinLockProvider>
     </ErrorBoundary>
   );
 }
