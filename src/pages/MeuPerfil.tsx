@@ -5,24 +5,15 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { GlassCard } from '../components/GlassCard';
 import { PrimaryButton } from '../components/PrimaryButton';
 import { mockUser } from '../data/mockData';
-
-const PROFILE_KEY = 'ebran:profile:v1';
-const AVATAR_KEY = 'ebran:avatar:v1';
-
-function loadProfile() {
-  try {
-    const raw = localStorage.getItem(PROFILE_KEY);
-    return raw ? JSON.parse(raw) as { name: string } : null;
-  } catch { return null; }
-}
+import { useProfile } from '../contexts/ProfileContext';
 
 export function MeuPerfil() {
   const navigate = useNavigate();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const { profile, setName: setProfileName, setAvatar: setProfileAvatar } = useProfile();
 
-  const savedProfile = loadProfile();
-  const [name, setName] = useState(savedProfile?.name ?? mockUser.name);
-  const [avatar, setAvatar] = useState<string | null>(() => localStorage.getItem(AVATAR_KEY));
+  const [name, setName] = useState(profile.name);
+  const avatar = profile.avatar;
   const [saved, setSaved] = useState(false);
 
   const handlePhotoClick = () => fileInputRef.current?.click();
@@ -31,17 +22,13 @@ export function MeuPerfil() {
     const file = e.target.files?.[0];
     if (!file) return;
     const reader = new FileReader();
-    reader.onload = () => {
-      const base64 = reader.result as string;
-      setAvatar(base64);
-      localStorage.setItem(AVATAR_KEY, base64);
-    };
+    reader.onload = () => setProfileAvatar(reader.result as string);
     reader.readAsDataURL(file);
     e.target.value = '';
   };
 
   const handleSave = () => {
-    localStorage.setItem(PROFILE_KEY, JSON.stringify({ name }));
+    setProfileName(name);
     setSaved(true);
     setTimeout(() => { setSaved(false); navigate(-1); }, 900);
   };
