@@ -8,6 +8,7 @@ import { GoalsProvider } from './contexts/GoalsContext';
 import { DailyFocusProvider } from './contexts/DailyFocusContext';
 import { HealthProvider } from './contexts/HealthContext';
 import { ActivityProvider } from './contexts/ActivityContext';
+import { FinanceProvider } from './contexts/FinanceContext';
 import { PinLockProvider, usePinLock } from './contexts/PinLockContext';
 import { ThemeProvider } from './contexts/ThemeContext';
 import { ErrorBoundary } from './components/ErrorBoundary';
@@ -127,13 +128,15 @@ export default function App() {
               <AuthGate>
                 <ThemeProvider>
                   <ActivityProvider>
-                    <HealthProvider>
-                      <GoalsProvider>
-                        <DailyFocusProvider>
-                          <AppContent />
-                        </DailyFocusProvider>
-                      </GoalsProvider>
-                    </HealthProvider>
+                    <FinanceProvider>
+                      <HealthProvider>
+                        <GoalsProvider>
+                          <DailyFocusProvider>
+                            <AppContent />
+                          </DailyFocusProvider>
+                        </GoalsProvider>
+                      </HealthProvider>
+                    </FinanceProvider>
                   </ActivityProvider>
                 </ThemeProvider>
               </AuthGate>
