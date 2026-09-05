@@ -6,8 +6,8 @@ import { Header } from '../components/Header';
 import { Chip } from '../components/Chip';
 import { GlassCard } from '../components/GlassCard';
 import { ProgressBar } from '../components/ProgressBar';
-import { mockFinanceSummary, mockFinanceRecords, mockWorkSummary, mockWorkRecords } from '../data/mockData';
-import { formatCurrency, getPercentage } from '../lib/utils';
+import { formatCurrency } from '../lib/utils';
+import { useFinance } from '../contexts/FinanceContext';
 
 const tabs = ['Resumo', 'Lançamentos', 'Categorias', 'Trabalho', 'Cuidado', 'Planejamento'] as const;
 type Tab = typeof tabs[number];
@@ -21,19 +21,10 @@ const categoryLabels: Record<string, string> = {
 };
 
 function ResumoTab() {
-  const { income, expenses, balance, savings_rate } = mockFinanceSummary;
+  const { summary } = useFinance();
+  const { income, expenses, balance, savings_rate } = summary;
   return (
     <div className="flex flex-col gap-3">
-      <div
-        className="flex items-center gap-3 rounded-2xl px-4 py-3"
-        style={{ background: 'rgba(var(--color-accent-rgb),0.08)', border: '0.5px solid rgba(var(--color-accent-rgb),0.2)' }}
-      >
-        <span style={{ fontSize: 18 }}>🔗</span>
-        <div>
-          <p className="text-[#F7F7F7] text-xs font-semibold">Resumo do Ebran</p>
-          <p className="text-[#6F6F6F] text-xs">Lançamentos detalhados no app do Breno · Este painel é seu resumo pessoal</p>
-        </div>
-      </div>
       <div className="grid grid-cols-2 gap-3">
         <GlassCard padding="p-4">
           <div className="flex items-center gap-2 mb-2">
@@ -69,7 +60,8 @@ function ResumoTab() {
 }
 
 function LancamentosTab() {
-  const allRecords = [...mockFinanceRecords].sort((a, b) => b.date.localeCompare(a.date));
+  const { records } = useFinance();
+  const allRecords = [...records].sort((a, b) => b.date.localeCompare(a.date));
   return (
     <GlassCard>
       <p className="text-[#A8A8A8] text-xs font-semibold uppercase tracking-wider mb-3">Lançamentos</p>
@@ -113,32 +105,33 @@ function CategoriasTab() {
 }
 
 function TrabalhoTab() {
-  const workPct = getPercentage(mockWorkSummary.monthly_revenue, mockWorkSummary.monthly_goal);
+  const { records } = useFinance();
+  const work = records.filter(r => r.type === 'income' && r.category === 'work' && r.status !== 'cancelled');
+  const revenue = work.reduce((s, r) => s + r.amount, 0);
+  const avg = work.length ? revenue / work.length : 0;
   return (
     <div className="flex flex-col gap-3">
       <GlassCard>
         <div className="flex items-center gap-2 mb-3">
           <Briefcase size={16} color="var(--color-accent)" />
-          <span className="text-[#F7F7F7] font-semibold text-sm">Faturamento do mês</span>
+          <span className="text-[#F7F7F7] font-semibold text-sm">Faturamento</span>
         </div>
-        <p className="text-[#F7F7F7] font-bold text-3xl">{formatCurrency(mockWorkSummary.monthly_revenue)}</p>
-        <p className="text-[#6F6F6F] text-xs mt-1">Meta: {formatCurrency(mockWorkSummary.monthly_goal)}</p>
-        <ProgressBar value={workPct} height={6} className="mt-3" />
+        <p className="text-[#F7F7F7] font-bold text-3xl">{formatCurrency(revenue)}</p>
         <div className="grid grid-cols-2 gap-3 mt-4">
-          <div><p className="text-[#6F6F6F] text-xs">Serviços</p><p className="text-[#F7F7F7] font-bold">{mockWorkSummary.services_count}</p></div>
-          <div><p className="text-[#6F6F6F] text-xs">Ticket médio</p><p className="text-[#F7F7F7] font-bold">{formatCurrency(mockWorkSummary.average_ticket)}</p></div>
+          <div><p className="text-[#6F6F6F] text-xs">Serviços</p><p className="text-[#F7F7F7] font-bold">{work.length}</p></div>
+          <div><p className="text-[#6F6F6F] text-xs">Ticket médio</p><p className="text-[#F7F7F7] font-bold">{formatCurrency(avg)}</p></div>
         </div>
       </GlassCard>
       <GlassCard>
         <p className="text-[#A8A8A8] text-xs font-semibold uppercase tracking-wider mb-3">Registros recentes</p>
-        {mockWorkRecords.length === 0 ? (
+        {work.length === 0 ? (
           <p className="text-[#6F6F6F] text-sm text-center py-4">Nenhum registro de trabalho.</p>
         ) : (
-          mockWorkRecords.slice(0, 3).map(r => (
+          work.slice(0, 5).map(r => (
             <div key={r.id} className="flex items-center justify-between py-3 border-b" style={{ borderColor: 'rgba(255,255,255,0.06)' }}>
               <div>
                 <p className="text-[#F7F7F7] text-sm font-medium">{r.description}</p>
-                <p className="text-[#6F6F6F] text-xs">{r.date} · {r.payment_method?.toUpperCase()}</p>
+                <p className="text-[#6F6F6F] text-xs">{r.date} · {r.payment_method?.toUpperCase() ?? ''}</p>
               </div>
               <p className="text-[#22c55e] font-bold text-sm">+{formatCurrency(r.amount)}</p>
             </div>

@@ -7,6 +7,10 @@ import { TextField } from '../components/TextField';
 import { SelectField } from '../components/SelectField';
 import { PrimaryButton } from '../components/PrimaryButton';
 import { GlassCard } from '../components/GlassCard';
+import { useFinance } from '../contexts/FinanceContext';
+import { useActivity } from '../contexts/ActivityContext';
+import { formatCurrency } from '../lib/utils';
+import type { FinanceCategory, PaymentMethod } from '../lib/types';
 
 const recordTypes = ['Trabalho', 'Financeiro', 'Meta', 'Saúde', 'Cuidado'] as const;
 type RecordType = typeof recordTypes[number];
@@ -30,13 +34,47 @@ const categoryOptions = [
 
 export function NewRecord() {
   const navigate = useNavigate();
+  const { addRecord } = useFinance();
+  const { log } = useActivity();
   const [selectedType, setSelectedType] = useState<RecordType>('Trabalho');
+  const [flow, setFlow] = useState<'income' | 'expense'>('income');
   const [description, setDescription] = useState('');
   const [amount, setAmount] = useState('');
   const [paymentMethod, setPaymentMethod] = useState('pix');
   const [category, setCategory] = useState('work');
-  const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
+  const [date, setDate] = useState(() => {
+    const d = new Date();
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+  });
   const [note, setNote] = useState('');
+
+  function handleSave() {
+    const value = parseFloat(amount.replace(',', '.')) || 0;
+    const now = new Date().toISOString();
+    const base = {
+      id: `fin-${Date.now()}`, user_id: 'user-1', date,
+      created_at: now, status: 'confirmed' as const,
+      payment_method: paymentMethod as PaymentMethod,
+    };
+
+    if (selectedType === 'Trabalho') {
+      addRecord({ ...base, type: 'income', description: description || 'Trabalho', amount: value, category: 'work', note });
+      log('income', `Recebido: ${formatCurrency(value)}`, description || undefined);
+      navigate('/financas');
+    } else if (selectedType === 'Financeiro') {
+      addRecord({ ...base, type: flow, description: description || 'Lançamento', amount: value, category: category as FinanceCategory });
+      log(flow === 'income' ? 'income' : 'expense', `${flow === 'income' ? 'Entrada' : 'Saída'}: ${formatCurrency(value)}`, description || undefined);
+      navigate('/financas');
+    } else if (selectedType === 'Cuidado') {
+      addRecord({ ...base, type: 'expense', description: description || 'Cuidado', amount: value, category: 'care', note });
+      log('expense', `Cuidado: ${formatCurrency(value)}`, description || undefined);
+      navigate('/financas');
+    } else if (selectedType === 'Meta') {
+      navigate('/metas');
+    } else {
+      navigate('/saude');
+    }
+  }
 
   return (
     <div className="flex flex-col min-h-screen pb-10" style={{ background: '#000' }}>
@@ -74,8 +112,14 @@ export function NewRecord() {
           <>
             <GlassCard padding="p-3">
               <div className="flex gap-3">
-                {['Entrada', 'Saída'].map(t => (
-                  <Chip key={t} label={t} active={t === 'Entrada'} size="sm" />
+                {(['Entrada', 'Saída'] as const).map(t => (
+                  <Chip
+                    key={t}
+                    label={t}
+                    active={flow === (t === 'Entrada' ? 'income' : 'expense')}
+                    onClick={() => setFlow(t === 'Entrada' ? 'income' : 'expense')}
+                    size="sm"
+                  />
                 ))}
               </div>
             </GlassCard>
@@ -128,7 +172,7 @@ export function NewRecord() {
           </>
         )}
 
-        <PrimaryButton fullWidth onClick={() => navigate(-1)}>
+        <PrimaryButton fullWidth onClick={handleSave}>
           Salvar registro
         </PrimaryButton>
       </div>

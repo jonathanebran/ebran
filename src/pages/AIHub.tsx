@@ -7,7 +7,8 @@ import { classifyAICommand } from '../lib/aiClassifier';
 import { useGoals } from '../contexts/GoalsContext';
 import { useDailyFocus } from '../contexts/DailyFocusContext';
 import { useHealth } from '../contexts/HealthContext';
-import type { Goal, DailyFocusItem, Appointment, GoalType } from '../lib/types';
+import { useFinance } from '../contexts/FinanceContext';
+import type { Goal, DailyFocusItem, Appointment, GoalType, FinanceRecord, FinanceCategory, PaymentMethod } from '../lib/types';
 
 const quickExamples = [
   'Recebi R$ 500 via Pix hoje',
@@ -86,6 +87,7 @@ export function AIHub() {
   const { addGoal } = useGoals();
   const { addItem } = useDailyFocus();
   const { data: health, update: updateHealth } = useHealth();
+  const { addRecord: addFinance } = useFinance();
   const [executed, setExecuted] = useState<Set<string>>(new Set());
 
   const send = (text: string) => {
@@ -146,9 +148,29 @@ export function AIHub() {
       };
       updateHealth({ appointments: [...health.appointments, appt] });
       feedback = `Consulta com ${specialty} agendada! ✅`; route = '/saude';
+    } else if (result.action === 'create_finance_record') {
+      const isIncome = (d.type as string) !== 'expense';
+      const amount = (d.amount as number) || 0;
+      const rec: FinanceRecord = {
+        id: `fin-${Date.now()}`, user_id: 'user-1',
+        type: isIncome ? 'income' : 'expense',
+        description: (d.description as string) || (isIncome ? 'Entrada' : 'Despesa'),
+        amount, category: ((d.category as FinanceCategory) || (isIncome ? 'work' : 'products')),
+        payment_method: (d.method as string)?.toLowerCase() as PaymentMethod | undefined,
+        date: todayIso(), status: 'confirmed', created_at: now,
+      };
+      addFinance(rec);
+      feedback = `${isIncome ? 'Entrada' : 'Despesa'} de R$ ${amount} registrada em Finanças! ✅`; route = '/financas';
+    } else if (result.action === 'create_work_record') {
+      const amount = (d.amount as number) || 0;
+      addFinance({
+        id: `fin-${Date.now()}`, user_id: 'user-1', type: 'income',
+        description: (d.description as string) || 'Trabalho', amount, category: 'work',
+        date: todayIso(), status: 'confirmed', created_at: now,
+      });
+      feedback = `Registro de R$ ${amount} em Trabalho salvo! ✅`; route = '/financas';
     } else {
-      // Finanças e Trabalho ainda não têm armazenamento — leva até a página.
-      feedback = 'Ainda não guardo Finanças/Trabalho aqui — te levando até a página. 👇';
+      feedback = 'Abrindo a página… 👇';
       route = DESTINATION_ROUTES[result.suggestedDestination] ?? null;
     }
 
