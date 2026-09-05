@@ -48,20 +48,27 @@ const EXECUTABLE_ACTIONS = new Set([
   'create_finance_record', 'create_work_record',
 ]);
 
-const todayIso = () => new Date().toISOString().slice(0, 10);
+// Data LOCAL (YYYY-MM-DD) — igual ao isoLocal usado na tela do Foco. Usar
+// toISOString() (UTC) ancorava o item no dia errado à noite no Brasil.
+function isoLocal(d: Date): string {
+  const mm = String(d.getMonth() + 1).padStart(2, '0');
+  const dd = String(d.getDate()).padStart(2, '0');
+  return `${d.getFullYear()}-${mm}-${dd}`;
+}
+const todayIso = () => isoLocal(new Date());
 
 const WEEKDAY_INDEX: Record<string, number> = {
   domingo: 0, segunda: 1, terça: 2, terca: 2, quarta: 3, quinta: 4, sexta: 5, sábado: 6, sabado: 6,
 };
 
-// Próxima data (YYYY-MM-DD) para um nome de dia da semana.
+// Próxima data (local, YYYY-MM-DD) para um nome de dia da semana.
 function nextWeekdayIso(dayName: string): string {
   const target = WEEKDAY_INDEX[dayName.toLowerCase()];
   const d = new Date();
   if (target == null) return todayIso();
   const diff = (target - d.getDay() + 7) % 7 || 7;
   d.setDate(d.getDate() + diff);
-  return d.toISOString().slice(0, 10);
+  return isoLocal(d);
 }
 
 export function AIHub() {
