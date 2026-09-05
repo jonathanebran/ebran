@@ -293,10 +293,14 @@ export interface AIClassifierResult {
 
 export interface PhotoSession {
   id: string;
+  user_id?: string;
   client: string;
   service_type: string;
   date: string;  // YYYY-MM-DD
   time: string;  // HH:MM
+  amount?: number;
+  payment_method?: PaymentMethod;
   duration_min?: number;
   notes?: string;
+  created_at?: string;
 }

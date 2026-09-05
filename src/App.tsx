@@ -9,6 +9,7 @@ import { DailyFocusProvider } from './contexts/DailyFocusContext';
 import { HealthProvider } from './contexts/HealthContext';
 import { ActivityProvider } from './contexts/ActivityContext';
 import { FinanceProvider } from './contexts/FinanceContext';
+import { WorkProvider } from './contexts/WorkContext';
 import { PinLockProvider, usePinLock } from './contexts/PinLockContext';
 import { ThemeProvider } from './contexts/ThemeContext';
 import { ErrorBoundary } from './components/ErrorBoundary';
@@ -129,6 +130,7 @@ export default function App() {
                 <ThemeProvider>
                   <ActivityProvider>
                     <FinanceProvider>
+                      <WorkProvider>
                       <HealthProvider>
                         <GoalsProvider>
                           <DailyFocusProvider>
@@ -136,6 +138,7 @@ export default function App() {
                           </DailyFocusProvider>
                         </GoalsProvider>
                       </HealthProvider>
+                      </WorkProvider>
                     </FinanceProvider>
                   </ActivityProvider>
                 </ThemeProvider>
