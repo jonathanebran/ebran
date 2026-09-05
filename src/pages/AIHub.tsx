@@ -4,6 +4,10 @@ import { ArrowLeft, Sparkles, Send, Mic } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { GlassCard } from '../components/GlassCard';
 import { classifyAICommand } from '../lib/aiClassifier';
+import { useGoals } from '../contexts/GoalsContext';
+import { useDailyFocus } from '../contexts/DailyFocusContext';
+import { useHealth } from '../contexts/HealthContext';
+import type { Goal, DailyFocusItem, Appointment, GoalType } from '../lib/types';
 
 const quickExamples = [
   'Recebi R$ 500 via Pix hoje',
@@ -38,6 +42,28 @@ const ACTION_ROUTES: Record<string, string> = {
   'Ir para Trabalho':    '/trabalho',
 };
 
+// Ações que o assistente sabe EXECUTAR de verdade (criam dados).
+const EXECUTABLE_ACTIONS = new Set([
+  'create_goal', 'add_items', 'create_appointment',
+  'create_finance_record', 'create_work_record',
+]);
+
+const todayIso = () => new Date().toISOString().slice(0, 10);
+
+const WEEKDAY_INDEX: Record<string, number> = {
+  domingo: 0, segunda: 1, terça: 2, terca: 2, quarta: 3, quinta: 4, sexta: 5, sábado: 6, sabado: 6,
+};
+
+// Próxima data (YYYY-MM-DD) para um nome de dia da semana.
+function nextWeekdayIso(dayName: string): string {
+  const target = WEEKDAY_INDEX[dayName.toLowerCase()];
+  const d = new Date();
+  if (target == null) return todayIso();
+  const diff = (target - d.getDay() + 7) % 7 || 7;
+  d.setDate(d.getDate() + diff);
+  return d.toISOString().slice(0, 10);
+}
+
 export function AIHub() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -49,6 +75,11 @@ export function AIHub() {
       content: 'Olá! Sou o seu assistente pessoal do Ebran. Diga o que quer organizar, registrar ou planejar — em texto livre. Voz e imagem em breve. 🔮',
     },
   ]);
+
+  const { addGoal } = useGoals();
+  const { addItem } = useDailyFocus();
+  const { data: health, update: updateHealth } = useHealth();
+  const [executed, setExecuted] = useState<Set<string>>(new Set());
 
   const send = (text: string) => {
     if (!text.trim()) return;
@@ -62,6 +93,61 @@ export function AIHub() {
     };
     setMessages(prev => [...prev, userMsg, aiMsg]);
     setInput('');
+  };
+
+  // Executa de verdade a ação sugerida, criando os dados nos contextos.
+  const execute = (msgId: string, result: ReturnType<typeof classifyAICommand>) => {
+    const now = new Date().toISOString();
+    const d = (result.extractedData ?? {}) as Record<string, unknown>;
+    let feedback = 'Feito! ✅';
+    let route: string | null = null;
+
+    if (result.action === 'create_goal') {
+      const title = (d.title as string) || 'Nova meta';
+      const goal: Goal = {
+        id: `goal-${Date.now()}`, user_id: 'user-1', title,
+        type: ((d.type as GoalType) || 'financial'), category: '',
+        target_amount: (d.target_amount as number) || 0, current_amount: 0, reserved_amount: 0,
+        desired_date: (d.deadline as string) || undefined,
+        recurrence: 'monthly', priority: 'medium', status: 'active',
+        tags: [], created_at: now, updated_at: now,
+      };
+      addGoal(goal);
+      feedback = `Meta "${title}" criada! ✅`; route = '/metas';
+    } else if (result.action === 'add_items') {
+      const market = (d.marketItems as string[]) || [];
+      const care = (d.careItems as string[]) || [];
+      let i = 0;
+      const mk = (name: string, category: DailyFocusItem['category'], rec: DailyFocusItem['recurrence']) => {
+        addItem({
+          id: `df-${Date.now()}-${i++}`, user_id: 'user-1', name,
+          category, status: 'pending', priority: 'medium', recurrence: rec,
+          date: todayIso(), created_at: now,
+        });
+      };
+      market.forEach(n => mk(n, 'market', 'weekly'));
+      care.forEach(n => mk(n, 'care', 'monthly'));
+      const total = market.length + care.length;
+      feedback = total ? `${total} item(ns) adicionado(s) ao Foco! ✅` : 'Nenhum item reconhecido.';
+      route = total ? '/foco' : null;
+    } else if (result.action === 'create_appointment') {
+      const specialty = (d.specialty as string) || 'Consulta';
+      const appt: Appointment = {
+        id: `apt-${Date.now()}`, user_id: 'user-1', title: specialty, specialty,
+        date: d.day ? nextWeekdayIso(d.day as string) : todayIso(),
+        time: (d.time as string) || '', status: 'scheduled', created_at: now,
+      };
+      updateHealth({ appointments: [...health.appointments, appt] });
+      feedback = `Consulta com ${specialty} agendada! ✅`; route = '/saude';
+    } else {
+      // Finanças e Trabalho ainda não têm armazenamento — leva até a página.
+      feedback = 'Ainda não guardo Finanças/Trabalho aqui — te levando até a página. 👇';
+      route = DESTINATION_ROUTES[result.suggestedDestination] ?? null;
+    }
+
+    setExecuted(prev => new Set(prev).add(msgId));
+    setMessages(prev => [...prev, { id: `${Date.now()}-ok`, type: 'ai', content: feedback }]);
+    if (route) setTimeout(() => navigate(route!), 800);
   };
 
   // Se a Home mandou uma mensagem, processa automaticamente ao abrir.
@@ -128,21 +214,27 @@ export function AIHub() {
                             </div>
                           );
                         })}
-                        {msg.result.confirmationRequired && (
-                          <motion.button
-                            whileTap={{ scale: 0.96 }}
-                            onClick={() => {
-                              const route = DESTINATION_ROUTES[msg.result!.suggestedDestination] ?? '/';
-                              navigate(route);
-                            }}
-                            className="mt-1 py-2 rounded-xl text-xs font-semibold text-center"
-                            style={{
-                              background: 'linear-gradient(135deg, var(--color-start), var(--color-end))',
-                              color: 'var(--color-on-gradient)',
-                            }}
-                          >
-                            Confirmar e salvar
-                          </motion.button>
+                        {EXECUTABLE_ACTIONS.has(msg.result.action) && (
+                          executed.has(msg.id) ? (
+                            <div
+                              className="mt-1 py-2 rounded-xl text-xs font-semibold text-center"
+                              style={{ background: 'rgba(34,197,94,0.15)', color: '#22c55e' }}
+                            >
+                              Salvo ✅
+                            </div>
+                          ) : (
+                            <motion.button
+                              whileTap={{ scale: 0.96 }}
+                              onClick={() => execute(msg.id, msg.result!)}
+                              className="mt-1 py-2 rounded-xl text-xs font-semibold text-center"
+                              style={{
+                                background: 'linear-gradient(135deg, var(--color-start), var(--color-end))',
+                                color: 'var(--color-on-gradient)',
+                              }}
+                            >
+                              Confirmar e salvar
+                            </motion.button>
+                          )
                         )}
                       </div>
                     )}
